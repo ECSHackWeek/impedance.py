@@ -42,10 +42,8 @@ def R(p, f):
         Z = R
 
     """
-    assert type(p) == type([1.5]), 'Input must be of type list'
-    assert type(p[0]) == type(2.5), 'list elements must be ints or floats'
-    assert len(p) == 1, 'input list must be length 1'
-    
+
+    typeChecker(p,f,R.__name__,1)
     return np.array(len(f)*[p[0]])
 
 
@@ -57,15 +55,12 @@ def C(p, f):
         Z = \\frac{1}{C \\times j 2 \\pi f}
 
      """
-#    print(p)
-    assert type(p) == type([1.5]), 'Input must be of type list'
-    assert type(p[0]) == type(2.5), 'list elements must be ints or floats'
-    assert len(p) == 1, 'input list must be length 1'
     
+    typeChecker(p,f,C.__name__,1)
     omega = 2*np.pi*np.array(f)
-    C = p[0]
+    Cap = p[0]
 
-    return 1.0/(C*1j*omega)
+    return 1.0/(Cap*1j*omega)
 
 
 def W(p, f):
@@ -79,9 +74,8 @@ def W(p, f):
     where :math:`R` = p[0] (Ohms) and :math:`T` = p[1] (sec) = :math:`\\frac{L^2}{D}`
 
     """
-    assert type(p) == type([1.5]), 'Input must be of type list'
-    assert type(p[0]) == type(2.5), 'list elements must be ints or floats'
-    assert len(p) == 2, 'input list must be length 2'
+    
+    typeChecker(p,f,W.__name__,2)
     
     omega = 2*np.pi*np.array(f)
 
@@ -94,7 +88,8 @@ def A(p, f):
     """ defines a semi-infinite Warburg element
 
     """
-
+    
+    typeChecker(p,f,A.__name__,1)
     omega = 2*np.pi*np.array(f)
     Aw = p[0]
 
@@ -114,7 +109,7 @@ def E(p, f):
 
     where :math:`Q` = p[0] and :math:`\\alpha` = p[1].
     """
-
+    typeChecker(p,f,E.__name__,2)
     omega = 2*np.pi*np.array(f)
     Q = p[0]
     alpha = p[1]
@@ -132,9 +127,22 @@ def G(p, f):
         Z = \\frac{1}{Y \\times \\sqrt{K + j 2 \\pi f }}
 
      """
-
+    typeChecker(p,f,G.__name__,2)
     omega = 2*np.pi*np.array(f)
     Z0 = p[0]
     k = p[1]
 
     return Z0/np.sqrt(k + 1j*omega)
+
+def typeChecker(p,f,name,length):
+    assert type(p) == type([1.5]), f'in {name}, input must be of type list'
+    for i in p:
+        assert type(i) == type(0.5) or type(i) == type(1) or \
+                type(i) == type(np.array([1])[0]) or type(i) == type(np.array([1.5])[0]), \
+                (f'in {name}, value {i} in {p} (parmameter values) is not a number')
+    for i in f:
+        assert type(i) == type(0.5) or type(i) == type(1) or \
+                type(i) == type(np.array([1])[0]) or type(i) == type(np.array([1.5])[0]), \
+                (f'in {name}, value {i} in {f} (frequencies) is not a number')
+    assert len(p) == length, f'in {name}, input list must be length {length}'
+    return

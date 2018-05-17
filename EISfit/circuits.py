@@ -100,10 +100,15 @@ class Randles(BaseCircuit):
         
         if CPE:
             self.circuit = 'R_0-p(R_1,E_1/E_2)-W_1/W_2'
+            circuit_length = 6
+            assert len(initial_guess) == circuit_length, 'Initial guess length needs to be equal to {circuit_length}'
         else:
             self.circuit = 'R_0-p(R_1,C_1)-W_1/W_2'
-        circuit_length = 5
-        assert len(initial_guess) == circuit_length, 'Initial guess length needs to be equal to {circuit_length}'
+            
+            circuit_length = 5
+            assert len(initial_guess) == circuit_length, 'Initial guess length needs to be equal to {circuit_length}'
+            
+        
         self.initial_guess = initial_guess
         self.parameters_ = None
 
