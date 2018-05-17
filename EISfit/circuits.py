@@ -65,7 +65,7 @@ class BaseCircuit:
         Parameters
         ----------
         frequencies: numpy array
-            Frequencies
+            Frequencies 
 
         Returns
         -------
@@ -83,14 +83,40 @@ class BaseCircuit:
 
         else:
             raise ValueError("The model hasn't been fit yet")
+    
+    def __repr__(self):
+        """
+        Defines the pretty printing of the circuit
+
+        """
+        if self._is_fit():
+            return "{} circuit (fit values={}, circuit={})".format(self.name, self.parameters_, self.circuit)
+        else:
+            return "{} circuit (initial_guess={}, circuit={})".format(self.name, self.initial_guess, self.circuit)
 
 class Randles(BaseCircuit):
     def __init__(self, initial_guess=None, CPE=False):
         """
         Constructor for the Randles' circuit class
+        
+        Inputs
+        ------
+        initial_guess: A list of values to use as the initial guess for element values
+        CPE: Whether or not to use constant phase elements in place of a Warburg element
+        
+        Methods
+        -------
+        
+        .fit(frequencies, impedances)
+            frequencies: A list of frequencies where the values should be tested
+            impedances: A list of impedances used to fitting using scipy's least_squares fitting algorithm.
+        .predict(frequencies)
+            frequencies: A list of frequencies where new values will be calculated
+        
 
 
         """
+        self.name = 'Randles'
         # write some asserts to enforce typing
         if initial_guess is not None:
             for i in initial_guess:
@@ -112,9 +138,6 @@ class Randles(BaseCircuit):
         self.initial_guess = initial_guess
         self.parameters_ = None
 
-    def __repr__(self):
-        """
-        Defines the pretty printing of the circuit
 
-        """
-        return "Randles circuit (initial_guess={}, circuit={})".format(self.initial_guess, self.circuit)
+
+    
