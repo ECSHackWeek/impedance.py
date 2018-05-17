@@ -1,31 +1,19 @@
 from .fitting import circuit_fit, computeCircuit
 
-class Randles:
-    def __init__(self, initial_guess=None, CPE=False):
+class BaseCircuit:
+    def __init__(self, initial_guess=None):
         """
         Constructor for the Randles' circuit class
 
 
         """
 
-        if CPE:
-            self.circuit = 'R_0-p(R_1,E_1/E_2)-W_1/W_2'
-        else:
-            self.circuit = 'R_0-p(R_1,C_1)-W_1/W_2'
-
         self.initial_guess = initial_guess
         self.parameters_ = None
 
-    def __repr__(self):
-        """
-        Defines the pretty printing of the circuit
-
-        """
-        return "Randles circuit (initial_guess={}, circuit={})".format(self.initial_guess, self.circuit)
-
     def fit(self, frequencies, impedance):
         """
-        Fit the Randles circuit model
+        Fit the circuit model
 
         Parameters
         ----------
@@ -57,7 +45,7 @@ class Randles:
             return False
 
     def predict(self, frequencies):
-        """ Predict using the fit Randles model
+        """ Predict impedance using a fit model
 
         Parameters
         ----------
@@ -80,3 +68,26 @@ class Randles:
 
         else:
             raise ValueError("The model hasn't been fit yet")
+
+class Randles(BaseCircuit):
+    def __init__(self, initial_guess=None, CPE=False):
+        """
+        Constructor for the Randles' circuit class
+
+
+        """
+
+        if CPE:
+            self.circuit = 'R_0-p(R_1,E_1/E_2)-W_1/W_2'
+        else:
+            self.circuit = 'R_0-p(R_1,C_1)-W_1/W_2'
+
+        self.initial_guess = initial_guess
+        self.parameters_ = None
+
+    def __repr__(self):
+        """
+        Defines the pretty printing of the circuit
+
+        """
+        return "Randles circuit (initial_guess={}, circuit={})".format(self.initial_guess, self.circuit)
