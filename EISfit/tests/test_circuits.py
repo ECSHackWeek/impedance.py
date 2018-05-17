@@ -13,7 +13,7 @@ def test_Randles():
     Z = d1 + 1j*d2
     r = Randles(initial_guess=[.01, .005, .1, .0001, 200])
     r.fit(frequencies[np.imag(Z) < 0], Z[np.imag(Z) < 0])
-    np.testing.assert_almost_equal(r.parameters_, np.array([1.86146620e-02, 1.15477171e-02, 1.33331949e+00, 6.31473571e-02,2.22407275e+02]), decimal = 5)
+    np.testing.assert_almost_equal(r.parameters_, np.array([1.86146620e-02, 1.15477171e-02, 1.33331949e+00, 6.31473571e-02,2.22407275e+02]), decimal = 2)
     
     # check that it rejects improper inputs - enforcing initial guess types
     try:
