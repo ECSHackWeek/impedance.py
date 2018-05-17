@@ -1,7 +1,7 @@
 certifi==2018.4.16
-mkl-fft
-mkl-random
+mkl-fft==1.0.2
+mkl-random==1.0.1
 nose==1.3.7
-numpy
-scipy
+numpy==1.14.2
+scipy==1.0.1
 wincertstore==0.2
