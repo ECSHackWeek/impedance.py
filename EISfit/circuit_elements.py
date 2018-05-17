@@ -42,9 +42,9 @@ def R(p, f):
         Z = R
 
     """
-    assert type(p) == type([1.5])
-    assert type(p[0]) == type(2.5)
-    assert len(p) == 1
+    assert type(p) == type([1.5]), 'Input must be of type list'
+    assert type(p[0]) == type(2.5), 'list elements must be ints or floats'
+    assert len(p) == 1, 'input list must be length 1'
     
     return np.array(len(f)*[p[0]])
 
@@ -58,9 +58,9 @@ def C(p, f):
 
      """
 #    print(p)
-    assert type(p) == type([1.5])
-    assert type(p[0]) == type(2.5)
-    assert len(p) == 1
+    assert type(p) == type([1.5]), 'Input must be of type list'
+    assert type(p[0]) == type(2.5), 'list elements must be ints or floats'
+    assert len(p) == 1, 'input list must be length 1'
     
     omega = 2*np.pi*np.array(f)
     C = p[0]
@@ -79,9 +79,9 @@ def W(p, f):
     where :math:`R` = p[0] (Ohms) and :math:`T` = p[1] (sec) = :math:`\\frac{L^2}{D}`
 
     """
-    assert type(p) == type([1.5])
-    assert type(p[0]) == type(2.5)
-    assert len(p) == 2
+    assert type(p) == type([1.5]), 'Input must be of type list'
+    assert type(p[0]) == type(2.5), 'list elements must be ints or floats'
+    assert len(p) == 2, 'input list must be length 2'
     
     omega = 2*np.pi*np.array(f)
 
