@@ -2,3 +2,4 @@
 .DS_Store
 
 EISfit/__pycache__/
+EISfit/tests/__pycache__/
