@@ -1,9 +1,25 @@
 language: python
+
 python:
-  - "3.6"
-# command to install dependencies
+   - 3.5
+   - 3.6
+
+branches:
+   only:
+       - master
+
 install:
-  - pip install -r requirements.txt
-# command to run tests
+   - pip install coverage
+   - pip install coveralls
+   - pip install flake8
+   - pip install -r requirements.txt
+
+before_script:
+   - flake8 codebase
+
 script:
-  - nosetests # or py.test for Python versions 3.5 and below
+   - coverage run -m unittest discover
+
+after_success:
+   - coverage report
+   - coveralls
