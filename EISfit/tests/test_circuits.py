@@ -39,6 +39,13 @@ def test_Randles():
     else:
         raise Exception('unhandled error occurred')
     
+    # check that it rejects improper inputs - enforcing the length of initial_guess
+    try:
+        r = Randles(initial_guess=[.01, .005, .1, .0001])
+    except(AssertionError):
+        pass
+    else:
+        raise Exception('unhandled error occurred')
     
     pass
 

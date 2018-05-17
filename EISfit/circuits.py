@@ -14,7 +14,8 @@ class BaseCircuit:
         if initial_guess is not None:
             for i in initial_guess:
                 assert type(i) == type(0.5) or type(i) == type(1) or \
-                type(i) == type(np.array([1])[0]) or type(i) == type(np.array([1.5])[0])
+                type(i) == type(np.array([1])[0]) or type(i) == type(np.array([1.5])[0]), \
+                (f'value {i} in initial_guess is not a number')
         self.initial_guess = initial_guess
         self.parameters_ = None
 
@@ -41,7 +42,8 @@ class BaseCircuit:
         assert len(frequencies) == len(impedance)
         for i in frequencies:
             assert type(i) == type(0.5) or type(i) == type(1) or \
-            type(i) == type(np.array([1])[0]) or type(i) == type(np.array([1.5])[0])
+            type(i) == type(np.array([1])[0]) or type(i) == type(np.array([1.5])[0]), \
+            (f'value {i} in initial_guess is not a number')
         # check_valid_impedance()
         if self.initial_guess is not None:
             self.parameters_, _ = circuit_fit(frequencies, impedance, self.circuit, self.initial_guess)
@@ -93,12 +95,15 @@ class Randles(BaseCircuit):
         if initial_guess is not None:
             for i in initial_guess:
                 assert type(i) == type(0.5) or type(i) == type(1) or \
-                type(i) == type(np.array([1])[0]) or type(i) == type(np.array([1.5])[0])
+                type(i) == type(np.array([1])[0]) or type(i) == type(np.array([1.5])[0]), \
+                (f'value {i} in initial_guess is not a number')
+        
         if CPE:
             self.circuit = 'R_0-p(R_1,E_1/E_2)-W_1/W_2'
         else:
             self.circuit = 'R_0-p(R_1,C_1)-W_1/W_2'
-
+        circuit_length = 5
+        assert len(initial_guess) == circuit_length, 'Initial guess length needs to be equal to {circuit_length}'
         self.initial_guess = initial_guess
         self.parameters_ = None
 
