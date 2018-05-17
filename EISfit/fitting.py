@@ -141,7 +141,7 @@ def computeCircuit(circuit, parameters, frequencies):
     -------
     array of floats
     """
-    print(buildCircuit(circuit, parameters, frequencies))
+#    print(buildCircuit(circuit, parameters, frequencies))
     return eval(buildCircuit(circuit, parameters, frequencies))
 
 

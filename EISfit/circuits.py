@@ -1,4 +1,5 @@
 from .fitting import circuit_fit, computeCircuit
+import numpy as np
 
 class BaseCircuit:
     """ A base class for all circuits
@@ -10,7 +11,10 @@ class BaseCircuit:
 
 
         """
-
+        if initial_guess is not None:
+            for i in initial_guess:
+                assert type(i) == type(0.5) or type(i) == type(1) or \
+                type(i) == type(np.array([1])[0]) or type(i) == type(np.array([1.5])[0])
         self.initial_guess = initial_guess
         self.parameters_ = None
 
@@ -31,7 +35,13 @@ class BaseCircuit:
         self: returns an instance of self
 
         """
-
+        # tests
+        import numpy as np
+        assert type(frequencies) == type([1.5]) or type(frequencies) == type(np.array([1.5]))
+        assert len(frequencies) == len(impedance)
+        for i in frequencies:
+            assert type(i) == type(0.5) or type(i) == type(1) or \
+            type(i) == type(np.array([1])[0]) or type(i) == type(np.array([1.5])[0])
         # check_valid_impedance()
         if self.initial_guess is not None:
             self.parameters_, _ = circuit_fit(frequencies, impedance, self.circuit, self.initial_guess)
@@ -79,7 +89,11 @@ class Randles(BaseCircuit):
 
 
         """
-
+        # write some asserts to enforce typing
+        if initial_guess is not None:
+            for i in initial_guess:
+                assert type(i) == type(0.5) or type(i) == type(1) or \
+                type(i) == type(np.array([1])[0]) or type(i) == type(np.array([1.5])[0])
         if CPE:
             self.circuit = 'R_0-p(R_1,E_1/E_2)-W_1/W_2'
         else:
