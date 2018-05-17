@@ -34,9 +34,14 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess):
     """
 
     circuit = circuit.replace('_', '')
-
+    
     f = frequencies
     Z = impedances
+    
+    # takes out the _s
+#    print(circuit)
+#    print(f)
+#    print(Z)
 
     p_values, covar, _, _, ier = leastsq(residuals, initial_guess,
                                          args=(Z, f, circuit),
@@ -136,7 +141,7 @@ def computeCircuit(circuit, parameters, frequencies):
     -------
     array of floats
     """
-
+    print(buildCircuit(circuit, parameters, frequencies))
     return eval(buildCircuit(circuit, parameters, frequencies))
 
 

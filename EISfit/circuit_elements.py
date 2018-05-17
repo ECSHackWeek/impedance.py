@@ -42,6 +42,10 @@ def R(p, f):
         Z = R
 
     """
+    assert type(p) == type([1.5])
+    assert type(p[0]) == type(2.5)
+    assert len(p) == 1
+    
     return np.array(len(f)*[p[0]])
 
 
@@ -53,7 +57,11 @@ def C(p, f):
         Z = \\frac{1}{C \\times j 2 \\pi f}
 
      """
-
+#    print(p)
+    assert type(p) == type([1.5])
+    assert type(p[0]) == type(2.5)
+    assert len(p) == 1
+    
     omega = 2*np.pi*np.array(f)
     C = p[0]
 
@@ -71,7 +79,10 @@ def W(p, f):
     where :math:`R` = p[0] (Ohms) and :math:`T` = p[1] (sec) = :math:`\\frac{L^2}{D}`
 
     """
-
+    assert type(p) == type([1.5])
+    assert type(p[0]) == type(2.5)
+    assert len(p) == 2
+    
     omega = 2*np.pi*np.array(f)
 
     Zw = np.vectorize(lambda y: p[0]/(np.sqrt(p[1]*1j*y)*cmath.tanh(np.sqrt(p[1]*1j*y))))
