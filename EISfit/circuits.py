@@ -1,6 +1,9 @@
 from .fitting import circuit_fit, computeCircuit
 
 class BaseCircuit:
+    """ A base class for all circuits
+
+    """
     def __init__(self, initial_guess=None):
         """
         Constructor for the Randles' circuit class
