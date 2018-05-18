@@ -3,8 +3,26 @@
 
 
 def read_Gamry(filename):
-    # Read the .DTA file from Gamry
-    # Return the frequency and Z = real + imag * 1j
+    """ function for reading the .DTA file from Gamry
+
+    Input
+    -----------------
+    filename: 
+        example: test1.DTA
+    
+    Returns
+    ------------
+    frequencies : list of floats
+    
+    impedance : list of complex numbers
+        Z = real + imag * 1j
+
+    Notes
+    ---------
+
+
+    """
+
     INPUT = open(filename,'r',encoding = 'ISO-8859-1')
     lines = INPUT.readlines()
     INPUT.close()
@@ -23,8 +41,27 @@ def read_Gamry(filename):
     return Freq, Z
 
 def read_Autolab(filename):
-    # Read the .csv file from Autolab
-    # Return the frequency and Z = real + imag * 1j           
+    """ function for reading the .csv file from Autolab
+
+    Input
+    -----------------
+    filename: 
+        example: test2.csv
+    
+    Returns
+    ------------
+    frequencies : list of floats
+    
+    impedance : list of complex numbers
+        Z = real + imag * 1j
+
+    Notes
+    ---------
+
+
+    """
+
+
     INPUT = open(filename,'r')
     lines = INPUT.readlines()
     INPUT.close()
@@ -38,8 +75,26 @@ def read_Autolab(filename):
     return Freq, Z
 
 def read_Parstat(filename):
-    # Read the .txt file from Parstat
-    # Return the frequency and Z = real + imag * 1j        
+    """ function for reading the .txt file from Parstat
+
+    Input
+    -----------------
+    filename: 
+        example: test3.txt
+    
+    Returns
+    ------------
+    frequencies : list of floats
+    
+    impedance : list of complex numbers
+        Z = real + imag * 1j
+
+    Notes
+    ---------
+
+
+    """
+    
     INPUT = open(filename,'r')
     lines = INPUT.readlines()
     INPUT.close()
