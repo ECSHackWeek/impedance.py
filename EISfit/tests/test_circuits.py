@@ -2,7 +2,7 @@ from EISfit.circuits import Randles
 import numpy as np
 
 # store some global test data
-data = np.genfromtxt('./Z1tofit.csv', delimiter=',')
+data = np.genfromtxt('./tests/Z1tofit.csv', delimiter=',')
 frequencies = data[:, 0]
 Z = data[:, 1] + 1j*data[:, 2]
 
