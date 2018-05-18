@@ -11,22 +11,17 @@ Welcome to EISfit's documentation!
    :maxdepth: 2
    :caption: Contents
 
+   examples
+
+   fitting
+
+   circuits
+
    validation
 
-.. automodule:: EISfit.circuits
-   :members:
+   preprocessing
 
-.. automodule:: EISfit.circuit_elements
-   :members:
-
-.. automodule:: EISfit.fitting
-   :members:
-
-.. automodule:: EISfit.genetic
-   :members:
-
-.. automodule:: EISfit.preprocessing
-   :members:
+   genetic 
 
 
 Indices and tables
