@@ -6,7 +6,7 @@ class BaseCircuit:
     """ A base class for all circuits
 
     """
-    def __init__(self, initial_guess=None):
+    def __init__(self, initial_guess=None, algorithm='leastsq', bounds=None):
         """
         Constructor for the Randles' circuit class
 
@@ -14,10 +14,11 @@ class BaseCircuit:
         """
         if initial_guess is not None:
             for i in initial_guess:
-                assert i.isinstance((float, int, np.int32, np.float64)), \
+                assert isinstance(i,(float, int, np.int32, np.float64)), \
                        'value {} in initial_guess is not a number'.format(i)
         self.initial_guess = initial_guess
         self.parameters_ = None
+        self.bounds = bounds
 
     def fit(self, frequencies, impedance):
         """
@@ -45,7 +46,8 @@ class BaseCircuit:
         # check_valid_impedance()
         if self.initial_guess is not None:
             self.parameters_, _ = circuit_fit(frequencies, impedance,
-                                              self.circuit, self.initial_guess)
+                                              self.circuit, self.initial_guess,\
+                                              self.algorithm, bounds = self.bounds)
         else:
             # TODO auto calc guess
             raise ValueError('no initial guess supplied')
@@ -101,7 +103,7 @@ class BaseCircuit:
 
 
 class Randles(BaseCircuit):
-    def __init__(self, initial_guess=None, CPE=False):
+    def __init__(self, initial_guess=None, CPE=False, algorithm='leastsq', bounds=None):
         """ Constructor for the Randles' circuit class
 
         Parameters
@@ -114,12 +116,13 @@ class Randles(BaseCircuit):
         self.name = 'Randles'
         self.parameters_ = None
         self.initial_guess = initial_guess
+        self.algorithm = algorithm
+        self.bounds = bounds
         # write some asserts to enforce typing
         if initial_guess is not None:
             for i in initial_guess:
-                assert type(i) == type(0.5) or type(i) == type(1) or \
-                type(i) == type(np.array([1])[0]) or type(i) == type(np.array([1.5])[0]), \
-                ('value {} in initial_guess is not a number'.format(i))
+                 assert isinstance(i,(float, int, np.int32, np.float64)), \
+                       'value {} in initial_guess is not a number'.format(i)
 
         if CPE:
             self.circuit = 'R_0-p(R_1,E_1/E_2)-W_1/W_2'
@@ -133,7 +136,7 @@ class Randles(BaseCircuit):
 
 
 class DefineCircuit(BaseCircuit):
-    def __init__(self, initial_guess=None, circuit=None):
+    def __init__(self, initial_guess=None, circuit=None, algorithm='leastsq', bounds=None):
         """
         Constructor for the Randles' circuit class
 
@@ -158,12 +161,13 @@ class DefineCircuit(BaseCircuit):
         self.parameters_ = None
         self.initial_guess = initial_guess
         self.circuit = circuit
+        self.algorithm = algorithm
+        self.bounds = bounds
         # write some asserts to enforce typing
         if initial_guess is not None:
             for i in initial_guess:
-                assert type(i) == type(0.5) or type(i) == type(1) or \
-                type(i) == type(np.array([1])[0]) or type(i) == type(np.array([1.5])[0]), \
-                ('value {} in initial_guess is not a number'.format(i))
+                 assert isinstance(i,(float, int, np.int32, np.float64)), \
+                       'value {} in initial_guess is not a number'.format(i)
 
 
             circuit_length = calculateCircuitLength(self.circuit)
@@ -188,6 +192,7 @@ class FlexiCircuit(BaseCircuit):
         self.generations = generations
         self.popsize = popsize
         self.max_elements = max_elements
+#        self.bounds = bounds
 
     def fit(self, frequencies, impedances):
         from scipy.optimize import leastsq
