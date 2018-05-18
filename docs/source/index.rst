@@ -1,3 +1,4 @@
+
 .. EISfit documentation master file, created by
    sphinx-quickstart on Wed May 16 16:54:07 2018.
    You can adapt this file completely to your liking, but it should at least
@@ -9,9 +10,21 @@ Welcome to EISfit's documentation!
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
+   
+.. automodule:: EISfit.circuits
+   :members:
+
+.. automodule:: EISfit.circuit_elements
+   :members:
 
 .. automodule:: EISfit.fitting
-  :members:
+   :members:
+
+.. automodule:: EISfit.genetic
+   :members:
+
+.. automodule:: EISfit.preprocessing
+   :members:
 
 
 Indices and tables

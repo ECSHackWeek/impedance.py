@@ -114,6 +114,8 @@ class Randles(BaseCircuit):
             Use a constant phase element instead of a capacitor
         """
         self.name = 'Randles'
+        self.parameters_ = None
+        self.initial_guess = initial_guess
         # write some asserts to enforce typing
         if initial_guess is not None:
             for i in initial_guess:
