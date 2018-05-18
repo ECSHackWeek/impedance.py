@@ -3,11 +3,31 @@ from .circuits import DefineCircuit
 import numpy as np
 
 def rmse(a, b):
+    """
+    A function which calculates the root mean squared error between two vectors.
+    
+    Notes
+    ---------
+    .. math::
+
+        RMSE = \\sqrt{\\frac{1}{n}(a-b)^2}
+    """
+    
     return(np.sqrt(np.mean(np.square(a-b))))
 
 def measModel(frequencies, impedances, max_k = 7, R_val = 0.1, C_val = 10):
     """
     Iteratively add RC circuits until the error converges. If error does not converge, it indicates that the data is poor.
+    
+    Notes
+    ---------
+    .. math::
+
+        RMSE = R_0 + \\sum_{0}^{k} R_i || C_i
+        
+    Inputs
+    ---------
+    frequencies: A list of frequencies to test 
     """
     out = "R_0"
     initial_guess = [R_val]
