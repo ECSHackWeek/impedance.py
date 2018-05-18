@@ -90,6 +90,7 @@ class BaseCircuit:
 
         """
         if self._is_fit():
+            print(self._is_fit())
             return "{} circuit (fit values={}, circuit={})".format(self.name, self.parameters_, self.circuit)
         else:
             return "{} circuit (initial_guess={}, circuit={})".format(self.name, self.initial_guess, self.circuit)
@@ -117,6 +118,8 @@ class Randles(BaseCircuit):
 
         """
         self.name = 'Randles'
+        self.parameters_ = None
+        self.initial_guess = initial_guess
         # write some asserts to enforce typing
         if initial_guess is not None:
             for i in initial_guess:
@@ -153,6 +156,7 @@ class FlexiCircuit(BaseCircuit):
         self.generations = generations
         self.popsize = popsize
         self.max_elements = max_elements
+        
     def fit(self, frequencies, impedances):
         from .genetic import make_population
         from .fitting import residuals, valid, computeCircuit
