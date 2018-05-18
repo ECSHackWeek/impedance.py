@@ -141,7 +141,7 @@ def computeCircuit(circuit, parameters, frequencies):
     -------
     array of floats
     """
-#    print(buildCircuit(circuit, parameters, frequencies))
+    
     return eval(buildCircuit(circuit, parameters, frequencies))
 
 
@@ -195,3 +195,10 @@ def buildCircuit(circuit, parameters, frequencies):
     eval_string = series_string.strip(",") + "])"
 
     return eval_string
+
+def calculateCircuitLength(circuit):
+    l1 = ['R','E','W','C','A','G']
+    length = 0
+    for char in l1:
+        length += circuit.count(char)
+    return length

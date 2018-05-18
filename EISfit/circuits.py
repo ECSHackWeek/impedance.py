@@ -1,4 +1,4 @@
-from .fitting import circuit_fit, computeCircuit
+from .fitting import circuit_fit, computeCircuit, calculateCircuitLength
 import numpy as np
 
 class BaseCircuit:
@@ -129,16 +129,53 @@ class Randles(BaseCircuit):
 
         if CPE:
             self.circuit = 'R_0-p(R_1,E_1/E_2)-W_1/W_2'
-            circuit_length = 6
+            circuit_length = calculateCircuitLength(self.circuit)
             assert len(initial_guess) == circuit_length, 'Initial guess length needs to be equal to {circuit_length}'
         else:
             self.circuit = 'R_0-p(R_1,C_1)-W_1/W_2'
 
-            circuit_length = 5
+            circuit_length = calculateCircuitLength(self.circuit)
             assert len(initial_guess) == circuit_length, 'Initial guess length needs to be equal to {circuit_length}'
 
+class DefineCircuit(BaseCircuit):
+    def __init__(self, initial_guess=None, circuit=None):
+        """
+        Constructor for the Randles' circuit class
+
+        Inputs
+        ------
+        initial_guess: A list of values to use as the initial guess for element values
+        CPE: Whether or not to use constant phase elements in place of a Warburg element
+
+        Methods
+        -------
+
+        .fit(frequencies, impedances)
+            frequencies: A list of frequencies where the values should be tested
+            impedances: A list of impedances used to fitting using scipy's least_squares fitting algorithm.
+        .predict(frequencies)
+            frequencies: A list of frequencies where new values will be calculated
+
+
+
+        """
+        self.name = 'Custom'
+        self.parameters_ = None
+        self.initial_guess = initial_guess
+        self.circuit = circuit
+        # write some asserts to enforce typing
+        if initial_guess is not None:
+            for i in initial_guess:
+                assert type(i) == type(0.5) or type(i) == type(1) or \
+                type(i) == type(np.array([1])[0]) or type(i) == type(np.array([1.5])[0]), \
+                ('value {} in initial_guess is not a number'.format(i))
+
+
+            circuit_length = calculateCircuitLength(self.circuit)
+            assert len(initial_guess) == circuit_length, 'Initial guess length needs to be equal to {circuit_length}'            
+
 class FlexiCircuit(BaseCircuit):
-    def __init__(self, max_elements = None, generations = 200, popsize = 30, initial_guess=None):
+    def __init__(self, max_elements = None, generations = 2, popsize = 30, initial_guess=None):
         """
         Constructor for the Flexible Circuit class
         
@@ -158,6 +195,7 @@ class FlexiCircuit(BaseCircuit):
         self.max_elements = max_elements
         
     def fit(self, frequencies, impedances):
+        from scipy.optimize import leastsq
         from .genetic import make_population
         from .fitting import residuals, valid, computeCircuit
         n = 5
@@ -169,22 +207,24 @@ class FlexiCircuit(BaseCircuit):
             for pop in self.population:
                 self.circuit = pop
                 print(self.circuit)
-                for j in range(n-4,n+4):
+                circuit_length = calculateCircuitLength(self.circuit)
+#                for j in range(n-4,n+4):
 #                    print(residuals(self.initial_guess,Z,f,self.circuit))
-                    try:
+#                    try:
 #                        print(self.circuit)
-                        self.initial_guess = list(np.ones(j)/10)
+                self.initial_guess = list(np.ones(circuit_length)/10)
 #                        print(residuals(self.initial_guess,Z,F,))
 #                        print(self.initial_guess)
-                        p_values, covar, ff, _, ier = leastsq(residuals, self.initial_guess,
-                                                 args=(Z, f, self.circuit),
-                                                 maxfev=100000, ftol=1E-13,
-                                                 full_output=True)
-                        print(p_values)
-                        scores.append([ff['fvec'],pop])
+                p_values, covar, ff, _, ier = leastsq(residuals, self.initial_guess,
+                                         args=(Z, f, self.circuit),
+                                         maxfev=100000, ftol=1E-13,
+                                         full_output=True)
+
+                print(p_values)
+                scores.append([np.square(ff['fvec']).mean(),pop])
                         
-                    except:
-                        pass
+#                    except:
+#                        pass
         print(scores)
         return scores
 
