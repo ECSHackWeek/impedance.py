@@ -14,9 +14,8 @@ class BaseCircuit:
         """
         if initial_guess is not None:
             for i in initial_guess:
-                assert type(i) == type(0.5) or type(i) == type(1) or \
-                type(i) == type(np.array([1])[0]) or type(i) == type(np.array([1.5])[0]), \
-                ('value {} in initial_guess is not a number'.format(i))
+                assert i.isinstance((float, int, np.int32, np.float64)), \
+                       'value {} in initial_guess is not a number'.format(i)
         self.initial_guess = initial_guess
         self.parameters_ = None
 
@@ -39,15 +38,14 @@ class BaseCircuit:
         """
         # tests
         import numpy as np
-        assert type(frequencies) == type([1.5]) or type(frequencies) == type(np.array([1.5]))
+        assert isinstance(frequencies, np.ndarray)
         assert len(frequencies) == len(impedance)
-        for i in frequencies:
-            assert type(i) == type(0.5) or type(i) == type(1) or \
-            type(i) == type(np.array([1])[0]) or type(i) == type(np.array([1.5])[0]), \
-            ('value {} in initial_guess is not a number'.format(i))
+        assert isinstance(frequencies[0], (float, int, np.int32, np.float64)),\
+            'frequencies does not contain a number'
         # check_valid_impedance()
         if self.initial_guess is not None:
-            self.parameters_, _ = circuit_fit(frequencies, impedance, self.circuit, self.initial_guess)
+            self.parameters_, _ = circuit_fit(frequencies, impedance,
+                                              self.circuit, self.initial_guess)
         else:
             # TODO auto calc guess
             raise ValueError('no initial guess supplied')
@@ -169,7 +167,7 @@ class DefineCircuit(BaseCircuit):
 
 
             circuit_length = calculateCircuitLength(self.circuit)
-            assert len(initial_guess) == circuit_length, 'Initial guess length needs to be equal to {circuit_length}'            
+            assert len(initial_guess) == circuit_length, 'Initial guess length needs to be equal to {circuit_length}'
 
 class FlexiCircuit(BaseCircuit):
     def __init__(self, max_elements = None, generations = 2, popsize = 30, initial_guess=None):
