@@ -1,7 +1,8 @@
-from .circuit_elements import *
-#from .validation import rmse
+from EISfit.circuit_elements import R, C, W, A, E, G, s, p  # noqa: F401
+import numpy as np
 from scipy.optimize import leastsq
 from scipy.optimize import minimize
+
 
 def rmse(a, b):
     """
@@ -18,6 +19,7 @@ def rmse(a, b):
 
 def circuit_fit(frequencies, impedances, circuit, initial_guess, algorithm='leastsq',
                bounds = None):
+
     """ Main function for fitting an equivalent circuit to data
 
     Parameters
@@ -53,7 +55,7 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, algorithm='leas
     """
 
     circuit = circuit.replace('_', '')
-    
+
     f = frequencies
     Z = impedances
     
@@ -89,6 +91,7 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, algorithm='leas
         p_values = res.x
         covar = None
         p_error = len(p_values)*[-1]
+
     else:
         res = minimize(residualWrapper, initial_guess, args=(Z,f,circuit), 
                       method = algorithm)
@@ -159,7 +162,7 @@ def valid(circuit, param):
 
     """
 
-    p_string = [p for p in circuit if p not in 'ps(),-/']
+    p_string = [x for x in circuit if x not in 'ps(),-/']
 
     for i, (a, b) in enumerate(zip(p_string[::2], p_string[1::2])):
         if str(a+b) == "E2":
@@ -185,7 +188,7 @@ def computeCircuit(circuit, parameters, frequencies):
     -------
     array of floats
     """
-    
+
     return eval(buildCircuit(circuit, parameters, frequencies))
 
 
@@ -240,8 +243,9 @@ def buildCircuit(circuit, parameters, frequencies):
 
     return eval_string
 
+
 def calculateCircuitLength(circuit):
-    l1 = ['R','E','W','C','A','G']
+    l1 = ['R', 'E', 'W', 'C', 'A', 'G']
     length = 0
     for char in l1:
         length += circuit.count(char)
