@@ -55,7 +55,7 @@ def C(p, f):
         Z = \\frac{1}{C \\times j 2 \\pi f}
 
      """
-    
+
     typeChecker(p,f,C.__name__,1)
     omega = 2*np.pi*np.array(f)
     Cap = p[0]
@@ -74,9 +74,9 @@ def W(p, f):
     where :math:`R` = p[0] (Ohms) and :math:`T` = p[1] (sec) = :math:`\\frac{L^2}{D}`
 
     """
-    
+
     typeChecker(p,f,W.__name__,2)
-    
+
     omega = 2*np.pi*np.array(f)
 
     Zw = np.vectorize(lambda y: p[0]/(np.sqrt(p[1]*1j*y)*cmath.tanh(np.sqrt(p[1]*1j*y))))
@@ -88,7 +88,7 @@ def A(p, f):
     """ defines a semi-infinite Warburg element
 
     """
-    
+
     typeChecker(p,f,A.__name__,1)
     omega = 2*np.pi*np.array(f)
     Aw = p[0]
@@ -135,14 +135,14 @@ def G(p, f):
     return Z0/np.sqrt(k + 1j*omega)
 
 def typeChecker(p,f,name,length):
-    assert type(p) == type([1.5]), f'in {name}, input must be of type list'
+    assert type(p) == type([1.5]), 'in {}, input must be of type list'.format(name)
     for i in p:
         assert type(i) == type(0.5) or type(i) == type(1) or \
                 type(i) == type(np.array([1])[0]) or type(i) == type(np.array([1.5])[0]), \
-                (f'in {name}, value {i} in {p} (parmameter values) is not a number')
+                ('in {}, value {} in {} (parmameter values) is not a number'.format(name, i, p))
     for i in f:
         assert type(i) == type(0.5) or type(i) == type(1) or \
                 type(i) == type(np.array([1])[0]) or type(i) == type(np.array([1.5])[0]), \
-                (f'in {name}, value {i} in {f} (frequencies) is not a number')
-    assert len(p) == length, f'in {name}, input list must be length {length}'
+                ('in {}, value {} in {} (frequencies) is not a number'.format(name, i, f))
+    assert len(p) == length, 'in {}, input list must be length {}'.format(name, length)
     return
