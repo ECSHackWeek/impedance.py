@@ -165,7 +165,7 @@ def valid(circuit, param):
     p_string = [x for x in circuit if x not in 'ps(),-/']
 
     for i, (a, b) in enumerate(zip(p_string[::2], p_string[1::2])):
-        if str(a+b) == "E2":
+        if str(a + b) == "E2":
             if param[i] <= 0 or param[i] >= 1:
                 return False
         else:
