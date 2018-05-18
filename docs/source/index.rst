@@ -9,8 +9,10 @@ Welcome to EISfit's documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
-   
+   :caption: Contents
+
+   validation
+
 .. automodule:: EISfit.circuits
    :members:
 
