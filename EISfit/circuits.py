@@ -15,7 +15,7 @@ class BaseCircuit:
             for i in initial_guess:
                 assert type(i) == type(0.5) or type(i) == type(1) or \
                 type(i) == type(np.array([1])[0]) or type(i) == type(np.array([1.5])[0]), \
-                (f'value {i} in initial_guess is not a number')
+                ('value {} in initial_guess is not a number'.format(i))
         self.initial_guess = initial_guess
         self.parameters_ = None
 
@@ -43,7 +43,7 @@ class BaseCircuit:
         for i in frequencies:
             assert type(i) == type(0.5) or type(i) == type(1) or \
             type(i) == type(np.array([1])[0]) or type(i) == type(np.array([1.5])[0]), \
-            (f'value {i} in initial_guess is not a number')
+            ('value {} in initial_guess is not a number'.format(i))
         # check_valid_impedance()
         if self.initial_guess is not None:
             self.parameters_, _ = circuit_fit(frequencies, impedance, self.circuit, self.initial_guess)
@@ -65,7 +65,7 @@ class BaseCircuit:
         Parameters
         ----------
         frequencies: numpy array
-            Frequencies 
+            Frequencies
 
         Returns
         -------
@@ -83,7 +83,7 @@ class BaseCircuit:
 
         else:
             raise ValueError("The model hasn't been fit yet")
-    
+
     def __repr__(self):
         """
         Defines the pretty printing of the circuit
@@ -98,21 +98,21 @@ class Randles(BaseCircuit):
     def __init__(self, initial_guess=None, CPE=False):
         """
         Constructor for the Randles' circuit class
-        
+
         Inputs
         ------
         initial_guess: A list of values to use as the initial guess for element values
         CPE: Whether or not to use constant phase elements in place of a Warburg element
-        
+
         Methods
         -------
-        
+
         .fit(frequencies, impedances)
             frequencies: A list of frequencies where the values should be tested
             impedances: A list of impedances used to fitting using scipy's least_squares fitting algorithm.
         .predict(frequencies)
             frequencies: A list of frequencies where new values will be calculated
-        
+
 
 
         """
@@ -122,22 +122,18 @@ class Randles(BaseCircuit):
             for i in initial_guess:
                 assert type(i) == type(0.5) or type(i) == type(1) or \
                 type(i) == type(np.array([1])[0]) or type(i) == type(np.array([1.5])[0]), \
-                (f'value {i} in initial_guess is not a number')
-        
+                ('value {} in initial_guess is not a number'.format(i))
+
         if CPE:
             self.circuit = 'R_0-p(R_1,E_1/E_2)-W_1/W_2'
             circuit_length = 6
             assert len(initial_guess) == circuit_length, 'Initial guess length needs to be equal to {circuit_length}'
         else:
             self.circuit = 'R_0-p(R_1,C_1)-W_1/W_2'
-            
+
             circuit_length = 5
             assert len(initial_guess) == circuit_length, 'Initial guess length needs to be equal to {circuit_length}'
-            
-        
+
+
         self.initial_guess = initial_guess
         self.parameters_ = None
-
-
-
-    
