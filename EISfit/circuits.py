@@ -1,6 +1,7 @@
 from .fitting import circuit_fit, computeCircuit, calculateCircuitLength
 import numpy as np
 
+
 class BaseCircuit:
     """ A base class for all circuits
 
@@ -78,8 +79,8 @@ class BaseCircuit:
             # print('Output! {}'.format(self.parameters_))
 
             return computeCircuit(self.circuit,
-                                   self.parameters_.tolist(),
-                                   frequencies.tolist())
+                                  self.parameters_.tolist(),
+                                  frequencies.tolist())
 
         else:
             raise ValueError("The model hasn't been fit yet")
@@ -90,32 +91,27 @@ class BaseCircuit:
 
         """
         if self._is_fit():
-            print(self._is_fit())
-            return "{} circuit (fit values={}, circuit={})".format(self.name, self.parameters_, self.circuit)
+            return "{} circuit (fit values={}, \
+                    circuit={})".format(self.name,
+                                        self.parameters_,
+                                        self.circuit)
         else:
-            return "{} circuit (initial_guess={}, circuit={})".format(self.name, self.initial_guess, self.circuit)
+            return "{} circuit (initial_guess={}, \
+                    circuit={})".format(self.name,
+                                        self.initial_guess,
+                                        self.circuit)
+
 
 class Randles(BaseCircuit):
     def __init__(self, initial_guess=None, CPE=False):
-        """
-        Constructor for the Randles' circuit class
+        """ Constructor for the Randles' circuit class
 
-        Inputs
-        ------
-        initial_guess: A list of values to use as the initial guess for element values
-        CPE: Whether or not to use constant phase elements in place of a Warburg element
-
-        Methods
-        -------
-
-        .fit(frequencies, impedances)
-            frequencies: A list of frequencies where the values should be tested
-            impedances: A list of impedances used to fitting using scipy's least_squares fitting algorithm.
-        .predict(frequencies)
-            frequencies: A list of frequencies where new values will be calculated
-
-
-
+        Parameters
+        ----------
+        initial_guess: list of floats
+            A list of values to use as the initial guess
+        CPE: boolean
+            Use a constant phase element instead of a capacitor
         """
         self.name = 'Randles'
         self.parameters_ = None
@@ -136,6 +132,7 @@ class Randles(BaseCircuit):
 
             circuit_length = calculateCircuitLength(self.circuit)
             assert len(initial_guess) == circuit_length, 'Initial guess length needs to be equal to {circuit_length}'
+
 
 class DefineCircuit(BaseCircuit):
     def __init__(self, initial_guess=None, circuit=None):
@@ -178,22 +175,22 @@ class FlexiCircuit(BaseCircuit):
     def __init__(self, max_elements = None, generations = 2, popsize = 30, initial_guess=None):
         """
         Constructor for the Flexible Circuit class
-        
-        Inputs
-        ------
-        max_elements: The maximum number of elements available to the algorithm
-        solve_time: The maximum allowed solve time, in seconds.
-        
-        
+
+        Parameters
+        ----------
+        max_elements: integer
+            The maximum number of elements available to the algorithm
+        solve_time: integer
+            The maximum allowed solve time, in seconds.
+
         """
-        from .genetic import make_population
-        from .fitting import residuals, valid, computeCircuit
+
         self.name = 'Flexible Circuit'
         self.initial_guess = initial_guess
         self.generations = generations
         self.popsize = popsize
         self.max_elements = max_elements
-        
+
     def fit(self, frequencies, impedances):
         from scipy.optimize import leastsq
         from .genetic import make_population
@@ -222,9 +219,6 @@ class FlexiCircuit(BaseCircuit):
 
                 print(p_values)
                 scores.append([np.square(ff['fvec']).mean(),pop])
-                        
-#                    except:
-#                        pass
+
         print(scores)
         return scores
-
