@@ -1,5 +1,5 @@
 Validation
 ==========
 
-.. automodule:: EISfit.docvalidation
+.. automodule:: EISfit.validation
    :members:
