@@ -13,7 +13,7 @@ def rmse(a, b):
         RMSE = \\sqrt{\\frac{1}{n}(a-b)^2}
     """
     
-    return(np.sqrt(np.mean(np.square(a-b))))
+    return(np.abs(np.sqrt(np.mean(np.square(a-b)))))
 
 def measModel(frequencies, impedances, max_k = 7, R_val = 0.1, C_val = 10):
     """
@@ -28,6 +28,10 @@ def measModel(frequencies, impedances, max_k = 7, R_val = 0.1, C_val = 10):
     Inputs
     ---------
     frequencies: A list of frequencies to test 
+    impedances: A list of values to match to
+    max_k: The maximum number of RC elements to fit
+    R_val: The initial value for R
+    C_val: The initial value for C
     """
     out = "R_0"
     initial_guess = [R_val]
