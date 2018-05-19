@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.org/ECSHackWeek/eisfit.svg?branch=master)](https://travis-ci.org/ECSHackWeek/eisfit)
+[![Build Status](https://travis-ci.org/ECSHackWeek/EISfit.svg?branch=master)](https://travis-ci.org/ECSHackWeek/EISfit)
 
-[![Coverage Status](https://coveralls.io/repos/github/ECSHackWeek/eisfit/badge.svg?branch=master)](https://coveralls.io/github/ECSHackWeek/eisfit?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/ECSHackWeek/EISfit/badge.svg?branch=master)](https://coveralls.io/github/ECSHackWeek/eisfit?branch=master)
 
 [![Documentation Status](https://readthedocs.org/projects/eisfit/badge/?version=latest)](http://eisfit.readthedocs.io/en/latest/?badge=latest)
 
