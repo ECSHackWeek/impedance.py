@@ -20,7 +20,7 @@ before_script:
    - flake8 --exit-zero EISfit
 
 script:
-   - nosetests --with-coverage --cover-erase --cover-package=EISfit
+   - nosetests --with-coverage --cover-erase --cover-package=eisfit
 
 after_success:
    - coverage report
