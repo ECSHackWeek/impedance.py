@@ -1,4 +1,4 @@
-from .fitting import circuit_fit, computeCircuit, calculateCircuitLength
+#from .fitting import circuit_fit, computeCircuit, calculateCircuitLength
 from .circuits import DefineCircuit
 import numpy as np
 
@@ -15,7 +15,7 @@ def rmse(a, b):
     
     return(np.abs(np.sqrt(np.mean(np.square(a-b)))))
 
-def measModel(frequencies, impedances, max_k = 7, R_val = 0.1, C_val = 10):
+def measModel(frequencies, impedances, algorithm='SLSQP', max_k = 7, R_val = 0.1, C_val = 10):
     """
     Iteratively add RC circuits until the error converges. If error does not converge, it indicates that the data is poor.
     
@@ -42,7 +42,7 @@ def measModel(frequencies, impedances, max_k = 7, R_val = 0.1, C_val = 10):
         initial_guess.append(R_val)
         initial_guess.append(C_val)
         test = DefineCircuit(initial_guess = initial_guess,
-                            circuit = out)
+                            circuit = out, algorithm = algorithm)
         print(out)
         test.fit(frequencies, impedances)
         model_list.append(test)

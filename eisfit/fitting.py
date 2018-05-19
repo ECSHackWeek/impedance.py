@@ -1,9 +1,25 @@
 from EISfit.circuit_elements import R, C, W, A, E, G, s, p  # noqa: F401
 import numpy as np
 from scipy.optimize import leastsq
+from scipy.optimize import minimize
 
 
-def circuit_fit(frequencies, impedances, circuit, initial_guess):
+def rmse(a, b):
+    """
+    A function which calculates the root mean squared error between two vectors.
+    
+    Notes
+    ---------
+    .. math::
+
+        RMSE = \\sqrt{\\frac{1}{n}(a-b)^2}
+    """
+    
+    return(np.abs(np.sqrt(np.mean(np.square(a-b)))))
+
+def circuit_fit(frequencies, impedances, circuit, initial_guess, algorithm='leastsq',
+               bounds = None):
+
     """ Main function for fitting an equivalent circuit to data
 
     Parameters
@@ -19,6 +35,9 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess):
 
     initial_guess : list of floats
         initial guesses for the fit parameters
+    algorithm: string
+        Name of algorithm to pass to scipy.optimize.minimize
+        or to instantiate scipy.optimize.leastsq
 
     Returns
     ------------
@@ -39,22 +58,53 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess):
 
     f = frequencies
     Z = impedances
-
-    p_values, covar, _, _, ier = leastsq(residuals, initial_guess,
-                                         args=(Z, f, circuit),
-                                         maxfev=100000, ftol=1E-13,
-                                         full_output=True)
-
-    p_error = []
-    if ier in [1, 2, 3, 4] and covar is not None:
-        s_sq = (residuals(p_values, Z, frequencies, circuit)**2).sum()
-        p_cov = covar * s_sq/(len(Z) - len(p_values))
-        for i, __ in enumerate(covar):
-            p_error.append(np.absolute(p_cov[i][i])**0.5)
-    else:
+    
+    # takes out the _s
+#    print(circuit)
+#    print(f)
+#    print(Z)
+    if algorithm == 'leastsq':
+        p_values, covar, _, _, ier = leastsq(residuals, initial_guess,
+                                             args=(Z, f, circuit),
+                                             maxfev=100000, ftol=1E-13,
+                                             full_output=True)
+        p_error = []
+        if ier in [1, 2, 3, 4] and covar is not None:
+            s_sq = (residuals(p_values, Z, frequencies, circuit)**2).sum()
+            p_cov = covar * s_sq/(len(Z) - len(p_values))
+            for i, __ in enumerate(covar):
+                p_error.append(np.absolute(p_cov[i][i])**0.5)
+        else:
+            p_error = len(p_values)*[-1]
+    elif algorithm in ['SLSQP','L-BFGS-B', 'TNC']:
+        if bounds is None:
+            bounds = []
+            p_string = [p for p in circuit if p not in 'ps(),-/']
+            for i, (a, b) in enumerate(zip(p_string[::2], p_string[1::2])):
+                if str(a+b) == "E2":
+                    bounds.append((0,1))
+                else:
+                    bounds.append((initial_guess[i]*1e-2,initial_guess[i]*1e2))
+#            bounds = tuple(() for i in initial_guess)
+        res = minimize(residualWrapper, initial_guess, args=(Z,f,circuit), 
+                      method = algorithm, bounds = bounds)
+        p_values = res.x
+        covar = None
         p_error = len(p_values)*[-1]
 
+    else:
+        res = minimize(residualWrapper, initial_guess, args=(Z,f,circuit), 
+                      method = algorithm)
+        p_values = res.x
+        covar = None
+        p_error = len(p_values)*[-1]
+        
+
     return p_values, p_error
+
+def residualWrapper(param, Z, f, circuit):
+    res = residuals(param, Z, f, circuit)
+    return np.mean(np.square(res))
 
 
 def residuals(param, Z, f, circuit):
@@ -115,7 +165,7 @@ def valid(circuit, param):
     p_string = [x for x in circuit if x not in 'ps(),-/']
 
     for i, (a, b) in enumerate(zip(p_string[::2], p_string[1::2])):
-        if str(a+b) == "E2":
+        if str(a + b) == "E2":
             if param[i] <= 0 or param[i] >= 1:
                 return False
         else:
