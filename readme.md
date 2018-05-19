@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/ECSHackWeek/eisfit.svg?branch=master)](https://travis-ci.org/ECSHackWeek/eisfit)
+[![Build Status](https://travis-ci.org/ECSHackWeek/EISfit.svg?branch=master)](https://travis-ci.org/ECSHackWeek/EISfit)
 
 [![Coverage Status](https://coveralls.io/repos/github/ECSHackWeek/eisfit/badge.svg?branch=master&service=github)](https://coveralls.io/github/ECSHackWeek/eisfit?branch=master&service=github)
 
