@@ -1,5 +1,5 @@
 Fitting
 =======
 
-.. automodule:: EISfit.fitting
+.. automodule:: eisfit.fitting
    :members:

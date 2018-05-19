@@ -1,4 +1,4 @@
-from EISfit.fitting import *
+from eisfit.fitting import *
 
 
 def test_residuals():

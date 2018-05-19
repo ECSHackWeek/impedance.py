@@ -1,4 +1,4 @@
-from EISfit.circuit_elements import R, C, W, A, E, G
+from eisfit.circuit_elements import R, C, W, A, E, G
 import cmath
 
 

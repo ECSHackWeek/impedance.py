@@ -1,4 +1,4 @@
-from EISfit.circuit_elements import R, C, W, A, E, G, s, p  # noqa: F401
+from eisfit.circuit_elements import R, C, W, A, E, G, s, p  # noqa: F401
 import numpy as np
 from scipy.optimize import leastsq
 from scipy.optimize import minimize

@@ -1,4 +1,4 @@
-from EISfit.circuits import Randles
+from eisfit.circuits import Randles
 import numpy as np
 
 # store some global test data

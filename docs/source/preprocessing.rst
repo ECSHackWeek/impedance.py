@@ -1,5 +1,5 @@
 Preprocessing
 =============
 
-.. automodule:: EISfit.preprocessing
+.. automodule:: eisfit.preprocessing
    :members:

@@ -1,8 +1,8 @@
 Circuits
 ========
 
-.. automodule:: EISfit.circuits
+.. automodule:: eisfit.circuits
    :members:
 
-.. automodule:: EISfit.circuit_elements
+.. automodule:: eisfit.circuit_elements
    :members:
