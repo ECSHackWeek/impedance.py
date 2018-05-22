@@ -6,19 +6,21 @@ from scipy.optimize import minimize
 
 def rmse(a, b):
     """
-    A function which calculates the root mean squared error between two vectors.
-    
+    A function which calculates the root mean squared error
+    between two vectors.
+
     Notes
     ---------
     .. math::
 
         RMSE = \\sqrt{\\frac{1}{n}(a-b)^2}
     """
-    
+
     return(np.abs(np.sqrt(np.mean(np.square(a-b)))))
 
-def circuit_fit(frequencies, impedances, circuit, initial_guess, algorithm='leastsq',
-               bounds = None):
+
+def circuit_fit(frequencies, impedances, circuit,
+                initial_guess, algorithm='leastsq', bounds=None):
 
     """ Main function for fitting an equivalent circuit to data
 
@@ -58,7 +60,7 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, algorithm='leas
 
     f = frequencies
     Z = impedances
-    
+
     # takes out the _s
 #    print(circuit)
 #    print(f)
@@ -76,31 +78,32 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, algorithm='leas
                 p_error.append(np.absolute(p_cov[i][i])**0.5)
         else:
             p_error = len(p_values)*[-1]
-    elif algorithm in ['SLSQP','L-BFGS-B', 'TNC']:
+    elif algorithm in ['SLSQP', 'L-BFGS-B', 'TNC']:
         if bounds is None:
             bounds = []
-            p_string = [p for p in circuit if p not in 'ps(),-/']
+            p_string = [x for x in circuit if x not in 'ps(),-/']
             for i, (a, b) in enumerate(zip(p_string[::2], p_string[1::2])):
                 if str(a+b) == "E2":
-                    bounds.append((0,1))
+                    bounds.append((0, 1))
                 else:
-                    bounds.append((initial_guess[i]*1e-2,initial_guess[i]*1e2))
+                    bounds.append((initial_guess[i]*1e-2,
+                                   initial_guess[i]*1e2))
 #            bounds = tuple(() for i in initial_guess)
-        res = minimize(residualWrapper, initial_guess, args=(Z,f,circuit), 
-                      method = algorithm, bounds = bounds)
+        res = minimize(residualWrapper, initial_guess, args=(Z, f, circuit),
+                       method=algorithm, bounds=bounds)
         p_values = res.x
         covar = None
         p_error = len(p_values)*[-1]
 
     else:
-        res = minimize(residualWrapper, initial_guess, args=(Z,f,circuit), 
-                      method = algorithm)
+        res = minimize(residualWrapper, initial_guess, args=(Z, f, circuit),
+                       method=algorithm)
         p_values = res.x
         covar = None
         p_error = len(p_values)*[-1]
-        
 
     return p_values, p_error
+
 
 def residualWrapper(param, Z, f, circuit):
     res = residuals(param, Z, f, circuit)

@@ -1,6 +1,7 @@
 import numpy as np
 import cmath
 
+
 def s(series):
     """ sums elements in series
 
@@ -43,7 +44,7 @@ def R(p, f):
 
     """
 
-    typeChecker(p,f,R.__name__,1)
+    typeChecker(p, f, R.__name__, 1)
     return np.array(len(f)*[p[0]])
 
 
@@ -56,7 +57,7 @@ def C(p, f):
 
      """
 
-    typeChecker(p,f,C.__name__,1)
+    typeChecker(p, f, C.__name__, 1)
     omega = 2*np.pi*np.array(f)
     Cap = p[0]
 
@@ -69,17 +70,19 @@ def W(p, f):
     Notes
     ---------
     .. math::
-        Z = \\frac{R}{\\sqrt{ T \\times j 2 \\pi f}} \\coth{\\sqrt{T \\times j 2 \\pi f }}
+        Z = \\frac{R}{\\sqrt{ T \\times j 2 \\pi f}} \\coth{\\sqrt{T \\times j 2 \\pi f }}  # noqa: E501
 
-    where :math:`R` = p[0] (Ohms) and :math:`T` = p[1] (sec) = :math:`\\frac{L^2}{D}`
+    where :math:`R` = p[0] (Ohms) and
+    :math:`T` = p[1] (sec) = :math:`\\frac{L^2}{D}`
 
     """
 
-    typeChecker(p,f,W.__name__,2)
+    typeChecker(p, f, W.__name__, 2)
 
     omega = 2*np.pi*np.array(f)
 
-    Zw = np.vectorize(lambda y: p[0]/(np.sqrt(p[1]*1j*y)*cmath.tanh(np.sqrt(p[1]*1j*y))))
+    Zw = np.vectorize(lambda y: p[0]/(np.sqrt(p[1]*1j*y) *
+                                      cmath.tanh(np.sqrt(p[1]*1j*y))))
 
     return Zw(omega)
 
@@ -89,7 +92,7 @@ def A(p, f):
 
     """
 
-    typeChecker(p,f,A.__name__,1)
+    typeChecker(p, f, A.__name__, 1)
     omega = 2*np.pi*np.array(f)
     Aw = p[0]
 
@@ -109,7 +112,7 @@ def E(p, f):
 
     where :math:`Q` = p[0] and :math:`\\alpha` = p[1].
     """
-    typeChecker(p,f,E.__name__,2)
+    typeChecker(p, f, E.__name__, 2)
     omega = 2*np.pi*np.array(f)
     Q = p[0]
     alpha = p[1]
@@ -127,22 +130,23 @@ def G(p, f):
         Z = \\frac{1}{Y \\times \\sqrt{K + j 2 \\pi f }}
 
      """
-    typeChecker(p,f,G.__name__,2)
+    typeChecker(p, f, G.__name__, 2)
     omega = 2*np.pi*np.array(f)
     Z0 = p[0]
     k = p[1]
 
     return Z0/np.sqrt(k + 1j*omega)
 
-def typeChecker(p,f,name,length):
-    assert type(p) == type([1.5]), 'in {}, input must be of type list'.format(name)
+
+def typeChecker(p, f, name, length):
+    assert p.isinstance(float), \
+                    'in {}, input must be of type list'.format(name)
     for i in p:
-        assert type(i) == type(0.5) or type(i) == type(1) or \
-                type(i) == type(np.array([1])[0]) or type(i) == type(np.array([1.5])[0]), \
-                ('in {}, value {} in {} (parmameter values) is not a number'.format(name, i, p))
+        assert isinstance(i, (float, int, np.int32, np.float64)), \
+            'in {}, value {} in {} is not a number'.format(name, i, p)
     for i in f:
-        assert type(i) == type(0.5) or type(i) == type(1) or \
-                type(i) == type(np.array([1])[0]) or type(i) == type(np.array([1.5])[0]), \
-                ('in {}, value {} in {} (frequencies) is not a number'.format(name, i, f))
-    assert len(p) == length, 'in {}, input list must be length {}'.format(name, length)
+        assert isinstance(i, (float, int, np.int32, np.float64)), \
+            'in {}, value {} in {} is not a number'.format(name, i, f)
+    assert len(p) == length, \
+        'in {}, input list must be length {}'.format(name, length)
     return

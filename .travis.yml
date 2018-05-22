@@ -17,7 +17,7 @@ install:
 # for production, remove the --exit-zero
 # this side-steps failing build on PEP8 violations
 before_script:
-   - flake8 --exit-zero eisfit
+   - flake8 eisfit --exclude=*.ipynb_checkpoints
 
 script:
    - nosetests --with-coverage --cover-erase --cover-package=eisfit

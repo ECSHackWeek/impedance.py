@@ -1,17 +1,10 @@
-from .fitting import circuit_fit, computeCircuit
-from .circuits import FlexiCircuit
-from .circuit_elements import *
-#import circuit_elements
-
 import numpy as np
 
 
-#print(l1)
-
-def generate_circuit(length, parent=None, mutate=0.3, parallel = 0.2):
-    i=0
-    elem = np.random.randint(0,length,size=length)
-    l1 = ['R','C','W1/W2','A','E1/E2','G1/G2']
+def generate_circuit(length, parent=None, mutate=0.3, parallel=0.2):
+    i = 0
+    elem = np.random.randint(0, length, size=length)
+    l1 = ['R', 'C', 'W1/W2', 'A', 'E1/E2', 'G1/G2']
     out = ""
     if parent is None:
         while i < length:
@@ -61,15 +54,11 @@ def generate_circuit(length, parent=None, mutate=0.3, parallel = 0.2):
             to_out.append(i)
             to_out.append('-')
         return ''.join(to_out[:-1])
-                
 
 
 def make_population(num, n, parent=None):
     gen = []
     if parent is None:
         for i in range(num):
-            gen.append(generate_circuit(n,parent=parent))
+            gen.append(generate_circuit(n, parent=parent))
     return gen
-
-    
-

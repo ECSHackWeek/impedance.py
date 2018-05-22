@@ -1,4 +1,4 @@
-from eisfit.fitting import *
+from eisfit.fitting import *  # noqa: F401, F403
 
 
 def test_residuals():
