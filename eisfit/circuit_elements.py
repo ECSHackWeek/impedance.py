@@ -139,8 +139,8 @@ def G(p, f):
 
 
 def typeChecker(p, f, name, length):
-    assert p.isinstance(float), \
-                    'in {}, input must be of type list'.format(name)
+    assert isinstance(p, list), \
+        'in {}, input must be of type list'.format(name)
     for i in p:
         assert isinstance(i, (float, int, np.int32, np.float64)), \
             'in {}, value {} in {} is not a number'.format(name, i, p)
