@@ -61,10 +61,6 @@ def circuit_fit(frequencies, impedances, circuit,
     f = frequencies
     Z = impedances
 
-    # takes out the _s
-#    print(circuit)
-#    print(f)
-#    print(Z)
     if algorithm == 'leastsq':
         p_values, covar, _, _, ier = leastsq(residuals, initial_guess,
                                              args=(Z, f, circuit),

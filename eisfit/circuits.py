@@ -3,26 +3,29 @@ import numpy as np
 
 
 class BaseCircuit:
-    """ A base class for all circuits
+    """ Base class for equivalent circuit models """
+    def __init__(self, initial_guess=None, name=None,
+                 algorithm='leastsq', bounds=None):
+        """ Base constructor for any equivalent circuit model """
 
-    """
-    def __init__(self, initial_guess=None, algorithm='leastsq', bounds=None):
-        """
-        Constructor for the Randles' circuit class
-
-
-        """
+        # if supplied, check that initial_guess is valid and store
         if initial_guess is not None:
             for i in initial_guess:
-                assert isinstance(i, (float, int, np.int32, np.float64)), \
-                       'value {} in initial_guess is not a number'.format(i)
+                assert isinstance(i, (float, int, np.int32, np.float64)),\
+                    'value {} in initial_guess is not a number'.format(i)
+
+        # initalize class attributes
         self.initial_guess = initial_guess
-        self.parameters_ = None
+        self.name = name
+        self.algorithm = algorithm
         self.bounds = bounds
 
+        # initialize fit parameters and confidence intervals
+        self.parameters_ = None
+        self.conf_ = None
+
     def fit(self, frequencies, impedance):
-        """
-        Fit the circuit model
+        """ Fit the circuit model
 
         Parameters
         ----------
@@ -37,13 +40,23 @@ class BaseCircuit:
         self: returns an instance of self
 
         """
-        # tests
-        import numpy as np
-        assert isinstance(frequencies, np.ndarray)
-        assert len(frequencies) == len(impedance)
+
+        # check that inputs are valid:
+        #    frequencies: array of numbers
+        #    impedance: array of complex numbers
+        #    impedance and frequency match in length
+
+        assert isinstance(frequencies, np.ndarray),\
+            'frequencies is not of type np.ndarray'
         assert isinstance(frequencies[0], (float, int, np.int32, np.float64)),\
             'frequencies does not contain a number'
-        # check_valid_impedance()
+        assert isinstance(impedance, np.ndarray),\
+            'impedance is not of type np.ndarray'
+        assert isinstance(impedance[0], (complex, np.complex128)),\
+            'impedance does not contain complex numbers'
+        assert len(frequencies) == len(impedance),\
+            'mismatch in length of input frequencies and impedances'
+
         if self.initial_guess is not None:
             self.parameters_, _ = circuit_fit(frequencies, impedance,
                                               self.circuit, self.initial_guess,
@@ -56,13 +69,14 @@ class BaseCircuit:
         return self
 
     def _is_fit(self):
+        """ check if model has been fit (parameters_ is not None) """
         if self.parameters_ is not None:
             return True
         else:
             return False
 
     def predict(self, frequencies):
-        """ Predict impedance using a fit model
+        """ Predict impedance using a fit equivalent circuit model
 
         Parameters
         ----------
@@ -76,117 +90,99 @@ class BaseCircuit:
 
         """
 
-        if self._is_fit():
-            # print('Output! {}'.format(self.parameters_))
+        # check that inputs are valid:
+        #    frequencies: array of numbers
 
+        assert isinstance(frequencies, np.ndarray),\
+            'frequencies is not of type np.ndarray'
+        assert isinstance(frequencies[0], (float, int, np.int32, np.float64)),\
+            'frequencies does not contain a number'
+
+        if self._is_fit():
             return computeCircuit(self.circuit,
                                   self.parameters_.tolist(),
                                   frequencies.tolist())
 
         else:
-            raise ValueError("The model hasn't been fit yet")
+            raise ValueError("The model hasn't been fit yet. " +
+                             "Please call the `.fit` method before trying to" +
+                             " predict model output")
 
-    def __repr__(self):
-        """
-        Defines the pretty printing of the circuit
+    def __str__(self):
+        """ Defines the pretty printing of the circuit """
 
-        """
+        # parse the element names from the circuit string
+        names = self.circuit.replace('p', '').replace('(', '').replace(')', '')
+        names = names.replace(',', '-').replace('/', '-').split('-')
+
+        to_print  = '\n-------------------------------\n'  # noqa E222
+        to_print += 'Circuit: {}\n'.format(self.name)
+        to_print += 'Circuit string: {}\n'.format(self.circuit)
+        to_print += 'Algorithm: {}\n'.format(self.algorithm)
+
         if self._is_fit():
-            return "{} circuit (fit values={}, \
-                    circuit={})".format(self.name,
-                                        self.parameters_,
-                                        self.circuit)
+            to_print += 'Fit: True\n'
+            to_print += 'Fit parameters:\n'
+            for name, param in zip(names, self.parameters_):
+                to_print += '\t{} = {:.2e}\n'.format(name, param)
         else:
-            return "{} circuit (initial_guess={}, \
-                    circuit={})".format(self.name,
-                                        self.initial_guess,
-                                        self.circuit)
+            to_print += 'Fit: False\n'
+            to_print += 'Initial guesses:\n'
+            for name, param in zip(names, self.initial_guess):
+                to_print += '\t{} = {:.2e}\n'.format(name, param)
+
+        to_print += '\n-------------------------------\n'
+        return to_print
 
 
 class Randles(BaseCircuit):
-    def __init__(self, initial_guess=None, CPE=False,
-                 algorithm='leastsq', bounds=None):
+    def __init__(self, CPE=False, **kwargs):
         """ Constructor for the Randles' circuit class
 
         Parameters
         ----------
-        initial_guess: list of floats
-            A list of values to use as the initial guess
         CPE: boolean
             Use a constant phase element instead of a capacitor
         """
-        self.name = 'Randles'
-        self.parameters_ = None
-        self.initial_guess = initial_guess
-        self.algorithm = algorithm
-        self.bounds = bounds
-        # write some asserts to enforce typing
-        if initial_guess is not None:
-            for i in initial_guess:
-                assert isinstance(i, (float, int, np.int32, np.float64)), \
-                       'value {} in initial_guess is not a number'.format(i)
+        super().__init__(**kwargs)
 
         if CPE:
+            self.name = 'Randles w/ CPE'
             self.circuit = 'R_0-p(R_1,E_1/E_2)-W_1/W_2'
             circuit_length = calculateCircuitLength(self.circuit)
-            assert len(initial_guess) == circuit_length, \
-                'Initial guess length needs to be equal to {circuit_length}'
+            assert len(self.initial_guess) == circuit_length, \
+                'Initial guess length needs to be equal to parameter length'
         else:
+            self.name = 'Randles'
             self.circuit = 'R_0-p(R_1,C_1)-W_1/W_2'
-
             circuit_length = calculateCircuitLength(self.circuit)
-            assert len(initial_guess) == circuit_length, \
-                'Initial guess length needs to be equal to {circuit_length}'
+            assert len(self.initial_guess) == circuit_length, \
+                'Initial guess length needs to be equal to parameter length'
 
 
 class DefineCircuit(BaseCircuit):
-    def __init__(self, initial_guess=None, circuit=None,
-                 algorithm='leastsq', bounds=None):
-        """
-        Constructor for the Randles' circuit class
+    def __init__(self, circuit=None, **kwargs):
+        """ Constructor for a customizable equivalent circuit model
 
-        Inputs
-        ------
-        initial_guess: A list of values to use as
-                       the initial guess for element values
-        CPE: Whether or not to use constant phase elements
-             in place of a Warburg element
+        Parameters
+        ----------
+        circuit: string
+            A string that should be interpreted as an equivalent circuit
 
-        Methods
-        -------
-
-        .fit(frequencies, impedances)
-            frequencies: A list of frequencies where the
-                         values should be tested
-            impedances: A list of impedances used to fitting using
-                        scipy's least_squares fitting algorithm.
-        .predict(frequencies)
-            frequencies: A list of frequencies where new
-                         values will be calculated
         """
 
-        self.name = 'Custom'
-        self.parameters_ = None
-        self.initial_guess = initial_guess
+        super().__init__(**kwargs)
         self.circuit = circuit
-        self.algorithm = algorithm
-        self.bounds = bounds
-        # write some asserts to enforce typing
-        if initial_guess is not None:
-            for i in initial_guess:
-                assert isinstance(i, (float, int, np.int32, np.float64)), \
-                       'value {} in initial_guess is not a number'.format(i)
 
-            circuit_length = calculateCircuitLength(self.circuit)
-            assert len(initial_guess) == circuit_length, \
-                'Initial guess length needs to be equal to {circuit_length}'
+        circuit_length = calculateCircuitLength(self.circuit)
+        assert len(self.initial_guess) == circuit_length, \
+            'Initial guess length needs to be equal to {circuit_length}'
 
 
 class FlexiCircuit(BaseCircuit):
     def __init__(self, max_elements=None, generations=2,
                  popsize=30, initial_guess=None):
-        """
-        Constructor for the Flexible Circuit class
+        """ Constructor for the Flexible Circuit class
 
         Parameters
         ----------
