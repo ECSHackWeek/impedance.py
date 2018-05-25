@@ -82,9 +82,7 @@ def circuit_fit(frequencies, impedances, circuit,
                 if str(a+b) == "E2":
                     bounds.append((0, 1))
                 else:
-                    bounds.append((initial_guess[i]*1e-2,
-                                   initial_guess[i]*1e2))
-#            bounds = tuple(() for i in initial_guess)
+                    bounds.append((0, None))
         res = minimize(residualWrapper, initial_guess, args=(Z, f, circuit),
                        method=algorithm, bounds=bounds)
         p_values = res.x

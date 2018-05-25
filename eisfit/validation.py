@@ -17,11 +17,13 @@ def rmse(a, b):
     return(np.abs(np.sqrt(np.mean(np.square(a-b)))))
 
 
-def measModel(frequencies, impedances,
-              algorithm='SLSQP', max_k=7, R_val=0.1, C_val=10):
-    """
-    Iteratively add RC circuits until the error converges.
-    If error does not converge, it indicates that the data is poor.
+def measurementModel(frequencies, impedances, algorithm='SLSQP',
+                     max_k=7, R_guess=0.1, C_guess=10):
+    """ Runs a measurement model test for validating impedance data
+
+    Iteratively add RC circuit elements until the error converges.
+    If error does not converge, it indicates that the data doesn't meet
+    standards for linearity.
 
     Notes
     ---------
@@ -29,29 +31,38 @@ def measModel(frequencies, impedances,
 
         RMSE = R_0 + \\sum_{0}^{k} R_i || C_i
 
-    Inputs
+    Parameters
     ---------
-    frequencies: A list of frequencies to test
-    impedances: A list of values to match to
-    max_k: The maximum number of RC elements to fit
-    R_val: The initial value for R
-    C_val: The initial value for C
+    frequencies: np.ndarray
+        A list of frequencies to test
+    impedances: np.ndarray of complex numbers
+        A list of values to match to
+    max_k: int
+        The maximum number of RC elements to fit
+    initial_guess: np.ndarray
+        Initial guesses for R and C elements
     """
-    out = "R_0"
-    initial_guess = [R_val]
+
+    circuit = "R_0"
+    initial_guess = [R_guess]
     error_list = []
     model_list = []
+
+    print('--- Running Measurement Model ---')
     for i in range(max_k):
-        out += "-p(R_{},C_{})".format(i+1, i+1)
-        initial_guess.append(R_val)
-        initial_guess.append(C_val)
-        test = DefineCircuit(initial_guess=initial_guess,
-                             circuit=out, algorithm=algorithm)
-        print(out)
-        test.fit(frequencies, impedances)
-        model_list.append(test)
-        fit = test.predict(frequencies)
+        circuit += "-p(R_{},C_{})".format((i+1) % 9, (i+1) % 9)
+        initial_guess.append(R_guess)
+        initial_guess.append(C_guess)
+        measModel = DefineCircuit(initial_guess=initial_guess,
+                                  circuit=circuit, algorithm=algorithm)
+
+        measModel.fit(frequencies, impedances)
+        initial_guess = list(measModel.parameters_)
+        model_list.append(measModel)
+        fit = measModel.predict(frequencies)
         error = rmse(impedances, fit)
         error_list.append(error)
 
-    return [model_list, error_list]
+        print('Num elements: {}  Error: {:.2e}'.format(i+1, error))
+
+    return model_list, error_list
