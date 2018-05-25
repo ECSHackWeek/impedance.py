@@ -2,109 +2,144 @@
 Methods for preprocessing impedance data from instrument files
 """
 
+import numpy as np
 
-def read_Gamry(filename):
+
+def readFile(filename, type=None):
+    """ A wrapper for reading in many common types of impedance files
+
+    Parameters
+    ----------
+    filename: string
+        Filename to extract impedance data from
+    type: string
+        Type of instrument file
+
+    Returns
+    -------
+    frequencies : np.ndarray
+        Array of frequencies
+    impedance : np.ndarray of complex numbers
+        Array of complex impedances
+
+    """
+
+    supported_types = ['gamry', 'autolab', 'parstat']
+
+    if type is not None:
+        assert type in supported_types,\
+            '{} is not a supported type ({})'.format(type, supported_types)
+
+    if type == 'gamry':
+        f, Z = readGamry(filename)
+    elif type == 'autolab':
+        f, Z = readAutolab(filename)
+    elif type == 'parstat':
+        f, Z = readParstat(filename)
+    elif type is None:
+        f, Z = readCSV(filename)
+
+    return f, Z
+
+
+def readGamry(filename):
     """ function for reading the .DTA file from Gamry
 
     Parameters
-    -----------------
-    filename:
-        example: test1.DTA
+    ----------
+    filename: string
+        Filename of .DTA file to extract impedance data from
 
     Returns
-    ------------
-    frequencies : list of floats
-
-    impedance : list of complex numbers
-        Z = real + imag * 1j
-
-    Notes
-    ---------
-
+    -------
+    frequencies : np.ndarray
+        Array of frequencies
+    impedance : np.ndarray of complex numbers
+        Array of complex impedances
 
     """
 
-    INPUT = open(filename, 'r', encoding='ISO-8859-1')
-    lines = INPUT.readlines()
-    INPUT.close()
-    n = -1
-    for line in lines:
-        n = n + 1
+    with open(filename, 'r', encoding='ISO-8859-1') as input:
+        lines = input.readlines()
+
+    for i, line in enumerate(lines):
         if 'ZCURVE' in line:
-            start_line = n
-    raw_data = lines[int(start_line)+3:]
-    Freq = []
-    Z = []
+            start_line = i
+
+    raw_data = lines[start_line + 3:]
+    f, Z = [], []
     for line in raw_data:
         each = line.split()
-        Freq.append(float(each[2]))
+        f.append(float(each[2]))
         Z.append(complex(float(each[3]), float(each[4])))
-    return Freq, Z
+
+    return np.array(f), np.array(Z)
 
 
-def read_Autolab(filename):
+def readAutolab(filename):
     """ function for reading the .csv file from Autolab
 
-    Input
-    -----------------
-    filename:
-        example: test2.csv
+    Parameters
+    ----------
+    filename: string
+        Filename of .csv file to extract impedance data from
 
     Returns
-    ------------
-    frequencies : list of floats
-
-    impedance : list of complex numbers
-        Z = real + imag * 1j
-
-    Notes
-    ---------
-
+    -------
+    frequencies : np.ndarray
+        Array of frequencies
+    impedance : np.ndarray of complex numbers
+        Array of complex impedances
 
     """
 
-    INPUT = open(filename, 'r')
-    lines = INPUT.readlines()
-    INPUT.close()
+    with open(filename, 'r') as input:
+        lines = input.readlines()
+
     raw_data = lines[1:]
-    Freq = []
-    Z = []
+    f, Z = [], []
     for line in raw_data:
         each = line.split(',')
-        Freq.append(each[0])
+        f.append(each[0])
         Z.append(complex(float(each[1]), float(each[2])))
-    return Freq, Z
+
+    return np.array(f), np.array(Z)
 
 
-def read_Parstat(filename):
+def readParstat(filename):
     """ function for reading the .txt file from Parstat
 
-    Input
-    -----------------
-    filename:
-        example: test3.txt
+    Parameters
+    ----------
+    filename: string
+        Filename of .txt file to extract impedance data from
 
     Returns
-    ------------
-    frequencies : list of floats
-
-    impedance : list of complex numbers
-        Z = real + imag * 1j
-
-    Notes
-    ---------
-
+    -------
+    frequencies : np.ndarray
+        Array of frequencies
+    impedance : np.ndarray of complex numbers
+        Array of complex impedances
 
     """
 
-    INPUT = open(filename, 'r')
-    lines = INPUT.readlines()
-    INPUT.close()
+    with open(filename, 'r') as input:
+        lines = input.readlines()
+
     raw_data = lines[1:]
-    Freq = []
-    Z = []
+    f, Z = [], []
     for line in raw_data:
         each = line.split()
-        Freq.append(each[4])
+        f.append(each[4])
         Z.append(complex(float(each[6]), float(each[7])))
-    return Freq, Z
+
+    return np.array(f), np.array(Z)
+
+
+def readCSV(filename):
+    data = np.genfromtxt(filename, delimiter=',')
+
+    f = data[:, 0]
+    Z = data[:, 1] + 1j*data[:, 2]
+
+    return f, Z
