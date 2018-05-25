@@ -12,16 +12,11 @@ Welcome to eisfit's documentation!
    :caption: Contents
 
    examples
-
    fitting
-
    circuits
-
    validation
-
    preprocessing
-
-   genetic 
+   genetic
 
 
 Indices and tables
