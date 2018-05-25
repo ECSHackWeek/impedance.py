@@ -1,5 +1,6 @@
-from eisfit.circuit_elements import R, C, W, A, E, G
+from eisfit.circuit_elements import R, C, W, A, E, G, s, p
 import cmath
+import numpy as np
 
 
 def correct_vals():
@@ -63,11 +64,17 @@ def test_all():
     pass
 
 
-# def test_s():
-#
-#     pass
-#
-#
-# def test_p():
-#
-#     pass
+def test_s():
+    a = np.array([5 + 6*1j, 2 + 3*1j])
+    b = np.array([5 + 6*1j, 2 + 3*1j])
+
+    answer = np.array([10 + 12*1j, 4 + 6*1j])
+    assert np.isclose(s([a, b]), answer).all()
+
+
+def test_p():
+    a = np.array([5 + 6*1j, 2 + 3*1j])
+    b = np.array([5 + 6*1j, 2 + 3*1j])
+
+    answer = np.array([2.5 + 3*1j, 1 + 1.5*1j])
+    assert np.isclose(p([a, b]), answer).all()
