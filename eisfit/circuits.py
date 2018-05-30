@@ -1,4 +1,6 @@
 from .fitting import circuit_fit, computeCircuit, calculateCircuitLength
+from .plotting import plot_nyquist
+import matplotlib.pyplot as plt
 import numpy as np
 
 
@@ -58,10 +60,13 @@ class BaseCircuit:
             'mismatch in length of input frequencies and impedances'
 
         if self.initial_guess is not None:
-            self.parameters_, _ = circuit_fit(frequencies, impedance,
-                                              self.circuit, self.initial_guess,
-                                              self.algorithm,
-                                              bounds=self.bounds)
+            parameters, conf = circuit_fit(frequencies, impedance,
+                                           self.circuit, self.initial_guess,
+                                           self.algorithm,
+                                           bounds=self.bounds)
+            self.parameters_ = parameters
+            if conf is not None:
+                self.conf_ = conf
         else:
             # TODO auto calc guess
             raise ValueError('no initial guess supplied')
@@ -134,8 +139,78 @@ class BaseCircuit:
         to_print += '\n-------------------------------\n'
         return to_print
 
+    def plot(self, f_data=None, Z_data=None, CI=True):
+        """ a convenience method for plotting Nyquist plots
+
+
+        Parameters
+        ----------
+        f_data: np.array of type float
+            Frequencies of input data (for Bode plots)
+        Z_data: np.array of type complex
+            Impedance data to plot
+        CI: boolean
+            Include bootstrapped confidence intervals in plot
+
+        Returns
+        -------
+        ax: matplotlib.axes
+            axes of the created nyquist plot
+        """
+
+        fig, ax = plt.subplots(figsize=(5, 5))
+
+        if Z_data is not None:
+            ax = plot_nyquist(ax, f_data, Z_data)
+
+        if self._is_fit():
+
+            if f_data is not None:
+                f_pred = f_data
+            else:
+                f_pred = np.logspace(5, -3)
+
+            Z_fit = self.predict(f_pred)
+            ax = plot_nyquist(ax, f_data, Z_fit, fit=True)
+
+            if CI:
+                N = 1000
+                n = len(self.parameters_)
+                f_pred = np.logspace(np.log10(min(f_data)),
+                                     np.log10(max(f_data)),
+                                     num=100)
+
+                params = self.parameters_
+                confs = self.conf_
+
+                full_range = np.ndarray(shape=(N, len(f_pred)), dtype=complex)
+                for i in range(N):
+                    self.parameters_ = params + \
+                                        confs*np.random.uniform(-2, 2, size=n)
+
+                    full_range[i, :] = self.predict(f_pred)
+
+                self.parameters_ = params
+
+                min_Z = []
+                max_Z = []
+                for x in np.real(Z_fit):
+                    ys = []
+                    for run in full_range:
+                        ind = np.argmin(np.abs(run.real - x))
+                        ys.append(run[ind].imag)
+
+                    min_Z.append(x + 1j*min(ys))
+                    max_Z.append(x + 1j*max(ys))
+
+                ax.fill_between(np.real(min_Z), -np.imag(min_Z),
+                                -np.imag(max_Z), alpha='.2')
+
+        plt.show()
+
 
 class Randles(BaseCircuit):
+    """ A Randles circuit model class """
     def __init__(self, CPE=False, **kwargs):
         """ Constructor for the Randles' circuit class
 

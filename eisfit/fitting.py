@@ -73,7 +73,7 @@ def circuit_fit(frequencies, impedances, circuit,
             for i, __ in enumerate(covar):
                 p_error.append(np.absolute(p_cov[i][i])**0.5)
         else:
-            p_error = len(p_values)*[-1]
+            p_error = None
     elif algorithm in ['SLSQP', 'L-BFGS-B', 'TNC']:
         if bounds is None:
             bounds = []
@@ -94,7 +94,7 @@ def circuit_fit(frequencies, impedances, circuit,
                        method=algorithm)
         p_values = res.x
         covar = None
-        p_error = len(p_values)*[-1]
+        p_error = None
 
     return p_values, p_error
 
