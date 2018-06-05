@@ -5,7 +5,7 @@
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
-SPHINXPROJ    = eisfit
+SPHINXPROJ    = impedance
 SOURCEDIR     = source
 BUILDDIR      = build
 

@@ -1,4 +1,4 @@
-from eisfit.validation import rmse
+from impedance.validation import rmse
 import numpy as np
 
 

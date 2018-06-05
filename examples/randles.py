@@ -4,7 +4,7 @@ import sys
 sys.path.append('../')
 
 # import Randles circuit object
-from eisfit.circuits import Randles  # noqa E402
+from impedance.circuits import Randles  # noqa E402
 
 # read in data
 data = np.genfromtxt('./data/exampleData.csv', delimiter=',')

@@ -1,4 +1,4 @@
-from eisfit.circuit_elements import R, C, W, A, E, G, s, p
+from impedance.circuit_elements import R, C, W, A, E, G, s, p
 import cmath
 import numpy as np
 

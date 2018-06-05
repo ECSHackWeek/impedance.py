@@ -3,7 +3,7 @@ import numpy as np
 import sys
 sys.path.append('../')
 
-from eisfit import validation  # noqa E402
+from impedance import validation  # noqa E402
 
 data = np.genfromtxt('./data/exampleData.csv', delimiter=',')
 f = data[:, 0]

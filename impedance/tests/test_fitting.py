@@ -1,4 +1,4 @@
-from eisfit.fitting import buildCircuit, rmse
+from impedance.fitting import buildCircuit, rmse
 import numpy as np
 
 # def test_residuals():

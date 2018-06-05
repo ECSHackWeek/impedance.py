@@ -1,4 +1,4 @@
-from eisfit.preprocessing import readFile, readGamry
+from impedance.preprocessing import readFile, readGamry
 import numpy as np
 
 # store some global test data

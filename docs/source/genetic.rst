@@ -1,5 +1,5 @@
 Genetic Modeling
 ================
 
-.. automodule:: eisfit.genetic
+.. automodule:: impedance.genetic
    :members:

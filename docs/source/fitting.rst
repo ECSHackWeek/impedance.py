@@ -1,5 +1,5 @@
 Fitting
 =======
 
-.. automodule:: eisfit.fitting
+.. automodule:: impedance.fitting
    :members:

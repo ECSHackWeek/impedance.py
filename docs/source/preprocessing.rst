@@ -1,5 +1,5 @@
 Preprocessing
 =============
 
-.. automodule:: eisfit.preprocessing
+.. automodule:: impedance.preprocessing
    :members:

@@ -17,10 +17,10 @@ install:
 # for production, remove the --exit-zero
 # this side-steps failing build on PEP8 violations
 before_script:
-   - flake8 eisfit --exclude=*.ipynb_checkpoints
+   - flake8 impedance --exclude=*.ipynb_checkpoints
 
 script:
-   - nosetests --with-coverage --cover-erase --cover-package=eisfit
+   - nosetests --with-coverage --cover-erase --cover-package=impedance
 
 after_success:
    - coverage report

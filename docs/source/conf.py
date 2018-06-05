@@ -19,14 +19,14 @@ sys.path.insert(0, os.path.abspath('../../'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'eisfit'
-copyright = '2018, Name'
-author = 'Name'
+project = 'impedance.py'
+copyright = '2018, impedance.py developers'
+author = ''
 
 # The short X.Y version
-version = ''
+version = '0.1'
 # The full version, including alpha/beta/rc tags
-release = ''
+release = '0.1.0-alpha'
 
 
 # -- General configuration ---------------------------------------------------
@@ -111,7 +111,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'eisfitdoc'
+htmlhelp_basename = 'impedancedoc'
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -138,7 +138,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'eisfit.tex', 'eisfit Documentation',
+    (master_doc, 'impedance.tex', 'eisfit Documentation',
      'Name', 'manual'),
 ]
 
@@ -148,7 +148,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'eisfit', 'eisfit Documentation',
+    (master_doc, 'impedance', 'impedance.py Documentation',
      [author], 1)
 ]
 
@@ -159,8 +159,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'eisfit', 'eisfit Documentation',
-     author, 'eisfit', 'One line description of project.',
+    (master_doc, 'impedance', 'impedance.py Documentation',
+     author, 'impedance', 'One line description of project.',
      'Miscellaneous'),
 ]
 

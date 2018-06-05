@@ -13,5 +13,5 @@ Testing your data with the measurement model is straightforward:
 
 
 
-.. automodule:: eisfit.validation
+.. automodule:: impedance.validation
    :members:

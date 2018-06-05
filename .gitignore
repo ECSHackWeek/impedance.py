@@ -1,8 +1,8 @@
-.ipynb_checkpoints
-.DS_Store
+*.ipynb_checkpoints
+*.DS_Store
 
-EISfit/__pycache__/
-EISfit/tests/__pycache__/
+impedance/__pycache__/
+impedance/tests/__pycache__/
 
 
 # Byte-compiled / optimized / DLL files
