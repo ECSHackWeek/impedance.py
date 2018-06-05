@@ -4,6 +4,6 @@
 
 [![Documentation Status](https://readthedocs.org/projects/impedancepy/badge/?version=latest)](https://impedancepy.readthedocs.io/en/latest/?badge=latest)
 
-## impedance.py is a library for making equivalent circuits and fitting them to Impedance data.
+# impedance.py is a Python package for working with impedance data
 
-Using a Sci-Kit-like API, we hope to make it more intuitive to fit EIS spectra with equivalent circuits.
+Using a [scikit-learn-like API](https://arxiv.org/abs/1309.0238), we hope to make visualizing, fitting, and analyzing impedance spectra more intuitive and reproducible.
