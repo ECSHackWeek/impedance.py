@@ -35,16 +35,16 @@ impedance.py requires:
 - Python (>=3.5)
 - SciPy (>=1.0)
 - NumPy (>=1.14)
-- Matplotlib (>=2.2)
+- Matplotlib (>=2.0)
 
-Several example notebooks are provided in the examples/jupyter directory. Opening these will require Jupyter notebook or Jupyter lab.
+Several example notebooks are provided in the examples/ directory. Opening these will require Jupyter notebook or Jupyter lab.
 
 #### User Installation
 
-If you already have a working installation of numpy, scipy, and matplotlib, the easiest way to install impedance.py is using pip:
+The easiest way to install impedance.py is using pip:
 
-`pip install -U impedance`
+`pip install impedance`
 
 #### Examples and Documentation
 
-Several examples can be found in the `examples/` directory (the [fitting_tutorial.ipynb](https://github.com/ECSHackWeek/impedance.py/blob/master/examples/fitting_tutorial.ipynb) is a great place to start) and the documentation can be found at [impedancepy.readthedocs.io](https://impedancepy.readthedocs.io/en/latest/). 
+Several examples can be found in the `examples/` directory (the [fitting_tutorial.ipynb](https://github.com/ECSHackWeek/impedance.py/blob/master/examples/fitting_tutorial.ipynb) is a great place to start) and the documentation can be found at [impedancepy.readthedocs.io](https://impedancepy.readthedocs.io/en/latest/).
