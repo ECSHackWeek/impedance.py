@@ -1,4 +1,4 @@
-from .circuits import DefineCircuit
+from .circuits import CustomCircuit
 import numpy as np
 
 
@@ -53,7 +53,7 @@ def measurementModel(frequencies, impedances, algorithm='SLSQP',
         circuit += "-p(R_{},C_{})".format((i+1) % 9, (i+1) % 9)
         initial_guess.append(R_guess)
         initial_guess.append(C_guess)
-        measModel = DefineCircuit(initial_guess=initial_guess,
+        measModel = CustomCircuit(initial_guess=initial_guess,
                                   circuit=circuit, algorithm=algorithm)
 
         measModel.fit(frequencies, impedances)

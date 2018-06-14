@@ -235,7 +235,7 @@ class Randles(BaseCircuit):
                 'Initial guess length needs to be equal to parameter length'
 
 
-class DefineCircuit(BaseCircuit):
+class CustomCircuit(BaseCircuit):
     def __init__(self, circuit=None, **kwargs):
         """ Constructor for a customizable equivalent circuit model
 
