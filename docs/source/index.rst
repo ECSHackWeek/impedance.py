@@ -42,7 +42,6 @@ The easiest way to install the package is using pip:
    fitting
    validation
    preprocessing
-   genetic
 
 
 Indices and tables
