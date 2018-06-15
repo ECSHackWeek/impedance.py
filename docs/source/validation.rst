@@ -8,10 +8,5 @@ Measurement Model
 
 Testing your data with the measurement model is straightforward:
 
-.. literalinclude:: ../../examples/validation.py
-   :language: python
-
-
-
 .. automodule:: impedance.validation
    :members:
