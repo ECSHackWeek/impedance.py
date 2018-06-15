@@ -39,7 +39,7 @@ def generate_circuit(length, parent=None, mutate=0.3, parallel=0.2):
                     out += "p("
                     out += l1[elem[i]]
                     out += ','
-#                    i += 1
+#                    i += 1 
                     out += l1[elem[i]]
                     out += ')'
 #                    i += 1
