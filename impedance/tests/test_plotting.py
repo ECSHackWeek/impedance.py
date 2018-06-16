@@ -1,6 +1,12 @@
-import matplotlib.pyplot as plt
+import os
 import numpy as np
 from impedance.plotting import plot_nyquist
+
+import matplotlib as mpl
+if os.environ.get('DISPLAY', '') == '':
+    print('no display found. Using non-interactive Agg backend')
+    mpl.use('Agg')
+import matplotlib.pyplot as plt  # noqa E402
 
 
 def test_plot_nyquist():
