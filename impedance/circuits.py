@@ -1,7 +1,12 @@
 from .fitting import circuit_fit, computeCircuit, calculateCircuitLength
 from .plotting import plot_nyquist
-import matplotlib.pyplot as plt
 import numpy as np
+
+import matplotlib as mpl
+if os.environ.get('DISPLAY', '') == '':
+    print('no display found. Using non-interactive Agg backend')
+    mpl.use('Agg')
+import matplotlib.pyplot as plt  # noqa E402
 
 
 class BaseCircuit:
