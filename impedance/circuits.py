@@ -1,6 +1,7 @@
 from .fitting import circuit_fit, computeCircuit, calculateCircuitLength
 from .plotting import plot_nyquist
 import numpy as np
+import os
 
 import matplotlib as mpl
 if os.environ.get('DISPLAY', '') == '':
