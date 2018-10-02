@@ -147,18 +147,24 @@ class BaseCircuit:
         to_print += 'Circuit string: {}\n'.format(self.circuit)
         to_print += 'Algorithm: {}\n'.format(self.algorithm)
 
+
         if self._is_fit():
-            to_print += 'Fit: True\n'
+            to_print += "Fit: True\n"
+        else:
+            to_print += "Fit: False\n"
+
+
+        to_print += '\n-------------------------------\n'
+        to_print += 'Initial guesses:\n'
+        for name, param in zip(names, self.initial_guess):
+            to_print += '\t{} = {:.2e}\n'.format(name, param)
+        if self._is_fit():
+            to_print += '\n-------------------------------\n'
             to_print += 'Fit parameters:\n'
             for name, param in zip(names, self.parameters_):
                 to_print += '\t{} = {:.2e}\n'.format(name, param)
-        else:
-            to_print += 'Fit: False\n'
-            to_print += 'Initial guesses:\n'
-            for name, param in zip(names, self.initial_guess):
-                to_print += '\t{} = {:.2e}\n'.format(name, param)
 
-        to_print += '\n-------------------------------\n'
+
         return to_print
 
     def plot(self, f_data=None, Z_data=None, CI=True):
