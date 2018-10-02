@@ -8,13 +8,13 @@ def model_export(model, filepath):
 
     model_string = model.circuit
 
-    model_param_names = model.get_names()
+    model_param_names = model.get_param_names()
 
     model_params = [(name, model.parameters_[index])
                     for index, name in enumerate(model_param_names)]
 
 
-    print("Exporting the following model to destination")
+    print("Exporting the following model to destination %s"%filepath)
     print(model)
 
     destination_object = open(filepath, 'w')
@@ -40,7 +40,7 @@ def model_import(filepath):
     circuit_model = CustomCircuit(initial_guess=circuit_params, circuit=circuit_string)
     circuit_model.parameters_ = np.array(circuit_model.initial_guess)
 
-    "Imported model with the following circuit parameters"
+    print("Imported model from %s with the following circuit parameters"%filepath)
     print(circuit_model)
 
     return circuit_model

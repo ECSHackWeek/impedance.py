@@ -119,7 +119,7 @@ class BaseCircuit:
                              "Please call the `.fit` method before trying to" +
                              " predict model output")
 
-    def get_names(self):
+    def get_param_names(self):
         """Converts circuit string to names"""
 
         # parse the element names from the circuit string
@@ -131,7 +131,7 @@ class BaseCircuit:
     def __str__(self):
         """ Defines the pretty printing of the circuit """
 
-        names = self.get_names()
+        names = self.get_param_names()
 
         to_print  = '\n-------------------------------\n'  # noqa E222
         to_print += 'Circuit: {}\n'.format(self.name)
