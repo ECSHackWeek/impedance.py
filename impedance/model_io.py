@@ -58,7 +58,14 @@ def model_import(filepath, as_initial_guess = True):
 
     json_data = json.load(json_data_file)
 
+
+
+
     circuit_name = json_data["Name"]
+
+    if circuit_name == 'None':
+        circuit_name = None
+    
     circuit_string = json_data["Circuit String"]
     circuit_param_list = json_data["Parameters"]
     circuit_ig_list = json_data["Initial Guess"]
