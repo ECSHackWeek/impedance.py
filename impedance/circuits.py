@@ -86,13 +86,17 @@ class BaseCircuit:
         else:
             return False
 
-    def predict(self, frequencies):
+    def predict(self, frequencies, use_initial=False):
         """ Predict impedance using a fit equivalent circuit model
 
         Parameters
         ----------
         frequencies: numpy array
             Frequencies
+
+        use_initial: boolean
+            If true and a fit was already completed,
+            use the initial parameters instead
 
         Returns
         -------
@@ -109,15 +113,20 @@ class BaseCircuit:
         assert isinstance(frequencies[0], (float, int, np.int32, np.float64)),\
             'frequencies does not contain a number'
 
-        if self._is_fit():
-            return computeCircuit(self.circuit,
-                                  self.parameters_.tolist(),
+
+
+        # If
+        if self._is_fit() and not use_initial:
+            print("Simulating circuit based on fitted parameters")
+            return computeCircuit(self.circuit, self.parameters_.tolist(),
                                   frequencies.tolist())
 
         else:
-            raise ValueError("The model hasn't been fit yet. " +
-                             "Please call the `.fit` method before trying to" +
-                             " predict model output")
+            print("Simulating circuit based on initial parameters")
+            return computeCircuit(self.circuit, self.initial_guess,
+                           frequencies.tolist())
+
+
 
     def get_param_names(self):
         """Converts circuit string to names"""
