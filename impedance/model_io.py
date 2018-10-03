@@ -29,6 +29,9 @@ def model_export(model, filepath):
     model_params = [(name, model.parameters_[index])
                     for index, name in enumerate(model_param_names)]
 
+    model_conf = [(name, model.conf_[index])
+                    for index, name in enumerate(model_param_names)]
+
 
     if not model_name:
         model_name = "None"
@@ -36,7 +39,8 @@ def model_export(model, filepath):
     data_dict = {"Name":model_name,
                  "Circuit String":model_string,
                  "Initial Guess":model_initial_guess,
-                 "Parameters":model_params
+                 "Parameters":model_params,
+                 "Confidence":model_conf,
     }
 
     print("Exporting the following model to destination %s"%filepath)
