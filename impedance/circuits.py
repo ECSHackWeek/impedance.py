@@ -137,9 +137,10 @@ class BaseCircuit:
 
         return names
 
-    def __str__(self):
-        """ Defines the pretty printing of the circuit """
 
+    def get_verbose_string(self):
+
+        """ Defines the pretty printing of all data in the circuit"""
         names = self.get_param_names()
 
         to_print  = '\n-------------------------------\n'  # noqa E222
@@ -165,6 +166,35 @@ class BaseCircuit:
                 to_print += '\t{} = {:.2e}'.format(name, param)
                 to_print += '\t(+/- {:.2e})\n'.format(conf)
 
+        return to_print
+
+    def __str__(self):
+        """ Defines the pretty printing of the circuit """
+
+        names = self.get_param_names()
+
+        to_print  = '\n-------------------------------\n'  # noqa E222
+        to_print += 'Circuit: {}\n'.format(self.name)
+        to_print += 'Circuit string: {}\n'.format(self.circuit)
+        to_print += 'Algorithm: {}\n'.format(self.algorithm)
+
+
+        if self._is_fit():
+            to_print += "Fit: True\n"
+        else:
+            to_print += "Fit: False\n"
+
+
+        if self._is_fit():
+            to_print += '\n-------------------------------\n'
+            to_print += 'Fit parameters:\n'
+            for name, param, conf in zip(names, self.parameters_, self.conf_):
+                to_print += '\t{} = {:.2e}\n'.format(name, param)
+        else:
+            to_print += '\n-------------------------------\n'
+            to_print += 'Initial guesses:\n'
+            for name, param in zip(names, self.initial_guess):
+                to_print += '\t{} = {:.2e}\n'.format(name, param)
 
         return to_print
 
