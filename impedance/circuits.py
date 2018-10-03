@@ -161,8 +161,9 @@ class BaseCircuit:
         if self._is_fit():
             to_print += '\n-------------------------------\n'
             to_print += 'Fit parameters:\n'
-            for name, param in zip(names, self.parameters_):
-                to_print += '\t{} = {:.2e}\n'.format(name, param)
+            for name, param, conf in zip(names, self.parameters_, self.conf_):
+                to_print += '\t{} = {:.2e}'.format(name, param)
+                to_print += '\t(+/- {:.2e})\n'.format(conf)
 
 
         return to_print
