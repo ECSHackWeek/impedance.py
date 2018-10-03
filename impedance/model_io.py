@@ -35,7 +35,7 @@ def model_export(model, filepath):
     json.dump(data_dict, destination_object)
 
 
-def model_import(filepath, as_initial_guess = True):
+def model_import(filepath, as_initial_guess = False):
     """ Imports parameters of a model from JSON
 
     Parameters
@@ -65,16 +65,25 @@ def model_import(filepath, as_initial_guess = True):
 
     if circuit_name == 'None':
         circuit_name = None
-    
+
     circuit_string = json_data["Circuit String"]
     circuit_param_list = json_data["Parameters"]
     circuit_ig_list = json_data["Initial Guess"]
 
     circuit_params = [item[1] for item in circuit_param_list]
     circuit_initial_guess = [item[1] for item in circuit_ig_list]
+    print(circuit_initial_guess)
 
-    circuit_model = CustomCircuit(initial_guess=circuit_initial_guess, circuit=circuit_string, name=circuit_name)
-    circuit_model.parameters_ = np.array(circuit_params)
+    # If this is being loaded as an initial guess, load the fitted circuit parameters as an initial guess
+    if as_initial_guess:
+
+        circuit_model = CustomCircuit(initial_guess=circuit_params, circuit=circuit_string, name=circuit_name)
+
+    else:
+
+        circuit_model = CustomCircuit(initial_guess=circuit_initial_guess, circuit=circuit_string, name=circuit_name)
+        circuit_model.parameters_ = np.array(circuit_params)
+
 
     print("Imported model from %s with the following circuit parameters"%filepath)
     print(circuit_model)
