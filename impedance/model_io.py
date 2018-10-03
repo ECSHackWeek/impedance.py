@@ -3,7 +3,19 @@ from .circuits import CustomCircuit
 import numpy as np
 
 def model_export(model, filepath):
-    """Export the impedance model to a JSON file"""
+    """ Exports a model to JSON
+
+    Parameters
+    ---------
+
+    model: CustomCircuit
+        Circuit model object
+
+    filepath: Path String
+        Destination for exporting model object
+
+
+    """
 
 
     model_string = model.circuit
@@ -36,7 +48,7 @@ def model_export(model, filepath):
 
 
 def model_import(filepath, as_initial_guess = False):
-    """ Imports parameters of a model from JSON
+    """ Imports a model from JSON
 
     Parameters
     ---------
