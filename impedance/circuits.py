@@ -113,20 +113,14 @@ class BaseCircuit:
         assert isinstance(frequencies[0], (float, int, np.int32, np.float64)),\
             'frequencies does not contain a number'
 
-
-
-        # If
         if self._is_fit() and not use_initial:
             print("Simulating circuit based on fitted parameters")
             return computeCircuit(self.circuit, self.parameters_.tolist(),
                                   frequencies.tolist())
-
         else:
             print("Simulating circuit based on initial parameters")
             return computeCircuit(self.circuit, self.initial_guess,
-                           frequencies.tolist())
-
-
+                                  frequencies.tolist())
 
     def get_param_names(self):
         """Converts circuit string to names"""
@@ -136,7 +130,6 @@ class BaseCircuit:
         names = names.replace(',', '-').replace('/', '-').split('-')
 
         return names
-
 
     def get_verbose_string(self):
 
@@ -148,12 +141,10 @@ class BaseCircuit:
         to_print += 'Circuit string: {}\n'.format(self.circuit)
         to_print += 'Algorithm: {}\n'.format(self.algorithm)
 
-
         if self._is_fit():
             to_print += "Fit: True\n"
         else:
             to_print += "Fit: False\n"
-
 
         to_print += '\n-------------------------------\n'
         to_print += 'Initial guesses:\n'
@@ -178,12 +169,10 @@ class BaseCircuit:
         to_print += 'Circuit string: {}\n'.format(self.circuit)
         to_print += 'Algorithm: {}\n'.format(self.algorithm)
 
-
         if self._is_fit():
             to_print += "Fit: True\n"
         else:
             to_print += "Fit: False\n"
-
 
         if self._is_fit():
             to_print += '\n-------------------------------\n'
