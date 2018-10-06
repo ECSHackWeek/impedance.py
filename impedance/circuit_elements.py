@@ -59,9 +59,25 @@ def C(p, f):
 
     typeChecker(p, f, C.__name__, 1)
     omega = 2*np.pi*np.array(f)
-    Cap = p[0]
+    capacitance = p[0]
 
-    return 1.0/(Cap*1j*omega)
+    return 1.0/(capacitance*1j*omega)
+
+
+def L(p, f):
+    """ defines an inductor
+
+    .. math::
+
+        Z = L \\times j 2 \\pi f
+
+     """
+
+    typeChecker(p, f, L.__name__, 1)
+    omega = 2*np.pi*np.array(f)
+    inductance = p[0]
+
+    return inductance*1j*omega
 
 
 def W(p, f):
