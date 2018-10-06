@@ -250,6 +250,19 @@ class CustomCircuit(BaseCircuit):
         circuit: string
             A string that should be interpreted as an equivalent circuit
 
+
+        Notes
+        -----
+        A custom circuit is defined as a string comprised of elements in series
+        (separated by a `-`) and elements in parallel (grouped as (x,y)).
+        Elements with two or more parameters are separated by a forward slash
+        (`/`).
+
+        Example:
+            Randles circuit is given by 'R0-p(R1,C1)-W1/W2'
+
+
+
         """
 
         super().__init__(**kwargs)
