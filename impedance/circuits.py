@@ -86,13 +86,17 @@ class BaseCircuit:
         else:
             return False
 
-    def predict(self, frequencies):
+    def predict(self, frequencies, use_initial=False):
         """ Predict impedance using a fit equivalent circuit model
 
         Parameters
         ----------
         frequencies: numpy array
             Frequencies
+
+        use_initial: boolean
+            If true and a fit was already completed,
+            use the initial parameters instead
 
         Returns
         -------
@@ -109,40 +113,89 @@ class BaseCircuit:
         assert isinstance(frequencies[0], (float, int, np.int32, np.float64)),\
             'frequencies does not contain a number'
 
-        if self._is_fit():
-            return computeCircuit(self.circuit,
-                                  self.parameters_.tolist(),
+
+
+        # If
+        if self._is_fit() and not use_initial:
+            print("Simulating circuit based on fitted parameters")
+            return computeCircuit(self.circuit, self.parameters_.tolist(),
                                   frequencies.tolist())
 
         else:
-            raise ValueError("The model hasn't been fit yet. " +
-                             "Please call the `.fit` method before trying to" +
-                             " predict model output")
+            print("Simulating circuit based on initial parameters")
+            return computeCircuit(self.circuit, self.initial_guess,
+                           frequencies.tolist())
 
-    def __str__(self):
-        """ Defines the pretty printing of the circuit """
+
+
+    def get_param_names(self):
+        """Converts circuit string to names"""
 
         # parse the element names from the circuit string
         names = self.circuit.replace('p', '').replace('(', '').replace(')', '')
         names = names.replace(',', '-').replace('/', '-').split('-')
+
+        return names
+
+
+    def get_verbose_string(self):
+
+        """ Defines the pretty printing of all data in the circuit"""
+        names = self.get_param_names()
 
         to_print  = '\n-------------------------------\n'  # noqa E222
         to_print += 'Circuit: {}\n'.format(self.name)
         to_print += 'Circuit string: {}\n'.format(self.circuit)
         to_print += 'Algorithm: {}\n'.format(self.algorithm)
 
+
         if self._is_fit():
-            to_print += 'Fit: True\n'
+            to_print += "Fit: True\n"
+        else:
+            to_print += "Fit: False\n"
+
+
+        to_print += '\n-------------------------------\n'
+        to_print += 'Initial guesses:\n'
+        for name, param in zip(names, self.initial_guess):
+            to_print += '\t{} = {:.2e}\n'.format(name, param)
+        if self._is_fit():
+            to_print += '\n-------------------------------\n'
             to_print += 'Fit parameters:\n'
-            for name, param in zip(names, self.parameters_):
+            for name, param, conf in zip(names, self.parameters_, self.conf_):
+                to_print += '\t{} = {:.2e}'.format(name, param)
+                to_print += '\t(+/- {:.2e})\n'.format(conf)
+
+        return to_print
+
+    def __str__(self):
+        """ Defines the pretty printing of the circuit """
+
+        names = self.get_param_names()
+
+        to_print  = '\n-------------------------------\n'  # noqa E222
+        to_print += 'Circuit: {}\n'.format(self.name)
+        to_print += 'Circuit string: {}\n'.format(self.circuit)
+        to_print += 'Algorithm: {}\n'.format(self.algorithm)
+
+
+        if self._is_fit():
+            to_print += "Fit: True\n"
+        else:
+            to_print += "Fit: False\n"
+
+
+        if self._is_fit():
+            to_print += '\n-------------------------------\n'
+            to_print += 'Fit parameters:\n'
+            for name, param, conf in zip(names, self.parameters_, self.conf_):
                 to_print += '\t{} = {:.2e}\n'.format(name, param)
         else:
-            to_print += 'Fit: False\n'
+            to_print += '\n-------------------------------\n'
             to_print += 'Initial guesses:\n'
             for name, param in zip(names, self.initial_guess):
                 to_print += '\t{} = {:.2e}\n'.format(name, param)
 
-        to_print += '\n-------------------------------\n'
         return to_print
 
     def plot(self, f_data=None, Z_data=None, CI=True):
