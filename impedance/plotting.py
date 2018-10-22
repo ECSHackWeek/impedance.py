@@ -15,12 +15,29 @@ class FixedOrderFormatter(ScalarFormatter):
         self.orderOfMagnitude = self._order_of_mag
 
 
-def plot_nyquist(ax, freq, Z, fit=False):
+def plot_nyquist(ax, freq, Z, scale=1, units='Ohms', fmt='.-'):
+    """ Convenience function for plotting nyquist plots
 
-    if fit:
-        fmt = '.-'
-    else:
-        fmt = 'o'
+
+        Parameters
+        ----------
+        ax: matplotlib.axes.Axes
+            axes on which to plot the nyquist plot
+        freq: np.array of floats
+            frequencies
+        Z: np.array of complex numbers
+            impedance data
+        scale: float
+            the scale for the axes
+        units: string
+            units for :math:`Z(\omega)`
+        fmt: string
+            format string passed to matplotlib (e.g. '.-' or 'o')
+
+        Returns
+        -------
+        ax: matplotlib.axes.Axes
+    """
 
     ax.plot(np.real(Z), -np.imag(Z), fmt, lw=3)
 
@@ -28,8 +45,10 @@ def plot_nyquist(ax, freq, Z, fit=False):
     ax.set_aspect('equal')
 
     # Set the labels to -imaginary vs real
-    ax.set_xlabel('$Z_{1}^{\prime}(\omega)$ $[m\Omega]$', fontsize=20)
-    ax.set_ylabel('$-Z_{1}^{\prime\prime}(\omega)$ $[m\Omega]$', fontsize=20)
+    ax.set_xlabel('$Z^{\prime}(\omega)$ ' +
+                  '$[{}]$'.format(units), fontsize=20)
+    ax.set_ylabel('$-Z^{\prime\prime}(\omega)$ ' +
+                  '$[{}]$'.format(units), fontsize=20)
 
     # Make the tick labels larger
     ax.tick_params(axis='both', which='major', labelsize=14)
@@ -42,8 +61,8 @@ def plot_nyquist(ax, freq, Z, fit=False):
     ax.grid(b=True, which='major', axis='both', alpha=.5)
 
     # Change axis units to 10^-3 and resize the offset text
-    ax.xaxis.set_major_formatter(FixedOrderFormatter(-3))
-    ax.yaxis.set_major_formatter(FixedOrderFormatter(-3))
+    ax.xaxis.set_major_formatter(FixedOrderFormatter(-np.log10(scale)))
+    ax.yaxis.set_major_formatter(FixedOrderFormatter(-np.log10(scale)))
     y_offset = ax.yaxis.get_offset_text()
     y_offset.set_size(18)
     t = ax.xaxis.get_offset_text()

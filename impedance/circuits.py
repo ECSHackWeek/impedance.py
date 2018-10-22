@@ -114,7 +114,6 @@ class BaseCircuit:
             'frequencies does not contain a number'
 
         if self._is_fit() and not use_initial:
-            print("Simulating circuit based on fitted parameters")
             return computeCircuit(self.circuit, self.parameters_.tolist(),
                                   frequencies.tolist())
         else:
@@ -219,7 +218,7 @@ class BaseCircuit:
                 f_pred = np.logspace(5, -3)
 
             Z_fit = self.predict(f_pred)
-            ax = plot_nyquist(ax, f_data, Z_fit, fit=True)
+            ax = plot_nyquist(ax, f_data, Z_fit, fmt='.-')
 
             if CI:
                 N = 1000
