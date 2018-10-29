@@ -60,7 +60,7 @@ def plot_nyquist(ax, freq, Z, scale=1, units='Ohms', fmt='.-'):
     # Add a light grid
     ax.grid(b=True, which='major', axis='both', alpha=.5)
 
-    # Change axis units to 10^-log10(scale) and resize the offset text
+    # Change axis units to 10**log10(scale) and resize the offset text
     ax.xaxis.set_major_formatter(FixedOrderFormatter(-np.log10(scale)))
     ax.yaxis.set_major_formatter(FixedOrderFormatter(-np.log10(scale)))
     y_offset = ax.yaxis.get_offset_text()
