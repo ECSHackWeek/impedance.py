@@ -30,7 +30,7 @@ def plot_nyquist(ax, freq, Z, scale=1, units='Ohms', fmt='.-'):
         scale: float
             the scale for the axes
         units: string
-            units for :math:`Z(\omega)`
+            units for :math:`Z(\\omega)`
         fmt: string
             format string passed to matplotlib (e.g. '.-' or 'o')
 
@@ -45,9 +45,9 @@ def plot_nyquist(ax, freq, Z, scale=1, units='Ohms', fmt='.-'):
     ax.set_aspect('equal')
 
     # Set the labels to -imaginary vs real
-    ax.set_xlabel('$Z^{\prime}(\omega)$ ' +
+    ax.set_xlabel(r'$Z^{\prime}(\omega)$ ' +
                   '$[{}]$'.format(units), fontsize=20)
-    ax.set_ylabel('$-Z^{\prime\prime}(\omega)$ ' +
+    ax.set_ylabel(r'$-Z^{\prime\prime}(\omega)$ ' +
                   '$[{}]$'.format(units), fontsize=20)
 
     # Make the tick labels larger
