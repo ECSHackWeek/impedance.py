@@ -112,7 +112,7 @@ def A(p, f):
     omega = 2*np.pi*np.array(f)
     Aw = p[0]
 
-    Zw = Aw*(1-1j)*np.sqrt(omega)
+    Zw = Aw*(1-1j)/np.sqrt(omega)
 
     return Zw
 
