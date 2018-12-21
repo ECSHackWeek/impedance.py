@@ -43,7 +43,6 @@ def R(p, f):
         Z = R
 
     """
-
     typeChecker(p, f, R.__name__, 1)
     return np.array(len(f)*[p[0]])
 
@@ -152,6 +151,22 @@ def G(p, f):
     k = p[1]
 
     return Z0/np.sqrt(k + 1j*omega)
+
+
+def K(p, f):
+    """ An RC element for use in lin-KK model
+
+    Notes
+    -----
+    .. math::
+
+        Z = \\frac{R}{1 + j \\omega \\tau_k}
+
+    """
+
+    omega = np.array(f)
+
+    return p[0]/(1 + 1j*omega*p[1])
 
 
 def typeChecker(p, f, name, length):

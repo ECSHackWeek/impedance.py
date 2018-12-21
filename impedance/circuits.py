@@ -1,5 +1,7 @@
-from .fitting import circuit_fit, computeCircuit, calculateCircuitLength
+from .fitting import circuit_fit, buildCircuit, calculateCircuitLength
 from .plotting import plot_nyquist
+from .circuit_elements import R, C, W, A, E, G, s, p  # noqa: F401
+
 import numpy as np
 import os
 
@@ -12,8 +14,7 @@ import matplotlib.pyplot as plt  # noqa E402
 
 class BaseCircuit:
     """ Base class for equivalent circuit models """
-    def __init__(self, initial_guess=None, name=None,
-                 algorithm='leastsq', bounds=None):
+    def __init__(self, initial_guess=None, name=None, bounds=None):
         """ Base constructor for any equivalent circuit model """
 
         # if supplied, check that initial_guess is valid and store
@@ -25,14 +26,12 @@ class BaseCircuit:
         # initalize class attributes
         self.initial_guess = initial_guess
         self.name = name
-        self.algorithm = algorithm
-        self.bounds = bounds
 
         # initialize fit parameters and confidence intervals
         self.parameters_ = None
         self.conf_ = None
 
-    def fit(self, frequencies, impedance):
+    def fit(self, frequencies, impedance, method='lm', bounds=None):
         """ Fit the circuit model
 
         Parameters
@@ -42,6 +41,14 @@ class BaseCircuit:
 
         impedance: numpy array of dtype 'complex128'
             Impedance values to fit
+
+        method: {‘lm’, ‘trf’, ‘dogbox’}, optional
+            Name of method to pass to scipy.optimize.curve_fit
+
+        bounds: 2-tuple of array_like, optional
+            Lower and upper bounds on parameters. Defaults to bounds on all
+            parameters of 0 and np.inf, except the CPE alpha
+            which has an upper bound of 1
 
         Returns
         -------
@@ -68,8 +75,7 @@ class BaseCircuit:
         if self.initial_guess is not None:
             parameters, conf = circuit_fit(frequencies, impedance,
                                            self.circuit, self.initial_guess,
-                                           self.algorithm,
-                                           bounds=self.bounds)
+                                           method=method, bounds=bounds)
             self.parameters_ = parameters
             if conf is not None:
                 self.conf_ = conf
@@ -114,12 +120,12 @@ class BaseCircuit:
             'frequencies does not contain a number'
 
         if self._is_fit() and not use_initial:
-            return computeCircuit(self.circuit, self.parameters_.tolist(),
-                                  frequencies.tolist())
+            return eval(buildCircuit(self.circuit, frequencies,
+                                     *self.parameters_))
         else:
             print("Simulating circuit based on initial parameters")
-            return computeCircuit(self.circuit, self.initial_guess,
-                                  frequencies.tolist())
+            return eval(buildCircuit(self.circuit, frequencies,
+                                     *self.initial_guess))
 
     def get_param_names(self):
         """Converts circuit string to names"""
@@ -138,7 +144,6 @@ class BaseCircuit:
         to_print  = '\n-------------------------------\n'  # noqa E222
         to_print += 'Circuit: {}\n'.format(self.name)
         to_print += 'Circuit string: {}\n'.format(self.circuit)
-        to_print += 'Algorithm: {}\n'.format(self.algorithm)
 
         if self._is_fit():
             to_print += "Fit: True\n"
@@ -166,7 +171,6 @@ class BaseCircuit:
         to_print  = '\n-------------------------------\n'  # noqa E222
         to_print += 'Circuit: {}\n'.format(self.name)
         to_print += 'Circuit string: {}\n'.format(self.circuit)
-        to_print += 'Algorithm: {}\n'.format(self.algorithm)
 
         if self._is_fit():
             to_print += "Fit: True\n"
@@ -186,7 +190,8 @@ class BaseCircuit:
 
         return to_print
 
-    def plot(self, f_data=None, Z_data=None, CI=True):
+    def plot(self, ax=None, f_data=None, Z_data=None,
+             conf_bounds=None, scale=None, units='Ohms'):
         """ a convenience method for plotting Nyquist plots
 
 
@@ -196,8 +201,12 @@ class BaseCircuit:
             Frequencies of input data (for Bode plots)
         Z_data: np.array of type complex
             Impedance data to plot
-        CI: boolean
-            Include bootstrapped confidence intervals in plot
+        conf_bounds: {'error_bars', 'filled', 'filledx', 'filledy'}, optional
+            Include bootstrapped confidence bands (95%) on the predicted best
+            fit model shown as either error bars or a filled confidence area.
+            Confidence bands are estimated by simulating the spectra for 10000
+            randomly sampled parameter sets where each of the parameters is
+            sampled from a normal distribution
 
         Returns
         -------
@@ -205,10 +214,12 @@ class BaseCircuit:
             axes of the created nyquist plot
         """
 
-        fig, ax = plt.subplots(figsize=(5, 5))
+        if ax is None:
+            fig, ax = plt.subplots(figsize=(5, 5))
 
         if Z_data is not None:
-            ax = plot_nyquist(ax, f_data, Z_data)
+            ax = plot_nyquist(ax, f_data, Z_data,
+                              scale=scale, units=units, fmt='s')
 
         if self._is_fit():
 
@@ -218,10 +229,13 @@ class BaseCircuit:
                 f_pred = np.logspace(5, -3)
 
             Z_fit = self.predict(f_pred)
-            ax = plot_nyquist(ax, f_data, Z_fit, fmt='.-')
+            ax = plot_nyquist(ax, f_data, Z_fit,
+                              scale=scale, units=units, fmt='s')
 
-            if CI:
-                N = 1000
+            base_ylim, base_xlim = ax.get_ylim(), ax.get_xlim()
+
+            if conf_bounds is not None:
+                N = 10000
                 n = len(self.parameters_)
                 f_pred = np.logspace(np.log10(min(f_data)),
                                      np.log10(max(f_data)),
@@ -230,30 +244,71 @@ class BaseCircuit:
                 params = self.parameters_
                 confs = self.conf_
 
+                # up_bnd = eval(buildCircuit(self.circuit, f_pred,
+                #                            *(params + confs)))
+                #
+                # lw_bnd = eval(buildCircuit(self.circuit, f_pred,
+                #                            *(params - confs)))
+                #
+                # ax = plot_nyquist(ax, f_data, up_bnd, fmt=':')
+                # ax = plot_nyquist(ax, f_data, lw_bnd, fmt='--')
+
+                #
+                # ax.set_ylim(base_ylim)
+                # ax.set_xlim(base_xlim)
+
                 full_range = np.ndarray(shape=(N, len(f_pred)), dtype=complex)
                 for i in range(N):
                     self.parameters_ = params + \
-                                        confs*np.random.uniform(-2, 2, size=n)
+                                        confs*np.random.randn(n)
 
                     full_range[i, :] = self.predict(f_pred)
 
                 self.parameters_ = params
 
-                min_Z = []
-                max_Z = []
-                for x in np.real(Z_fit):
-                    ys = []
+                min_Zr, min_Zi = [], []
+                max_Zr, max_Zi = [], []
+                xerr, yerr = [], []
+                for i, Z in enumerate(Z_fit):
+                    Zr, Zi = np.real(Z), np.imag(Z)
+                    yr, yi = [], []
                     for run in full_range:
-                        ind = np.argmin(np.abs(run.real - x))
-                        ys.append(run[ind].imag)
+                        yi.append(run[i].imag)
+                        yr.append(run[i].real)
 
-                    min_Z.append(x + 1j*min(ys))
-                    max_Z.append(x + 1j*max(ys))
+                    min_Zr.append(1j*Zi + (Zr - 2*np.std(yr)))
+                    max_Zr.append(1j*Zi + (Zr + 2*np.std(yr)))
 
-                ax.fill_between(np.real(min_Z), -np.imag(min_Z),
-                                -np.imag(max_Z), alpha='.2')
+                    min_Zi.append(Zr + 1j*(Zi - 2*np.std(yi)))
+                    max_Zi.append(Zr + 1j*(Zi + 2*np.std(yi)))
 
-        plt.show()
+                    xerr.append(2*np.std(yr))
+                    yerr.append(2*np.std(yi))
+
+                conf_x, conf_y = False, False
+                if conf_bounds == 'error_bars':
+                    ax.errorbar(Z_fit.real, -Z_fit.imag, xerr=xerr, yerr=yerr,
+                                fmt='', color='#7f7f7f', zorder=-2)
+                elif conf_bounds == 'filled':
+                    conf_x = True
+                    conf_y = True
+                elif conf_bounds == 'filledx':
+                    conf_x = True
+                elif conf_bounds == 'filledy':
+                    conf_y = True
+
+                if conf_x:
+                    ax.fill_betweenx(-np.imag(min_Zr), np.real(min_Zr),
+                                     np.real(max_Zr), alpha='.2',
+                                     color='#7f7f7f', zorder=-2)
+                if conf_y:
+                    ax.fill_between(np.real(min_Zi), -np.imag(min_Zi),
+                                    -np.imag(max_Zi), alpha='.2',
+                                    color='#7f7f7f', zorder=-2)
+
+                ax.set_ylim(base_ylim)
+                ax.set_xlim(base_xlim)
+        return ax
 
 
 class Randles(BaseCircuit):

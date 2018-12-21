@@ -50,5 +50,4 @@ def test_RMSE():
 
     c = np.array([2 + 4*1j, 1 + 4*1j])
     d = np.array([4 + 2*1j, 3 + 2*1j])
-
-    assert rmse(c, d) == 2*np.sqrt(2)
+    assert np.isclose(rmse(c, d), 2*np.sqrt(2))
