@@ -22,7 +22,6 @@ impedance.py currently provides:
 - convenient Nyquist plots including confidence interval estimation for fit circuits
 
 several features are currently being improved upon:
-- implementation of measurement models as a data validation method
 - interactive plotting with altair
 - adding more impedance elements
 - physics-based impedance models for lithium-ion batteries
