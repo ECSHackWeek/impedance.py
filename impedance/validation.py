@@ -59,10 +59,10 @@ def linKK(f, Z, c=0.85, max_M=50):
 
         \\mu = 1 - \\frac{\\sum_{R_k \\ge 0} |R_k|}{\\sum_{R_k < 0} |R_k|}
 
-    The argument :code:`c` defines the cutoff value for :math:`\mu`. The
+    The argument :code:`c` defines the cutoff value for :math:`\\mu`. The
     algorithm starts at :code:`M = 3` and iterates up to :code:`max_M` until a
-    :math:`\mu < c` is reached. The default of 0.85 is simply a heuristic value
-    based off of the experience of Schönleber et al.
+    :math:`\\mu < c` is reached. The default of 0.85 is simply a heuristic
+    value based off of the experience of Schönleber et al.
 
     If the argument :code:`c` is :code:`None`, then the automatic determination
     of RC elements is turned off and the solution is calculated for
