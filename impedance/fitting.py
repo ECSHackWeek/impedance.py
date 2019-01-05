@@ -1,6 +1,7 @@
 from .circuit_elements import R, C, W, A, E, G, s, p  # noqa: F401
 import numpy as np
 from scipy.optimize import curve_fit
+import re
 
 
 def rmse(a, b):
@@ -128,6 +129,81 @@ def computeCircuit(circuit, frequencies, *parameters):
     return eval(buildCircuit(circuit, frequencies, *parameters))
 
 
+def buildCircuit2(circuit, frequencies, *parameters, final_string='', index=0):
+
+    print('\nbuild circuit passed: {}'.format(circuit))
+
+    parallel = split_parallel(circuit)
+    series = split_series(circuit)
+
+    print('parallel ({}): {}'.format(len(parallel), parallel))
+    print('series({}): {}'.format(len(series), series))
+
+    if parallel is not None and len(parallel) > 1:
+        print('Parallel split: {}'.format(parallel))
+
+        final_string += "p(["
+        for i, elem in enumerate(parallel):
+            if ',' in elem:
+                final_string, index = buildCircuit2(elem, frequencies,
+                                                    *parameters,
+                                                    final_string=final_string,
+                                                    index=index)
+            else:
+                print('Elem type: {}'.format(elem[0]))
+
+                param_string = str(list(parameters)[index])
+                new = elem[0] + '(' + param_string + ')'# ',' + str(frequencies) + ')'
+                final_string += new
+
+                index += 1
+
+            if i == len(parallel) - 1:
+                final_string += '])'
+            else:
+                final_string += ','
+
+    if series is not None and len(series) > 1:
+        print('Series split: {}'.format(series))
+        final_string += "s(["
+
+        for i, elem in enumerate(series):
+            if ',' in elem:
+                final_string, index = buildCircuit2(elem, frequencies,
+                                                    *parameters,
+                                                    final_string=final_string,
+                                                    index=index)
+            else:
+                print('Elem type: {}'.format(elem[0]))
+
+                param_string = str(list(parameters)[index])
+                new = elem[0] + '(' + param_string + ')'#',' + str(frequencies) + ')'
+                final_string += new
+
+                index += 1
+
+            if i == len(series) - 1:
+                final_string += '])'
+            else:
+                final_string += ','
+
+    return final_string, index
+
+
+def split_parallel(circuit):
+
+    if circuit.startswith('p('):
+        circuit = circuit[2:]
+        if circuit[-1] == ')':
+            circuit = circuit[:-1]
+
+    return re.split(',\s*(?=[^)]*(?:\(|$))', circuit)
+
+
+def split_series(circuit):
+    return re.split('-\s*(?=[^)]*(?:\(|$))', circuit)
+
+
 def buildCircuit(circuit, frequencies, *parameters):
     """ transforms a circuit, parameters, and frequencies into a string
     that can be evaluated
@@ -154,7 +230,7 @@ def buildCircuit(circuit, frequencies, *parameters):
     for elem in circuit.split("-"):
         element_string = ""
         if "p" in elem:
-            parallel_string = "p(("
+            parallel_string = "p(["
             for par in elem.strip("p()").split(","):
                 param_string = ""
                 elem_type = par[0]
@@ -167,7 +243,7 @@ def buildCircuit(circuit, frequencies, *parameters):
                                         str(frequencies) + "),")
                 parallel_string += new_elem
 
-            element_string = parallel_string.strip(",") + "))"
+            element_string = parallel_string.strip(",") + "])"
         else:
             param_string = ""
             elem_type = elem[0]
