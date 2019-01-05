@@ -161,11 +161,11 @@ def buildCircuit(circuit, frequencies, *parameters, eval_string='', index=0):
             if circuit[-1] == ')':
                 circuit = circuit[:-1]
 
-        return re.split(',\s*(?=[^)]*(?:\(|$))', circuit)
+        return re.split(',\s*(?=[^)]*(?:\(|$))', circuit)  # noqa: W605
 
     def split_series(circuit):
         """ Splits a circuit string by dashes outside of parentheses """
-        return re.split('-\s*(?=[^)]*(?:\(|$))', circuit)
+        return re.split('-\s*(?=[^)]*(?:\(|$))', circuit)  # noqa: W605
 
     parallel = split_parallel(circuit)
     series = split_series(circuit)
