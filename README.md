@@ -18,12 +18,12 @@ If you have a feature request or find a bug, please feel free to [file an issue]
 
 impedance.py currently provides:
 - a simple API for fitting, predicting, and plotting impedance
+- validation methods for checking measurement validity
 - equivalent circuit fitting with customizable models
 - convenient Nyquist plots including confidence interval estimation for fit circuits
 
 several features are currently being improved upon:
 - interactive plotting with altair
-- adding more impedance elements
 - physics-based impedance models for lithium-ion batteries
 
 ### Installation
@@ -34,7 +34,7 @@ impedance.py requires:
 - Python (>=3.5)
 - SciPy (>=1.0)
 - NumPy (>=1.14)
-- Matplotlib (>=2.0)
+- Matplotlib (>=3.0)
 
 Several example notebooks are provided in the examples/ directory. Opening these will require Jupyter notebook or Jupyter lab.
 
