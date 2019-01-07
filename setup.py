@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="impedance",
-    version="0.1.1-alpha",
+    version="0.1.2-alpha",
     author="impedance.py developers",
     author_email="mmurbach@uw.edu",
     description="A Python package for working with impedance data",
@@ -13,7 +13,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://impedancepy.readthedocs.io/en/latest/",
     packages=setuptools.find_packages(),
-    install_requires=['matplotlib>=2.0', 'numpy>=1.14', 'scipy>=1.0'],
+    install_requires=['matplotlib>=3.0', 'numpy>=1.14', 'scipy>=1.0'],
     classifiers=(
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

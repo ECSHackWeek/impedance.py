@@ -1,7 +1,6 @@
-from impedance.circuit_elements import R, C, W, A, E, G, s, p  # noqa: F401
+from .circuit_elements import R, C, W, A, E, G, s, p  # noqa: F401
 import numpy as np
-from scipy.optimize import leastsq
-from scipy.optimize import minimize
+from scipy.optimize import curve_fit
 
 
 def rmse(a, b):
@@ -16,11 +15,12 @@ def rmse(a, b):
         RMSE = \\sqrt{\\frac{1}{n}(a-b)^2}
     """
 
-    return(np.abs(np.sqrt(np.mean(np.square(a-b)))))
+    n = len(a)
+    return np.linalg.norm(a - b) / np.sqrt(n)
 
 
-def circuit_fit(frequencies, impedances, circuit,
-                initial_guess, algorithm='leastsq', bounds=None):
+def circuit_fit(frequencies, impedances, circuit, initial_guess,
+                method='lm', bounds=None, bootstrap=False):
 
     """ Main function for fitting an equivalent circuit to data
 
@@ -37,9 +37,14 @@ def circuit_fit(frequencies, impedances, circuit,
 
     initial_guess : list of floats
         initial guesses for the fit parameters
-    algorithm: string
-        Name of algorithm to pass to scipy.optimize.minimize
-        or to instantiate scipy.optimize.leastsq
+
+    method : {‘lm’, ‘trf’, ‘dogbox’}, optional
+        Name of method to pass to scipy.optimize.curve_fit
+
+    bounds : 2-tuple of array_like, optional
+        Lower and upper bounds on parameters. Defaults to bounds on all
+        parameters of 0 and np.inf, except the CPE alpha
+        which has an upper bound of 1
 
     Returns
     ------------
@@ -47,7 +52,7 @@ def circuit_fit(frequencies, impedances, circuit,
         best fit parameters for specified equivalent circuit
 
     p_errors : list of floats
-        error estimates for fit parameters
+        one standard deviation error estimates for fit parameters
 
     Notes
     ---------
@@ -61,149 +66,89 @@ def circuit_fit(frequencies, impedances, circuit,
     f = frequencies
     Z = impedances
 
-    if algorithm == 'leastsq':
-        p_values, covar, _, _, ier = leastsq(residuals, initial_guess,
-                                             args=(Z, f, circuit),
-                                             maxfev=100000, ftol=1E-13,
-                                             full_output=True)
-        p_error = []
-        if ier in [1, 2, 3, 4] and covar is not None:
-            s_sq = (residuals(p_values, Z, frequencies, circuit)**2).sum()
-            p_cov = covar * s_sq/(len(Z) - len(p_values))
-            for i, __ in enumerate(covar):
-                p_error.append(np.absolute(p_cov[i][i])**0.5)
-        else:
-            p_error = None
-    elif algorithm in ['SLSQP', 'L-BFGS-B', 'TNC']:
-        if bounds is None:
-            bounds = []
-            p_string = [x for x in circuit if x not in 'ps(),-/']
-            for i, (a, b) in enumerate(zip(p_string[::2], p_string[1::2])):
-                if str(a+b) == "E2":
-                    bounds.append((0, 1))
-                else:
-                    bounds.append((0, None))
-        res = minimize(residualWrapper, initial_guess, args=(Z, f, circuit),
-                       method=algorithm, bounds=bounds)
-        p_values = res.x
-        covar = None
-        p_error = len(p_values)*[-1]
+    if bounds is None:
+        lb, ub = [], []
+        p_string = [x for x in circuit if x not in 'ps(),-/']
+        for i, (a, b) in enumerate(zip(p_string[::2], p_string[1::2])):
+            lb.append(0)
+            if str(a+b) == "E2":
+                ub.append(1)
+            else:
+                ub.append(np.inf)
 
-    else:
-        res = minimize(residualWrapper, initial_guess, args=(Z, f, circuit),
-                       method=algorithm)
-        p_values = res.x
-        covar = None
-        p_error = None
+        bounds = ((lb), (ub))
 
-    return p_values, p_error
+    popt, pcov = curve_fit(wrapCircuit(circuit), f,
+                           np.hstack([Z.real, Z.imag]), p0=initial_guess,
+                           bounds=bounds, maxfev=100000, ftol=1E-13)
+
+    perror = np.sqrt(np.diag(pcov))
+
+    return popt, perror
 
 
-def residualWrapper(param, Z, f, circuit):
-    res = residuals(param, Z, f, circuit)
-    return np.mean(np.square(res))
+def wrapCircuit(circuit):
+    """ wraps function so we can pass the circuit string """
+    def wrappedCircuit(frequencies, *parameters):
+        """ returns a stacked
+
+        Parameters
+        ----------
+        circuit : string
+        parameters : list of floats
+        frequencies : list of floats
+
+        Returns
+        -------
+        array of floats
+
+        """
+
+        x = eval(buildCircuit(circuit, frequencies, *parameters))
+        y_real = np.real(x)
+        y_imag = np.imag(x)
+
+        return np.hstack([y_real, y_imag])
+    return wrappedCircuit
 
 
-def residuals(param, Z, f, circuit):
-    """ Calculates the residuals between a given circuit/parameters
-    (fit) and `Z`/`f` (data). Minimized by scipy.leastsq()
-
-    Parameters
-    ----------
-    param : array of floats
-        parameters for evaluating the circuit
-
-    Z : array of complex numbers
-        impedance data being fit
-
-    f : array of floats
-        frequencies to evaluate
-
-    circuit : str
-        string defining the circuit
-
-    Returns
-    -------
-    residual : ndarray
-        returns array of size 2*len(f) with both real and imaginary residuals
-    """
-    err = Z - computeCircuit(circuit, param.tolist(), f.tolist())
-    z1d = np.zeros(Z.size*2, dtype=np.float64)
-    z1d[0:z1d.size:2] = err.real
-    z1d[1:z1d.size:2] = err.imag
-    if valid(circuit, param):
-        return z1d
-    else:
-        return 1e6*np.ones(Z.size*2, dtype=np.float64)
-
-
-def valid(circuit, param):
-    """ checks validity of parameters
-
-    Parameters
-    ----------
-    circuit : string
-        string defining the circuit
-
-    param : list
-        list of parameter values
-
-    Returns
-    -------
-    valid : boolean
-
-    Notes
-    -----
-    All parameters are considered valid if they are greater than zero --
-    except for E2 (the exponent of CPE) which also must be less than one.
-
-    """
-
-    p_string = [x for x in circuit if x not in 'ps(),-/']
-
-    for i, (a, b) in enumerate(zip(p_string[::2], p_string[1::2])):
-        if str(a + b) == "E2":
-            if param[i] <= 0 or param[i] >= 1:
-                return False
-        else:
-            if param[i] <= 0:
-                return False
-
-    return True
-
-
-def computeCircuit(circuit, parameters, frequencies):
+def computeCircuit(circuit, frequencies, *parameters):
     """ evaluates a circuit string for a given set of parameters and frequencies
 
     Parameters
     ----------
     circuit : string
-    parameters : list of floats
-    frequencies : list of floats
+    frequencies : list/tuple/array of floats
+    parameters : list/tuple/array of floats
 
     Returns
     -------
-    array of floats
+    array of complex numbers
     """
+    return eval(buildCircuit(circuit, frequencies, *parameters))
 
-    return eval(buildCircuit(circuit, parameters, frequencies))
 
-
-def buildCircuit(circuit, parameters, frequencies):
+def buildCircuit(circuit, frequencies, *parameters):
     """ transforms a circuit, parameters, and frequencies into a string
     that can be evaluated
 
     Parameters
     ----------
     circuit : str
-    parameters : list of floats
-    frequencies : list of floats
+    parameters : list/tuple/array of floats
+    frequencies : list/tuple/array of floats
 
     Returns
     -------
     eval_string : str
         Python expression for calculating the resulting fit
     """
+
+    parameters = np.array(parameters).tolist()
+    frequencies = np.array(frequencies).tolist()
+
+    # remove spaces from circuit string
+    circuit = circuit.replace(' ', '')
 
     series_string = "s(["
     for elem in circuit.split("-"):
