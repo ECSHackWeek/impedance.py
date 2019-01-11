@@ -346,7 +346,7 @@ class Randles(BaseCircuit):
 
 
 class CustomCircuit(BaseCircuit):
-    def __init__(self, circuit=None, **kwargs):
+    def __init__(self, circuit, **kwargs):
         """ Constructor for a customizable equivalent circuit model
 
         Parameters
