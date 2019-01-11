@@ -102,7 +102,6 @@ def test_CustomCircuit():
         '\tR_1 = 5.00e-03\n' + \
         '\tC_1 = 1.00e-01\n'
 
-
     # check that it rejects improper inputs
     # enforcing the length of initial_guess
     try:
