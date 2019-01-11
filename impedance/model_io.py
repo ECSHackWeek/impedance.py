@@ -20,34 +20,31 @@ def model_export(model, filepath):
 
     model_string = model.circuit
     model_name = model.name
-    model_param_names = model.get_param_names()
 
-    model_initial_guess = [(name, model.initial_guess[index])
-                           for index, name in enumerate(model_param_names)]
-    model_params = [(name, model.parameters_[index])
-                    for index, name in enumerate(model_param_names)]
-    model_conf = [(name, model.conf_[index])
-                  for index, name in enumerate(model_param_names)]
+    initial_guess = model.initial_guess
 
-    if not model_name:
-        model_name = "None"
+    if model._is_fit():
+        parameters_ = list(model.parameters_)
+        model_conf_ = list(model.conf_)
 
-    data_dict = {"Name": model_name,
-                 "Circuit String": model_string,
-                 "Initial Guess": model_initial_guess,
-                 "Parameters": model_params,
-                 "Confidence": model_conf,
-                 }
+        data_dict = {"Name": model_name,
+                     "Circuit String": model_string,
+                     "Initial Guess": initial_guess,
+                     "Fit": True,
+                     "Parameters": parameters_,
+                     "Confidence": model_conf_,
+                     }
+    else:
+        data_dict = {"Name": model_name,
+                     "Circuit String": model_string,
+                     "Initial Guess": initial_guess,
+                     "Fit": False}
 
-    print("Exporting the following model to destination %s" % filepath)
-    print(model)
-
-    destination_object = open(filepath, 'w')
-
-    json.dump(data_dict, destination_object)
+    with open(filepath, 'w') as f:
+        json.dump(data_dict, f)
 
 
-def model_import(filepath, as_initial_guess=False):
+def model_import(filepath):
     """ Imports a model from JSON
 
     Parameters
@@ -68,36 +65,19 @@ def model_import(filepath, as_initial_guess=False):
     json_data_file = open(filepath, 'r')
     json_data = json.load(json_data_file)
 
-    circuit_name = json_data["Name"]
+    model_name = json_data["Name"]
+    if model_name == 'None':
+        model_name = None
 
-    if circuit_name == 'None':
-        circuit_name = None
+    model_string = json_data["Circuit String"]
+    model_initial_guess = json_data["Initial Guess"]
 
-    circuit_string = json_data["Circuit String"]
-    circuit_param_list = json_data["Parameters"]
-    circuit_ig_list = json_data["Initial Guess"]
-    circuit_conf_list = json_data["Initial Guess"]
+    circuit_model = CustomCircuit(initial_guess=model_initial_guess,
+                                  circuit=model_string,
+                                  name=model_name)
 
-    circuit_params = [item[1] for item in circuit_param_list]
-    circuit_initial_guess = [item[1] for item in circuit_ig_list]
-    circuit_conf = [item[1] for item in circuit_conf_list]
-    print(circuit_initial_guess)
-
-    if as_initial_guess:
-        circuit_model = CustomCircuit(initial_guess=circuit_params,
-                                      circuit=circuit_string,
-                                      name=circuit_name)
-    else:
-        circuit_model = CustomCircuit(initial_guess=circuit_initial_guess,
-                                      circuit=circuit_string,
-                                      name=circuit_name)
-
-        circuit_model.parameters_ = np.array(circuit_params)
-        circuit_model.conf_ = np.array(circuit_conf)
-
-    print("Imported model from %s with" +
-          "the following circuit parameters" % filepath)
-
-    print(circuit_model)
+    if json_data["Fit"]:
+        circuit_model.parameters_ = np.array(json_data["Parameters"])
+        circuit_model.conf_ = np.array(json_data["Confidence"])
 
     return circuit_model
