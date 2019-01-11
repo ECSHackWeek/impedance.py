@@ -109,6 +109,14 @@ def test_Randles():
     else:
         raise Exception('unhandled error occurred')
 
+    # check that it rejects missing input
+    try:
+        r = Randles()
+    except(TypeError):
+        pass
+    else:
+        raise Exception('unhandled error occured')
+
     return
 
 
