@@ -14,14 +14,19 @@ import matplotlib.pyplot as plt  # noqa E402
 
 class BaseCircuit:
     """ Base class for equivalent circuit models """
-    def __init__(self, initial_guess=None, name=None, bounds=None):
-        """ Base constructor for any equivalent circuit model """
+    def __init__(self, initial_guess, name=None, bounds=None):
+        """ Base constructor for any equivalent circuit model
+
+        Parameters
+        ----------
+        initial_guess: numpy array
+            Initial guess of the circuit values
+        """
 
         # if supplied, check that initial_guess is valid and store
-        if initial_guess is not None:
-            for i in initial_guess:
-                assert isinstance(i, (float, int, np.int32, np.float64)),\
-                    'value {} in initial_guess is not a number'.format(i)
+        for i in initial_guess:
+            assert isinstance(i, (float, int, np.int32, np.float64)),\
+                'value {} in initial_guess is not a number'.format(i)
 
         # initalize class attributes
         self.initial_guess = initial_guess
@@ -318,6 +323,9 @@ class Randles(BaseCircuit):
 
         Parameters
         ----------
+        initial_guess: numpy array
+            Initial guess of the circuit values
+
         CPE: boolean
             Use a constant phase element instead of a capacitor
         """
@@ -343,6 +351,9 @@ class CustomCircuit(BaseCircuit):
 
         Parameters
         ----------
+        initial_guess: numpy array
+            Initial guess of the circuit values
+
         circuit: string
             A string that should be interpreted as an equivalent circuit
 
