@@ -193,7 +193,7 @@ class BaseCircuit:
         return to_print
 
     def plot(self, ax=None, f_data=None, Z_data=None,
-             conf_bounds=None, scale=None, units='Ohms'):
+             conf_bounds=None, scale=1, units='Ohms'):
         """ a convenience method for plotting Nyquist plots
 
 
