@@ -246,19 +246,6 @@ class BaseCircuit:
                 params = self.parameters_
                 confs = self.conf_
 
-                # up_bnd = eval(buildCircuit(self.circuit, f_pred,
-                #                            *(params + confs)))
-                #
-                # lw_bnd = eval(buildCircuit(self.circuit, f_pred,
-                #                            *(params - confs)))
-                #
-                # ax = plot_nyquist(ax, f_data, up_bnd, fmt=':')
-                # ax = plot_nyquist(ax, f_data, lw_bnd, fmt='--')
-
-                #
-                # ax.set_ylim(base_ylim)
-                # ax.set_xlim(base_xlim)
-
                 full_range = np.ndarray(shape=(N, len(f_pred)), dtype=complex)
                 for i in range(N):
                     self.parameters_ = params + \
