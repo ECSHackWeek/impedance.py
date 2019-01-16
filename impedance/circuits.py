@@ -126,11 +126,13 @@ class BaseCircuit:
 
         if self._is_fit() and not use_initial:
             return eval(buildCircuit(self.circuit, frequencies,
-                                     *self.parameters_))
+                                     *self.parameters_, eval_string='',
+                                     index=0)[0])
         else:
             print("Simulating circuit based on initial parameters")
             return eval(buildCircuit(self.circuit, frequencies,
-                                     *self.initial_guess))
+                                     *self.initial_guess, eval_string='',
+                                     index=0)[0])
 
     def get_param_names(self):
         """Converts circuit string to names"""
@@ -196,7 +198,7 @@ class BaseCircuit:
         return to_print
 
     def plot(self, ax=None, f_data=None, Z_data=None,
-             conf_bounds=None, scale=None, units='Ohms'):
+             conf_bounds=None, scale=1, units='Ohms'):
         """ a convenience method for plotting Nyquist plots
 
 

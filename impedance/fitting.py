@@ -104,7 +104,8 @@ def wrapCircuit(circuit):
 
         """
 
-        x = eval(buildCircuit(circuit, frequencies, *parameters))
+        x = eval(buildCircuit(circuit, frequencies, *parameters,
+                              eval_string='', index=0)[0])
         y_real = np.real(x)
         y_imag = np.imag(x)
 
@@ -125,65 +126,106 @@ def computeCircuit(circuit, frequencies, *parameters):
     -------
     array of complex numbers
     """
-    return eval(buildCircuit(circuit, frequencies, *parameters))
+    return eval(buildCircuit(circuit, frequencies, *parameters,
+                             eval_string='', index=0)[0])
 
 
-def buildCircuit(circuit, frequencies, *parameters):
-    """ transforms a circuit, parameters, and frequencies into a string
-    that can be evaluated
+def buildCircuit(circuit, frequencies, *parameters, eval_string='', index=0):
+    """ recursive function that transforms a circuit, parameters, and
+    frequencies into a string that can be evaluated
 
     Parameters
     ----------
-    circuit : str
-    parameters : list/tuple/array of floats
-    frequencies : list/tuple/array of floats
+    circuit: str
+    parameters: list/tuple/array of floats
+    frequencies: list/tuple/array of floats
 
     Returns
     -------
-    eval_string : str
+    eval_string: str
         Python expression for calculating the resulting fit
+    index: int
+        Tracks parameter index through recursive calling of the function
     """
 
     parameters = np.array(parameters).tolist()
     frequencies = np.array(frequencies).tolist()
-
-    # remove spaces from circuit string
     circuit = circuit.replace(' ', '')
 
-    series_string = "s(["
-    for elem in circuit.split("-"):
-        element_string = ""
-        if "p" in elem:
-            parallel_string = "p(("
-            for par in elem.strip("p()").split(","):
-                param_string = ""
-                elem_type = par[0]
-                elem_number = len(par.split("/"))
+    def parse_circuit(circuit, parallel=False, series=False):
+        """ Splits a circuit string by either dashes (series) or commas
+            (parallel) outside of any paranthesis. Removes any leading 'p('
+            or trailing ')' when in parallel mode """
 
-                param_string += str(parameters[0:elem_number])
-                parameters = parameters[elem_number:]
+        assert parallel != series, \
+            'Exactly one of parallel or series must be True'
 
-                new_elem = (elem_type + "(" + param_string + "," +
-                                        str(frequencies) + "),")
-                parallel_string += new_elem
+        def count_parens(string):
+            return string.count('('), string.count(')')
 
-            element_string = parallel_string.strip(",") + "))"
+        if parallel:
+            special = ','
+            if circuit.endswith(')') and circuit.startswith('p('):
+                circuit = circuit[2:-1]
+        if series:
+            special = '-'
+
+        split = circuit.split(special)
+        result = []
+        skipped = []
+        for i, sub_str in enumerate(split):
+            if i not in skipped:
+                if '(' not in sub_str and ')' not in sub_str:
+                    result.append(sub_str)
+                else:
+                    open_parens, closed_parens = count_parens(sub_str)
+                    if open_parens == closed_parens:
+                        result.append(sub_str)
+                    else:
+                        uneven = True
+                        while i < len(split) - 1 and uneven:
+                            sub_str += special + split[i+1]
+
+                            open_parens, closed_parens = count_parens(sub_str)
+                            uneven = open_parens != closed_parens
+
+                            i += 1
+                            skipped.append(i)
+                        result.append(sub_str)
+        return result
+
+    parallel = parse_circuit(circuit, parallel=True)
+    series = parse_circuit(circuit, series=True)
+
+    if parallel is not None and len(parallel) > 1:
+        eval_string += "p(["
+        split = parallel
+    elif series is not None and len(series) > 1:
+        eval_string += "s(["
+        split = series
+
+    for i, elem in enumerate(split):
+        if ',' in elem or '-' in elem:
+            eval_string, index = buildCircuit(elem, frequencies,
+                                              *parameters,
+                                              eval_string=eval_string,
+                                              index=index)
         else:
             param_string = ""
-            elem_type = elem[0]
             elem_number = len(elem.split("/"))
 
-            param_string += str(parameters[0:elem_number])
-            parameters = parameters[elem_number:]
+            param_string += str(parameters[index:index + elem_number])
+            new = elem[0] + '(' + param_string + ',' + str(frequencies) + ')'
+            eval_string += new
 
-            element_string = (elem_type + "(" + param_string + "," +
-                                          str(frequencies) + ")")
+            index += elem_number
 
-        series_string += element_string + ","
+        if i == len(split) - 1:
+            eval_string += '])'
+        else:
+            eval_string += ','
 
-    eval_string = series_string.strip(",") + "])"
-
-    return eval_string
+    return eval_string, index
 
 
 def calculateCircuitLength(circuit):

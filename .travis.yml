@@ -3,9 +3,9 @@ language: python
 python:
    - "3.6"
 
-branches:
-   only:
-       - master
+# branches:
+#    only:
+#        - master
 
 install:
    - pip install coverage
