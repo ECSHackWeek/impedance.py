@@ -14,14 +14,19 @@ import matplotlib.pyplot as plt  # noqa E402
 
 class BaseCircuit:
     """ Base class for equivalent circuit models """
-    def __init__(self, initial_guess=None, name=None, bounds=None):
-        """ Base constructor for any equivalent circuit model """
+    def __init__(self, initial_guess, name=None, bounds=None):
+        """ Base constructor for any equivalent circuit model
+
+        Parameters
+        ----------
+        initial_guess: numpy array
+            Initial guess of the circuit values
+        """
 
         # if supplied, check that initial_guess is valid and store
-        if initial_guess is not None:
-            for i in initial_guess:
-                assert isinstance(i, (float, int, np.int32, np.float64)),\
-                    'value {} in initial_guess is not a number'.format(i)
+        for i in initial_guess:
+            assert isinstance(i, (float, int, np.int32, np.float64)),\
+                'value {} in initial_guess is not a number'.format(i)
 
         # initalize class attributes
         self.initial_guess = initial_guess
@@ -30,6 +35,18 @@ class BaseCircuit:
         # initialize fit parameters and confidence intervals
         self.parameters_ = None
         self.conf_ = None
+
+    def __eq__(self, other):
+        if self.__class__ == other.__class__:
+            matches = []
+            for key, value in self.__dict__.items():
+                if isinstance(value, np.ndarray):
+                    matches.append((value == other.__dict__[key]).all())
+                else:
+                    matches.append(value == other.__dict__[key])
+            return np.array(matches).all()
+        else:
+            raise TypeError('Comparing object is not of the same type.')
 
     def fit(self, frequencies, impedance, method='lm', bounds=None):
         """ Fit the circuit model
@@ -121,11 +138,13 @@ class BaseCircuit:
 
         if self._is_fit() and not use_initial:
             return eval(buildCircuit(self.circuit, frequencies,
-                                     *self.parameters_))
+                                     *self.parameters_, eval_string='',
+                                     index=0)[0])
         else:
             print("Simulating circuit based on initial parameters")
             return eval(buildCircuit(self.circuit, frequencies,
-                                     *self.initial_guess))
+                                     *self.initial_guess, eval_string='',
+                                     index=0)[0])
 
     def get_param_names(self):
         """Converts circuit string to names"""
@@ -191,7 +210,7 @@ class BaseCircuit:
         return to_print
 
     def plot(self, ax=None, f_data=None, Z_data=None,
-             conf_bounds=None, scale=None, units='Ohms'):
+             conf_bounds=None, scale=1, units='Ohms'):
         """ a convenience method for plotting Nyquist plots
 
 
@@ -243,19 +262,6 @@ class BaseCircuit:
 
                 params = self.parameters_
                 confs = self.conf_
-
-                # up_bnd = eval(buildCircuit(self.circuit, f_pred,
-                #                            *(params + confs)))
-                #
-                # lw_bnd = eval(buildCircuit(self.circuit, f_pred,
-                #                            *(params - confs)))
-                #
-                # ax = plot_nyquist(ax, f_data, up_bnd, fmt=':')
-                # ax = plot_nyquist(ax, f_data, lw_bnd, fmt='--')
-
-                #
-                # ax.set_ylim(base_ylim)
-                # ax.set_xlim(base_xlim)
 
                 full_range = np.ndarray(shape=(N, len(f_pred)), dtype=complex)
                 for i in range(N):
@@ -318,6 +324,9 @@ class Randles(BaseCircuit):
 
         Parameters
         ----------
+        initial_guess: numpy array
+            Initial guess of the circuit values
+
         CPE: boolean
             Use a constant phase element instead of a capacitor
         """
@@ -338,11 +347,14 @@ class Randles(BaseCircuit):
 
 
 class CustomCircuit(BaseCircuit):
-    def __init__(self, circuit=None, **kwargs):
+    def __init__(self, circuit, **kwargs):
         """ Constructor for a customizable equivalent circuit model
 
         Parameters
         ----------
+        initial_guess: numpy array
+            Initial guess of the circuit values
+
         circuit: string
             A string that should be interpreted as an equivalent circuit
 

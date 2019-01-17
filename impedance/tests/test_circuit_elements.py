@@ -3,21 +3,6 @@ import cmath
 import numpy as np
 
 
-def correct_vals():
-    """ Creates the correct values for test_all() """
-    funcs = [R, C, W, A, E, G]
-    freqs = [0.001, 1.0, 1000]
-    input_vals = [0.1, 0.2]
-    inputs = [1, 1, 2, 1, 2, 2]
-    count = 0
-    val_list = []
-    for f in funcs:
-        val = f(input_vals[:inputs[count]], freqs)
-        val_list.append(list(val))
-        count += 1
-    return val_list
-
-
 def test_all():
     funcs = [R, C, W, A, E, G]
     freqs = [0.001, 1.0, 1000]
