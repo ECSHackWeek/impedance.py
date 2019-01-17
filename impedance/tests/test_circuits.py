@@ -30,6 +30,8 @@ def test_Randles():
     # check that plotting returns a plt.Axes() object
     fig, ax = plt.subplots()
     assert isinstance(randles.plot(ax, frequencies, Z), type(ax))
+    assert isinstance(randles.plot(ax, frequencies, Z,
+                                   conf_bounds='error_bars'), type(ax))
 
     # check that predicting impedance from fit works
     assert np.isclose(randles.predict(np.array([10.0])),
