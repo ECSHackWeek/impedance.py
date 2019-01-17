@@ -13,7 +13,7 @@ This project started at the [2018 Electrochemical Society (ECS) Hack Week in Sea
 
 Using a [scikit-learn-like API](https://arxiv.org/abs/1309.0238), we hope to make visualizing, fitting, and analyzing impedance spectra more intuitive and reproducible.
 
-<i>impedance.py is currently in the alpha phase and new features are rapidly being added.</i>
+<i>impedance.py is currently in a beta phase and new features are rapidly being added.</i>
 If you have a feature request or find a bug, please feel free to [file an issue](https://github.com/ECSHackWeek/impedance.py/issues) or, better yet, make the code improvements and [submit a pull request](https://help.github.com/articles/creating-a-pull-request-from-a-fork/)! The goal is to build an open-source tool that the entire impedance community can improve and use!
 
 impedance.py currently provides:
@@ -40,7 +40,7 @@ Several example notebooks are provided in the examples/ directory. Opening these
 
 #### User Installation
 
-The easiest way to install impedance.py is using pip:
+The easiest way to install impedance.py is from [PyPI](https://pypi.org/project/impedance/) using pip:
 
 `pip install impedance`
 
