@@ -36,6 +36,18 @@ class BaseCircuit:
         self.parameters_ = None
         self.conf_ = None
 
+    def __eq__(self, other):
+        if self.__class__ == other.__class__:
+            matches = []
+            for key, value in self.__dict__.items():
+                if isinstance(value, np.ndarray):
+                    matches.append((value == other.__dict__[key]).all())
+                else:
+                    matches.append(value == other.__dict__[key])
+            return np.array(matches).all()
+        else:
+            raise TypeError('Comparing object is not of the same type.')
+
     def fit(self, frequencies, impedance, method='lm', bounds=None):
         """ Fit the circuit model
 
@@ -250,19 +262,6 @@ class BaseCircuit:
 
                 params = self.parameters_
                 confs = self.conf_
-
-                # up_bnd = eval(buildCircuit(self.circuit, f_pred,
-                #                            *(params + confs)))
-                #
-                # lw_bnd = eval(buildCircuit(self.circuit, f_pred,
-                #                            *(params - confs)))
-                #
-                # ax = plot_nyquist(ax, f_data, up_bnd, fmt=':')
-                # ax = plot_nyquist(ax, f_data, lw_bnd, fmt='--')
-
-                #
-                # ax.set_ylim(base_ylim)
-                # ax.set_xlim(base_xlim)
 
                 full_range = np.ndarray(shape=(N, len(f_pred)), dtype=complex)
                 for i in range(N):
