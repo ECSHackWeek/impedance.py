@@ -1,4 +1,4 @@
-from .circuit_elements import R, C, W, A, E, G, s, p  # noqa: F401
+from .circuit_elements import R, C, L, W, A, E, G, s, p  # noqa: F401
 import numpy as np
 from scipy.optimize import curve_fit
 
@@ -229,7 +229,7 @@ def buildCircuit(circuit, frequencies, *parameters, eval_string='', index=0):
 
 
 def calculateCircuitLength(circuit):
-    l1 = ['R', 'E', 'W', 'C', 'A', 'G']
+    l1 = ['R', 'E', 'W', 'C', 'L', 'A', 'G']
     length = 0
     for char in l1:
         length += circuit.count(char)
