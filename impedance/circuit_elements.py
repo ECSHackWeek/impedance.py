@@ -85,7 +85,8 @@ def W(p, f):
     Notes
     ---------
     .. math::
-        Z = \\frac{R}{\\sqrt{ T \\times j 2 \\pi f}} \\coth{\\sqrt{T \\times j 2 \\pi f }}  # noqa: E501
+        Z = \\frac{R}{\\sqrt{ T \\times j 2 \\pi f}}
+        \\coth{\\sqrt{T \\times j 2 \\pi f }}
 
     where :math:`R` = p[0] (Ohms) and
     :math:`T` = p[1] (sec) = :math:`\\frac{L^2}{D}`
@@ -105,6 +106,11 @@ def W(p, f):
 def A(p, f):
     """ defines a semi-infinite Warburg element
 
+    Notes
+    -----
+    .. math::
+
+        Z = \\frac{A_W}{\\sqrt{ 2 \\pi f}} (1-j)
     """
 
     typeChecker(p, f, A.__name__, 1)

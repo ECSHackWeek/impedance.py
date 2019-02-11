@@ -20,13 +20,13 @@ sys.path.insert(0, os.path.abspath('../../'))
 # -- Project information -----------------------------------------------------
 
 project = 'impedance.py'
-copyright = '2018, impedance.py developers'
+copyright = '2019, impedance.py developers'
 author = ''
 
 # The short X.Y version
-version = '0.1'
+version = '0.2'
 # The full version, including alpha/beta/rc tags
-release = '0.1.0-alpha'
+release = '0.2-beta'
 
 
 # -- General configuration ---------------------------------------------------
