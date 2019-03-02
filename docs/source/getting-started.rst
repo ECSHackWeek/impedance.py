@@ -170,7 +170,7 @@ calling the `.fit()` method and passing it our experimental data!
 
 .. code-block:: python
 
-  circuit.fit(Z, frequencies)
+  circuit.fit(frequencies, Z)
 
 We can access the fit parameters with :code:`circuit.parameters_` or by
 printing the circuit object itself, :code:`print(circuit)`.
