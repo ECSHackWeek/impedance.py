@@ -379,3 +379,68 @@ class CustomCircuit(BaseCircuit):
         circuit_length = calculateCircuitLength(self.circuit)
         assert len(self.initial_guess) == circuit_length, \
             'Initial guess length needs to be equal to {circuit_length}'
+
+def draw_circuit(circuit):
+    """ Constructs an SchemDraw drawing of a circuit that is specified as
+    a string."""
+    
+    import SchemDraw as schem
+    import SchemDraw.elements as e
+    import re
+
+    clist = circuit.split('-')
+
+    # define Warburg circuit element
+    wpath = np.array(
+        [[-0.25, 0.5], [0, -0.5], [0.25, 0.25], [0.5, -0.5], [0.75, 0.5]])
+
+    WARBURG = {
+        'name': 'WARBURG',
+        'paths': [0.8*wpath, [[0, 0], [0.5, 0]]],
+    }
+
+    # map circuit elements to drawing fucntions
+    emap = {'R': e.RES, 'C': e.CAP, 'L': e.INDUCTOR, 'W': WARBURG}
+
+    # initialize drawing
+    dwg = schem.Drawing()
+
+    # function to draw parallel elements
+    def draw_parallel(d, c, eprev):
+
+        m = re.search('p\((.+),(.+)\)', c)
+        e1, e2 = m[1], m[2]
+
+        h = 1.5
+        emap = {'R': e.RES, 'C': e.CAP, 'W': WARBURG}
+
+        if eprev == 'Parallel':
+            d.add(e.LINE, d='right', l=h)
+        d.add(e.DOT)
+        d.push()
+        d.add(e.LINE, d='up', l=h)
+        d.add(emap[e1[0]], label='$'+e1+'$', d='right')
+        d.add(e.LINE, d='down', l=h)
+        d.add(e.DOT)
+        d.pop()
+        d.add(e.LINE, d='down', l=h)
+        d.add(emap[e2[0]], label='$'+e2+'$', d='right')
+        d.add(e.LINE, d='up', l=h)
+        d.add(e.DOT)
+
+        return d
+
+    # main loop
+    for c in clist:
+
+        if c[0] is not 'p':
+            dwg.add(emap[c[0]], label='$'+c+'$', d='right')
+            eprev = 'Serial'
+        else:
+            dwg = draw_parallel(dwg, c, eprev)
+            eprev = 'Parallel'
+
+    # create image
+    dwg.draw()
+
+    return dwg

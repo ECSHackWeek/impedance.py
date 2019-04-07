@@ -4,3 +4,4 @@ numpy>=1.14
 numpydoc
 nbsphinx
 scipy>=1.0
+schemdraw
