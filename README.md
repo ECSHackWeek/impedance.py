@@ -4,6 +4,8 @@
 
 [![Documentation Status](https://readthedocs.org/projects/impedancepy/badge/?version=latest&kill_cache=1)](https://impedancepy.readthedocs.io/en/latest/?badge=latest)
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/cd7e6ee6f638458bb1bc9e1cab025409)](https://www.codacy.com/app/mdmurbach/impedance.py?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ECSHackWeek/impedance.py&amp;utm_campaign=Badge_Grade)
+
 impedance.py
 ------------
 
@@ -17,24 +19,24 @@ Using a [scikit-learn-like API](https://arxiv.org/abs/1309.0238), we hope to mak
 If you have a feature request or find a bug, please feel free to [file an issue](https://github.com/ECSHackWeek/impedance.py/issues) or, better yet, make the code improvements and [submit a pull request](https://help.github.com/articles/creating-a-pull-request-from-a-fork/)! The goal is to build an open-source tool that the entire impedance community can improve and use!
 
 impedance.py currently provides:
-- a simple API for fitting, predicting, and plotting impedance
-- validation methods for checking measurement validity
-- equivalent circuit fitting with customizable models
-- convenient Nyquist plots including confidence interval estimation for fit circuits
+-   a simple API for fitting, predicting, and plotting impedance
+-   validation methods for checking measurement validity
+-   equivalent circuit fitting with customizable models
+-   convenient Nyquist plots including confidence interval estimation for fit circuits
 
 several features are currently being improved upon:
-- interactive plotting with altair
-- physics-based impedance models for lithium-ion batteries
+-   interactive plotting with altair
+-   physics-based impedance models for lithium-ion batteries
 
 ### Installation
 #### Dependencies
 
 impedance.py requires:
 
-- Python (>=3.5)
-- SciPy (>=1.0)
-- NumPy (>=1.14)
-- Matplotlib (>=3.0)
+-   Python (>=3.5)
+-   SciPy (>=1.0)
+-   NumPy (>=1.14)
+-   Matplotlib (>=3.0)
 
 Several example notebooks are provided in the examples/ directory. Opening these will require Jupyter notebook or Jupyter lab.
 
