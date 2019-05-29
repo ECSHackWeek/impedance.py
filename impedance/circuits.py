@@ -1,6 +1,6 @@
 from .fitting import circuit_fit, buildCircuit, calculateCircuitLength
 from .plotting import plot_nyquist
-from .circuit_elements import R, C, L, W, A, E, G, s, p  # noqa: F401
+from .circuit_elements import R, C, L, W, A, E, G, T, s, p  # noqa: F401
 
 import numpy as np
 import os

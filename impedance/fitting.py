@@ -1,4 +1,4 @@
-from .circuit_elements import R, C, L, W, A, E, G, s, p  # noqa: F401
+from .circuit_elements import R, C, L, W, A, E, G, T, s, p  # noqa: F401
 import numpy as np
 from scipy.optimize import curve_fit
 
