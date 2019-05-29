@@ -86,7 +86,7 @@ def test_Randles():
 def test_CustomCircuit():
 
     initial_guess = [.01, .005, .1, .005, .1, .001, 200]
-    custom_string = 'R_0-p(R_1,C_1)-p(R_2,C_2)-W_1/W_2'
+    custom_string = 'R_0-p(R_1,C_1)-p(R_2,C_2)-W_1'
     custom_circuit = CustomCircuit(initial_guess=initial_guess,
                                    circuit=custom_string)
 

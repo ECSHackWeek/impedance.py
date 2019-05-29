@@ -2,6 +2,21 @@ import numpy as np
 import cmath
 
 
+def num_params(n):
+    """ decorator to store number of parameters for an element """
+    def decorator(func):
+        def wrapper(p, f):
+            typeChecker(p, f, func.__name__, n)
+            return func(p, f)
+
+        wrapper.num_params = n
+        wrapper.__name__ = func.__name__
+        wrapper.__doc__ = func.__doc__
+
+        return wrapper
+    return decorator
+
+
 def s(series):
     """ sums elements in series
 
@@ -33,6 +48,7 @@ def p(parallel):
     return 1/z
 
 
+@num_params(1)
 def R(p, f):
     """ defines a resistor
 
@@ -43,10 +59,10 @@ def R(p, f):
         Z = R
 
     """
-    typeChecker(p, f, R.__name__, 1)
     return np.array(len(f)*[p[0]])
 
 
+@num_params(1)
 def C(p, f):
     """ defines a capacitor
 
@@ -55,14 +71,11 @@ def C(p, f):
         Z = \\frac{1}{C \\times j 2 \\pi f}
 
      """
-
-    typeChecker(p, f, C.__name__, 1)
     omega = 2*np.pi*np.array(f)
-    capacitance = p[0]
-
-    return 1.0/(capacitance*1j*omega)
+    return 1.0/(p[0]*1j*omega)
 
 
+@num_params(1)
 def L(p, f):
     """ defines an inductor
 
@@ -71,14 +84,11 @@ def L(p, f):
         Z = L \\times j 2 \\pi f
 
      """
-
-    typeChecker(p, f, L.__name__, 1)
     omega = 2*np.pi*np.array(f)
-    inductance = p[0]
-
-    return inductance*1j*omega
+    return p[0]*1j*omega
 
 
+@num_params(2)
 def W(p, f):
     """ defines a blocked boundary Finite-length Warburg Element
 
@@ -92,17 +102,13 @@ def W(p, f):
     :math:`T` = p[1] (sec) = :math:`\\frac{L^2}{D}`
 
     """
-
-    typeChecker(p, f, W.__name__, 2)
-
     omega = 2*np.pi*np.array(f)
-
     Zw = np.vectorize(lambda y: p[0]/(np.sqrt(p[1]*1j*y) *
                                       cmath.tanh(np.sqrt(p[1]*1j*y))))
-
     return Zw(omega)
 
 
+@num_params(1)
 def A(p, f):
     """ defines a semi-infinite Warburg element
 
@@ -112,16 +118,13 @@ def A(p, f):
 
         Z = \\frac{A_W}{\\sqrt{ 2 \\pi f}} (1-j)
     """
-
-    typeChecker(p, f, A.__name__, 1)
     omega = 2*np.pi*np.array(f)
     Aw = p[0]
-
     Zw = Aw*(1-1j)/np.sqrt(omega)
-
     return Zw
 
 
+@num_params(2)
 def E(p, f):
     """ defines a constant phase element
 
@@ -133,14 +136,12 @@ def E(p, f):
 
     where :math:`Q` = p[0] and :math:`\\alpha` = p[1].
     """
-    typeChecker(p, f, E.__name__, 2)
     omega = 2*np.pi*np.array(f)
-    Q = p[0]
-    alpha = p[1]
-
+    Q, alpha = p
     return 1.0/(Q*(1j*omega)**alpha)
 
 
+@num_params(2)
 def G(p, f):
     """ defines a Gerischer Element
 
@@ -151,14 +152,12 @@ def G(p, f):
         Z = \\frac{1}{Y \\times \\sqrt{K + j 2 \\pi f }}
 
      """
-    typeChecker(p, f, G.__name__, 2)
     omega = 2*np.pi*np.array(f)
-    Z0 = p[0]
-    k = p[1]
-
+    Z0, k = p
     return Z0/np.sqrt(k + 1j*omega)
 
 
+@num_params(2)
 def K(p, f):
     """ An RC element for use in lin-KK model
 

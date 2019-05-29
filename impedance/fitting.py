@@ -69,12 +69,13 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess,
     if bounds is None:
         lb, ub = [], []
         p_string = [x for x in circuit if x not in 'ps(),-/']
-        for i, (a, b) in enumerate(zip(p_string[::2], p_string[1::2])):
-            lb.append(0)
-            if str(a+b) == "E2":
-                ub.append(1)
-            else:
-                ub.append(np.inf)
+        for a, b in zip(p_string[::2], p_string[1::2]):
+            for i in range(eval(a).num_params):
+                lb.append(0)
+                if a == "E" and i == 2:
+                    ub.append(1)
+                else:
+                    ub.append(np.inf)
 
         bounds = ((lb), (ub))
 
@@ -212,7 +213,7 @@ def buildCircuit(circuit, frequencies, *parameters, eval_string='', index=0):
                                               index=index)
         else:
             param_string = ""
-            elem_number = len(elem.split("/"))
+            elem_number = eval(elem[0]).num_params
 
             param_string += str(parameters[index:index + elem_number])
             new = elem[0] + '(' + param_string + ',' + str(frequencies) + ')'
@@ -229,8 +230,9 @@ def buildCircuit(circuit, frequencies, *parameters, eval_string='', index=0):
 
 
 def calculateCircuitLength(circuit):
-    l1 = ['R', 'E', 'W', 'C', 'L', 'A', 'G']
+    elements = [R, C, L, W, A, E, G, T]
     length = 0
-    for char in l1:
-        length += circuit.count(char)
+    for element in elements:
+        num_params = element.num_params
+        length += num_params*circuit.count(element.__name__)
     return length

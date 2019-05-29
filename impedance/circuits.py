@@ -151,9 +151,18 @@ class BaseCircuit:
 
         # parse the element names from the circuit string
         names = self.circuit.replace('p', '').replace('(', '').replace(')', '')
-        names = names.replace(',', '-').replace('/', '-').split('-')
+        names = names.replace(',', '-').split('-')
 
-        return names
+        full_names = []
+        for i, name in enumerate(names):
+            num_params = eval(name[0]).num_params
+            if num_params > 1:
+                for j in range(num_params):
+                    full_names.append('{}_{}'.format(name, j))
+            else:
+                full_names.append(name)
+
+        return full_names
 
     def get_verbose_string(self):
 
@@ -334,13 +343,13 @@ class Randles(BaseCircuit):
 
         if CPE:
             self.name = 'Randles w/ CPE'
-            self.circuit = 'R_0-p(R_1,E_1/E_2)-W_1/W_2'
+            self.circuit = 'R0-p(R1,E1)-W1'
             circuit_length = calculateCircuitLength(self.circuit)
             assert len(self.initial_guess) == circuit_length, \
                 'Initial guess length needs to be equal to parameter length'
         else:
             self.name = 'Randles'
-            self.circuit = 'R_0-p(R_1,C_1)-W_1/W_2'
+            self.circuit = 'R0-p(R1,C1)-W1'
             circuit_length = calculateCircuitLength(self.circuit)
             assert len(self.initial_guess) == circuit_length, \
                 'Initial guess length needs to be equal to parameter length'
