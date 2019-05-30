@@ -151,7 +151,7 @@ class BaseCircuit:
 
         # parse the element names from the circuit string
         names = self.circuit.replace('p', '').replace('(', '').replace(')', '')
-        names = names.replace(',', '-').split('-')
+        names = names.replace(',', '-').replace(' ', '').split('-')
 
         full_names = []
         for i, name in enumerate(names):
