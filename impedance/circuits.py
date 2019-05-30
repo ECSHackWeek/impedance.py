@@ -1,4 +1,5 @@
-from .fitting import circuit_fit, buildCircuit, calculateCircuitLength
+from .fitting import circuit_fit, buildCircuit
+from .fitting import calculateCircuitLength, check_and_eval
 from .plotting import plot_nyquist
 from .circuit_elements import R, C, L, W, A, E, G, T, s, p  # noqa: F401
 
@@ -155,7 +156,7 @@ class BaseCircuit:
 
         full_names = []
         for i, name in enumerate(names):
-            num_params = eval(name[0]).num_params
+            num_params = check_and_eval(name[0]).num_params
             if num_params > 1:
                 for j in range(num_params):
                     full_names.append('{}_{}'.format(name, j))
