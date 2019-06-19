@@ -136,14 +136,13 @@ custom circuit with any combination of `circuit elements <circuit-elements.html>
 
 The circuit is defined as a string (i.e. using :code:`''` in Python), where elements in
 series are separated by a dash (:code:`-`), and elements in parallel are wrapped in
-a :code:`p( , )`. Each element is defined by the function (in `circuit-elements.py <circuit-elements.html>`_) followed by a single digit identifier. Elements with 2 parameters
-(e.g. a finite-length warburg element, :code:`W`) take the form :code:`W1/W2`.
+a :code:`p( , )`. Each element is defined by the function (in `circuit-elements.py <circuit-elements.html>`_) followed by a single digit identifier.
 
 For example, the circuit below:
 
 .. image:: _static/two_time_constants.png
 
-would be defined as :code:`R0-p(R1,C1)-p(R2-W1/W2,C2)`.
+would be defined as :code:`R0-p(R1,C1)-p(R2-W1,C2)`.
 
 Each circuit, we want to fit also needs to have an initial guess for each
 of the parameters. These inital guesses are passed in as a list in order the
@@ -157,7 +156,7 @@ circuit string and initial guesses.
 
   from impedance.circuits import CustomCircuit
 
-  circuit = 'R0-p(R1,C1)-p(R2-W1/W2,C2)'
+  circuit = 'R0-p(R1,C1)-p(R2-W1,C2)'
   initial_guess = [.01, .01, 100, .01, .05, 100, 1]
 
   circuit = CustomCircuit(circuit, initial_guess=initial_guess)
@@ -180,17 +179,17 @@ Step 5: Analyze/Visualize the results
 
 For this dataset, the resulting fit parameters are
 
-=========== ========
- Parameter   Value
------------ --------
-:math:`R_0` 1.65e-02
-:math:`R_1` 8.68e-03
-:math:`C_1` 3.32e+00
-:math:`R_2` 5.39e-03
-:math:`W_1` 6.31e-02
-:math:`W_2` 2.33e+02
-:math:`C_2` 2.20e-01
-=========== ========
+=============== ========
+   Parameter     Value
+--------------- --------
+:math:`R_0`     1.65e-02
+:math:`R_1`     8.68e-03
+:math:`C_1`     3.32e+00
+:math:`R_2`     5.39e-03
+:math:`W_{1,0}` 6.31e-02
+:math:`W_{1,1}` 2.33e+02
+:math:`C_2`     2.20e-01
+=============== ========
 
 We can get the resulting fit impedance by passing a list of frequencies to the :code:`.predict()` method.
 
