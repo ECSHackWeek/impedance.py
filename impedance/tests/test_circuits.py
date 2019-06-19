@@ -28,7 +28,7 @@ def test_Randles():
                                              2.22407275e+02]), decimal=2)
 
     # check that plotting returns a plt.Axes() object
-    fig, ax = plt.subplots()
+    _, ax = plt.subplots()
     assert isinstance(randles.plot(ax, frequencies, Z), type(ax))
     assert isinstance(randles.plot(ax, frequencies, Z,
                                    conf_bounds='error_bars'), type(ax))
