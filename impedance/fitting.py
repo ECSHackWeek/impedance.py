@@ -69,7 +69,7 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess,
     if bounds is None:
         lb, ub = [], []
         p_string = [x for x in circuit if x not in 'ps(),-/']
-        for a, b in zip(p_string[::2], p_string[1::2]):
+        for a in p_string[::2]:
             for i in range(check_and_eval(a).num_params):
                 lb.append(0)
                 if a == "E" and i == 2:

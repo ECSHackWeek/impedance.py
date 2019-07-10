@@ -155,7 +155,7 @@ class BaseCircuit:
         names = names.replace(',', '-').replace(' ', '').split('-')
 
         full_names = []
-        for i, name in enumerate(names):
+        for name in names:
             num_params = check_and_eval(name[0]).num_params
             if num_params > 1:
                 for j in range(num_params):
