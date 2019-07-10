@@ -42,9 +42,7 @@ Several example notebooks are provided in the examples/ directory. Opening these
 
 #### User Installation
 
-The easiest way to install impedance.py is from [PyPI](https://pypi.org/project/impedance/) using pip:
-
-`pip install impedance`
+The easiest way to install impedance.py is from [PyPI](https://pypi.org/project/impedance/) using pip (see [`Getting started with impedance.py`](https://impedancepy.readthedocs.io/en/latest/getting-started.html) for instructions).
 
 #### Examples and Documentation
 
