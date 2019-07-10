@@ -28,7 +28,7 @@ def test_Randles():
                                              2.22407275e+02]), decimal=2)
 
     # check that plotting returns a plt.Axes() object
-    fig, ax = plt.subplots()
+    _, ax = plt.subplots()
     assert isinstance(randles.plot(ax, frequencies, Z), type(ax))
     assert isinstance(randles.plot(ax, frequencies, Z,
                                    conf_bounds='error_bars'), type(ax))
@@ -86,13 +86,14 @@ def test_Randles():
 def test_CustomCircuit():
 
     initial_guess = [.01, .005, .1, .005, .1, .001, 200]
-    custom_string = 'R_0-p(R_1,C_1)-p(R_2,C_2)-W_1/W_2'
+    custom_string = 'R0-p(R1,C1)-p(R2,C2)-W1'
     custom_circuit = CustomCircuit(initial_guess=initial_guess,
                                    circuit=custom_string)
 
     # check get_param_names()
+    print(custom_circuit.get_param_names())
     assert custom_circuit.get_param_names() == \
-        ['R_0', 'R_1', 'C_1', 'R_2', 'C_2', 'W_1', 'W_2']
+        ['R0', 'R1', 'C1', 'R2', 'C2', 'W1_0', 'W1_1']
 
     # check _is_fit()
     assert not custom_circuit._is_fit()

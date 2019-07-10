@@ -5,14 +5,14 @@ Methods for preprocessing impedance data from instrument files
 import numpy as np
 
 
-def readFile(filename, type=None):
+def readFile(filename, instrument=None):
     """ A wrapper for reading in many common types of impedance files
 
     Parameters
     ----------
     filename: string
         Filename to extract impedance data from
-    type: string
+    instrument: string
         Type of instrument file
 
     Returns
@@ -26,17 +26,18 @@ def readFile(filename, type=None):
 
     supported_types = ['gamry', 'autolab', 'parstat']
 
-    if type is not None:
-        assert type in supported_types,\
-            '{} is not a supported type ({})'.format(type, supported_types)
+    if instrument is not None:
+        assert instrument in supported_types,\
+            '{} is not a supported instrument ({})'.format(instrument,
+                                                           supported_types)
 
-    if type == 'gamry':
+    if instrument == 'gamry':
         f, Z = readGamry(filename)
-    elif type == 'autolab':
+    elif instrument == 'autolab':
         f, Z = readAutolab(filename)
-    elif type == 'parstat':
+    elif instrument == 'parstat':
         f, Z = readParstat(filename)
-    elif type is None:
+    elif instrument is None:
         f, Z = readCSV(filename)
 
     return f, Z
@@ -59,8 +60,8 @@ def readGamry(filename):
 
     """
 
-    with open(filename, 'r', encoding='ISO-8859-1') as input:
-        lines = input.readlines()
+    with open(filename, 'r', encoding='ISO-8859-1') as input_file:
+        lines = input_file.readlines()
 
     for i, line in enumerate(lines):
         if 'ZCURVE' in line:
@@ -93,8 +94,8 @@ def readAutolab(filename):
 
     """
 
-    with open(filename, 'r') as input:
-        lines = input.readlines()
+    with open(filename, 'r') as input_file:
+        lines = input_file.readlines()
 
     raw_data = lines[1:]
     f, Z = [], []
@@ -123,8 +124,8 @@ def readParstat(filename):
 
     """
 
-    with open(filename, 'r') as input:
-        lines = input.readlines()
+    with open(filename, 'r') as input_file:
+        lines = input_file.readlines()
 
     raw_data = lines[1:]
     f, Z = [], []

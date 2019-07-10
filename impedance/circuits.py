@@ -1,6 +1,7 @@
-from .fitting import circuit_fit, buildCircuit, calculateCircuitLength
+from .fitting import circuit_fit, buildCircuit
+from .fitting import calculateCircuitLength, check_and_eval
 from .plotting import plot_nyquist
-from .circuit_elements import R, C, L, W, A, E, G, s, p  # noqa: F401
+from .circuit_elements import R, C, L, W, A, E, G, T, s, p  # noqa: F401
 
 import numpy as np
 import os
@@ -151,9 +152,18 @@ class BaseCircuit:
 
         # parse the element names from the circuit string
         names = self.circuit.replace('p', '').replace('(', '').replace(')', '')
-        names = names.replace(',', '-').replace('/', '-').split('-')
+        names = names.replace(',', '-').replace(' ', '').split('-')
 
-        return names
+        full_names = []
+        for name in names:
+            num_params = check_and_eval(name[0]).num_params
+            if num_params > 1:
+                for j in range(num_params):
+                    full_names.append('{}_{}'.format(name, j))
+            else:
+                full_names.append(name)
+
+        return full_names
 
     def get_verbose_string(self):
 
@@ -199,8 +209,8 @@ class BaseCircuit:
         if self._is_fit():
             to_print += '\n-------------------------------\n'
             to_print += 'Fit parameters:\n'
-            for name, param, conf in zip(names, self.parameters_, self.conf_):
-                to_print += '\t{} = {:.2e}\n'.format(name, param)
+            for values in zip(names, self.parameters_, self.conf_):
+                to_print += '\t{} = {:.2e} +/- {:.2e}\n'.format(*values)
         else:
             to_print += '\n-------------------------------\n'
             to_print += 'Initial guesses:\n'
@@ -334,13 +344,13 @@ class Randles(BaseCircuit):
 
         if CPE:
             self.name = 'Randles w/ CPE'
-            self.circuit = 'R_0-p(R_1,E_1/E_2)-W_1/W_2'
+            self.circuit = 'R0-p(R1,E1)-W1'
             circuit_length = calculateCircuitLength(self.circuit)
             assert len(self.initial_guess) == circuit_length, \
                 'Initial guess length needs to be equal to parameter length'
         else:
             self.name = 'Randles'
-            self.circuit = 'R_0-p(R_1,C_1)-W_1/W_2'
+            self.circuit = 'R0-p(R1,C1)-W1'
             circuit_length = calculateCircuitLength(self.circuit)
             assert len(self.initial_guess) == circuit_length, \
                 'Initial guess length needs to be equal to parameter length'

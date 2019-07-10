@@ -16,7 +16,7 @@ import numpy as np
 def test_buildCircuit():
 
     # Test simple Randles circuit with CPE
-    circuit = 'R_0-p(R_1, E_1/E_2)-W_1/W_2'
+    circuit = 'R_0-p(R_1, E_1)-W_1'
     params = [.1, .01, 15, .9, 1, 1000]
     frequencies = [1000.0, 5.0, 0.01]
 
