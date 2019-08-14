@@ -3,14 +3,8 @@ from .fitting import calculateCircuitLength, check_and_eval
 from .plotting import plot_nyquist
 from .circuit_elements import R, C, L, W, A, E, G, T, s, p  # noqa: F401
 
+import matplotlib.pyplot as plt
 import numpy as np
-import os
-
-import matplotlib as mpl
-if os.environ.get('DISPLAY', '') == '':
-    print('no display found. Using non-interactive Agg backend')
-    mpl.use('Agg')
-import matplotlib.pyplot as plt  # noqa E402
 
 
 class BaseCircuit:
