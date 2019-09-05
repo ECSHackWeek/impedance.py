@@ -16,7 +16,7 @@ import numpy as np
 def test_buildCircuit():
 
     # Test simple Randles circuit with CPE
-    circuit = 'R_0-p(R_1, E_1)-W_1'
+    circuit = 'R0-p(R1, E1)-W1'
     params = [.1, .01, 15, .9, 1, 1000]
     frequencies = [1000.0, 5.0, 0.01]
 
@@ -27,7 +27,7 @@ def test_buildCircuit():
         'W([1.0,1000.0],[1000.0,5.0,0.01])])'
 
     # Test multiple parallel elements
-    circuit = 'R_0-p(C_1,R_1,R_2)'
+    circuit = 'R0-p(C1,R1,R2)'
     params = [.1, .01, .2, .3]
     frequencies = [1000.0, 5.0, 0.01]
 
@@ -38,7 +38,7 @@ def test_buildCircuit():
         'R([0.3],[1000.0,5.0,0.01])])])'
 
     # Test nested parallel groups
-    circuit = 'R_0-p(p(R_1, C_1)-R_2, C_2)'
+    circuit = 'R0-p(p(R1, C1)-R2, C2)'
     params = [1, 2, 3, 4, 5]
     frequencies = [1000.0, 5.0, 0.01]
 
