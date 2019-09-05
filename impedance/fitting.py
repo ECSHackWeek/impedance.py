@@ -125,7 +125,7 @@ def wrapCircuit(circuit, constants):
     return wrappedCircuit
 
 
-def computeCircuit(circuit, frequencies, *parameters, constants={}):
+def computeCircuit(circuit, frequencies, *parameters, constants=None):
     """ evaluates a circuit string for a given set of parameters and frequencies
 
     Parameters
@@ -144,7 +144,7 @@ def computeCircuit(circuit, frequencies, *parameters, constants={}):
 
 
 def buildCircuit(circuit, frequencies, *parameters,
-                 constants={}, eval_string='', index=0):
+                 constants=None, eval_string='', index=0):
     """ recursive function that transforms a circuit, parameters, and
     frequencies into a string that can be evaluated
 

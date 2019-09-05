@@ -9,7 +9,7 @@ import numpy as np
 
 class BaseCircuit:
     """ Base class for equivalent circuit models """
-    def __init__(self, initial_guess, constants={}, name=None, bounds=None):
+    def __init__(self, initial_guess, constants=None, name=None, bounds=None):
         """ Base constructor for any equivalent circuit model
 
         Parameters
@@ -26,7 +26,10 @@ class BaseCircuit:
 
         # initalize class attributes
         self.initial_guess = initial_guess
-        self.constants = constants
+        if constants is not None:
+            self.constants = constants
+        else:
+            self.constants = {}
         self.name = name
 
         # initialize fit parameters and confidence intervals
