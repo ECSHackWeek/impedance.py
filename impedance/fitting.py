@@ -20,7 +20,7 @@ def rmse(a, b):
 
 
 def circuit_fit(frequencies, impedances, circuit, initial_guess,
-                method='lm', bounds=None, bootstrap=False):
+                constants, method='lm', bounds=None, bootstrap=False):
 
     """ Main function for fitting an equivalent circuit to data
 
@@ -69,17 +69,27 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess,
     if bounds is None:
         lb, ub = [], []
         p_string = [x for x in circuit if x not in 'ps(),-/']
-        for a in p_string[::2]:
+        for a, b in zip(p_string[::2], p_string[1::2]):
             for i in range(check_and_eval(a).num_params):
-                lb.append(0)
-                if a == "E" and i == 2:
-                    ub.append(1)
+                if i == 0:
+                    if a + b in constants.keys():
+                        continue
+                    else:
+                        lb.append(0)
+                        ub.append(np.inf)
                 else:
-                    ub.append(np.inf)
+                    if a + b + '_{}'.format(i) in constants.keys():
+                        continue
+                    else:
+                        lb.append(0)
+                        if a == "E" and i == 1:
+                            ub.append(1)
+                        else:
+                            ub.append(np.inf)
 
         bounds = ((lb), (ub))
 
-    popt, pcov = curve_fit(wrapCircuit(circuit), f,
+    popt, pcov = curve_fit(wrapCircuit(circuit, constants), f,
                            np.hstack([Z.real, Z.imag]), p0=initial_guess,
                            bounds=bounds, maxfev=100000, ftol=1E-13)
 
@@ -88,7 +98,7 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess,
     return popt, perror
 
 
-def wrapCircuit(circuit):
+def wrapCircuit(circuit, constants):
     """ wraps function so we can pass the circuit string """
     def wrappedCircuit(frequencies, *parameters):
         """ returns a stacked
@@ -106,7 +116,8 @@ def wrapCircuit(circuit):
         """
 
         x = eval(buildCircuit(circuit, frequencies, *parameters,
-                              eval_string='', index=0)[0])
+                              constants=constants, eval_string='',
+                              index=0)[0])
         y_real = np.real(x)
         y_imag = np.imag(x)
 
@@ -114,7 +125,7 @@ def wrapCircuit(circuit):
     return wrappedCircuit
 
 
-def computeCircuit(circuit, frequencies, *parameters):
+def computeCircuit(circuit, frequencies, *parameters, constants={}):
     """ evaluates a circuit string for a given set of parameters and frequencies
 
     Parameters
@@ -128,10 +139,12 @@ def computeCircuit(circuit, frequencies, *parameters):
     array of complex numbers
     """
     return eval(buildCircuit(circuit, frequencies, *parameters,
-                             eval_string='', index=0)[0])
+                             constants=constants, eval_string='',
+                             index=0)[0])
 
 
-def buildCircuit(circuit, frequencies, *parameters, eval_string='', index=0):
+def buildCircuit(circuit, frequencies, *parameters,
+                 constants={}, eval_string='', index=0):
     """ recursive function that transforms a circuit, parameters, and
     frequencies into a string that can be evaluated
 
@@ -209,17 +222,28 @@ def buildCircuit(circuit, frequencies, *parameters, eval_string='', index=0):
         if ',' in elem or '-' in elem:
             eval_string, index = buildCircuit(elem, frequencies,
                                               *parameters,
+                                              constants=constants,
                                               eval_string=eval_string,
                                               index=index)
         else:
             param_string = ""
             elem_number = check_and_eval(elem[0]).num_params
+            param_list = []
+            for j in range(elem_number):
+                if elem_number > 1:
+                    current_elem = elem + '_{}'.format(j)
+                else:
+                    current_elem = elem
 
-            param_string += str(parameters[index:index + elem_number])
+                if current_elem in constants.keys():
+                    param_list.append(constants[current_elem])
+                else:
+                    param_list.append(parameters[index])
+                    index += 1
+
+            param_string += str(param_list)
             new = elem[0] + '(' + param_string + ',' + str(frequencies) + ')'
             eval_string += new
-
-            index += elem_number
 
         if i == len(split) - 1:
             eval_string += '])'
