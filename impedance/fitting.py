@@ -193,12 +193,12 @@ def buildCircuit(circuit, frequencies, *parameters,
     parallel = parse_circuit(circuit, parallel=True)
     series = parse_circuit(circuit, series=True)
 
-    if parallel is not None and len(parallel) > 1:
-        eval_string += "p(["
-        split = parallel
-    elif series is not None and len(series) > 1:
+    if series is not None and len(series) > 1:
         eval_string += "s(["
         split = series
+    elif parallel is not None and len(parallel) > 1:
+        eval_string += "p(["
+        split = parallel
 
     for i, elem in enumerate(split):
         if ',' in elem or '-' in elem:
