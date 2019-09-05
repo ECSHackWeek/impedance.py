@@ -142,74 +142,46 @@ class BaseCircuit:
                                      index=0)[0])
 
     def get_param_names(self):
-        """Converts circuit string to names"""
+        """ Converts circuit string to names and units """
 
         # parse the element names from the circuit string
         names = self.circuit.replace('p', '').replace('(', '').replace(')', '')
         names = names.replace(',', '-').replace(' ', '').split('-')
 
-        full_names = []
+        full_names, all_units = [], []
         for name in names:
             num_params = check_and_eval(name[0]).num_params
+            units = check_and_eval(name[0]).units
             if num_params > 1:
                 for j in range(num_params):
-                    full_names.append('{}_{}'.format(name, j))
+                    full_name = '{}_{}'.format(name, j)
+                    full_names.append(full_name)
+                    all_units.append(units[j])
             else:
                 full_names.append(name)
+                all_units.append(units[0])
 
-        return full_names
-
-    def get_verbose_string(self):
-
-        """ Defines the pretty printing of all data in the circuit"""
-        names = self.get_param_names()
-
-        to_print  = '\n-------------------------------\n'  # noqa E222
-        to_print += 'Circuit: {}\n'.format(self.name)
-        to_print += 'Circuit string: {}\n'.format(self.circuit)
-
-        if self._is_fit():
-            to_print += "Fit: True\n"
-        else:
-            to_print += "Fit: False\n"
-
-        to_print += '\n-------------------------------\n'
-        to_print += 'Initial guesses:\n'
-        for name, param in zip(names, self.initial_guess):
-            to_print += '\t{} = {:.2e}\n'.format(name, param)
-        if self._is_fit():
-            to_print += '\n-------------------------------\n'
-            to_print += 'Fit parameters:\n'
-            for name, param, conf in zip(names, self.parameters_, self.conf_):
-                to_print += '\t{} = {:.2e}'.format(name, param)
-                to_print += '\t(+/- {:.2e})\n'.format(conf)
-
-        return to_print
+        return full_names, all_units
 
     def __str__(self):
-        """ Defines the pretty printing of the circuit """
+        """ Defines the pretty printing of the circuit"""
 
-        names = self.get_param_names()
-
-        to_print  = '\n-------------------------------\n'  # noqa E222
-        to_print += 'Circuit: {}\n'.format(self.name)
+        to_print  = '\n'  # noqa E222
+        if self.name is not None:
+            to_print += 'Name: {}\n'.format(self.name)
         to_print += 'Circuit string: {}\n'.format(self.circuit)
+        to_print += "Fit: {}\n".format(self._is_fit())
 
+        names, units = self.get_param_names()
+        to_print += '\nInitial guesses:\n'
+        for name, unit, param in zip(names, units, self.initial_guess):
+            to_print += '  {:>5} = {:.2e} [{}]\n'.format(name, param, unit)
         if self._is_fit():
-            to_print += "Fit: True\n"
-        else:
-            to_print += "Fit: False\n"
-
-        if self._is_fit():
-            to_print += '\n-------------------------------\n'
-            to_print += 'Fit parameters:\n'
-            for values in zip(names, self.parameters_, self.conf_):
-                to_print += '\t{} = {:.2e} +/- {:.2e}\n'.format(*values)
-        else:
-            to_print += '\n-------------------------------\n'
-            to_print += 'Initial guesses:\n'
-            for name, param in zip(names, self.initial_guess):
-                to_print += '\t{} = {:.2e}\n'.format(name, param)
+            params, confs = self.parameters_, self.conf_
+            to_print += '\nFit parameters:\n'
+            for name, unit, param, conf in zip(names, units, params, confs):
+                to_print += '  {:>5} = {:.2e}'.format(name, param)
+                to_print += '  (+/- {:.2e}) [{}]\n'.format(conf, unit)
 
         return to_print
 

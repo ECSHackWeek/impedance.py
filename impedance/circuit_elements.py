@@ -2,14 +2,23 @@ import numpy as np
 import cmath
 
 
-def num_params(n):
-    """ decorator to store number of parameters for an element """
+def element_metadata(num_params, units):
+    """ decorator to store metadata for a circuit element
+
+        Parameters
+        ----------
+        num_params : int
+            number of parameters for an element
+        units : list of str
+            list of units for the element parameters
+    """
     def decorator(func):
         def wrapper(p, f):
-            typeChecker(p, f, func.__name__, n)
+            typeChecker(p, f, func.__name__, num_params)
             return func(p, f)
 
-        wrapper.num_params = n
+        wrapper.num_params = num_params
+        wrapper.units = units
         wrapper.__name__ = func.__name__
         wrapper.__doc__ = func.__doc__
 
@@ -48,7 +57,7 @@ def p(parallel):
     return 1/z
 
 
-@num_params(1)
+@element_metadata(num_params=1, units=['Ohm'])
 def R(p, f):
     """ defines a resistor
 
@@ -62,7 +71,7 @@ def R(p, f):
     return np.array(len(f)*[p[0]])
 
 
-@num_params(1)
+@element_metadata(num_params=1, units=['F'])
 def C(p, f):
     """ defines a capacitor
 
@@ -75,7 +84,7 @@ def C(p, f):
     return 1.0/(p[0]*1j*omega)
 
 
-@num_params(1)
+@element_metadata(num_params=1, units=['H'])
 def L(p, f):
     """ defines an inductor
 
@@ -88,7 +97,7 @@ def L(p, f):
     return p[0]*1j*omega
 
 
-@num_params(2)
+@element_metadata(num_params=2, units=['Ohm', 'sec'])
 def W(p, f):
     """ defines a blocked boundary Finite-length Warburg Element
 
@@ -108,7 +117,7 @@ def W(p, f):
     return Zw(omega)
 
 
-@num_params(1)
+@element_metadata(num_params=1, units=['Ohm sec^-1/2'])
 def A(p, f):
     """ defines a semi-infinite Warburg element
 
@@ -124,7 +133,7 @@ def A(p, f):
     return Zw
 
 
-@num_params(2)
+@element_metadata(num_params=2, units=['Ohm^-1 sec^a', ''])
 def E(p, f):
     """ defines a constant phase element
 
@@ -141,7 +150,7 @@ def E(p, f):
     return 1.0/(Q*(1j*omega)**alpha)
 
 
-@num_params(2)
+@element_metadata(num_params=2, units=['Ohm^-1 sec^1/2', 'sec^-1'])
 def G(p, f):
     """ defines a Gerischer Element
 
@@ -157,7 +166,7 @@ def G(p, f):
     return Z0/np.sqrt(k + 1j*omega)
 
 
-@num_params(2)
+@element_metadata(num_params=2, units=['Ohm', 'sec'])
 def K(p, f):
     """ An RC element for use in lin-KK model
 
@@ -172,7 +181,7 @@ def K(p, f):
     return p[0]/(1 + 1j*omega*p[1])
 
 
-@num_params(4)
+@element_metadata(num_params=4, units=['', '', '', ''])
 def T(p, f):
     """ A macrohomogeneous porous electrode model from Paasch et al. [1]
 
