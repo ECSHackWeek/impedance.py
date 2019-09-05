@@ -125,24 +125,6 @@ def wrapCircuit(circuit, constants):
     return wrappedCircuit
 
 
-def computeCircuit(circuit, frequencies, *parameters, constants=None):
-    """ evaluates a circuit string for a given set of parameters and frequencies
-
-    Parameters
-    ----------
-    circuit : string
-    frequencies : list/tuple/array of floats
-    parameters : list/tuple/array of floats
-
-    Returns
-    -------
-    array of complex numbers
-    """
-    return eval(buildCircuit(circuit, frequencies, *parameters,
-                             constants=constants, eval_string='',
-                             index=0)[0])
-
-
 def buildCircuit(circuit, frequencies, *parameters,
                  constants=None, eval_string='', index=0):
     """ recursive function that transforms a circuit, parameters, and

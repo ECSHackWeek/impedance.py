@@ -9,8 +9,6 @@ import numpy as np
 #     pass
 #
 #
-# def test_computeCircuit():
-#     pass
 
 
 def test_buildCircuit():
