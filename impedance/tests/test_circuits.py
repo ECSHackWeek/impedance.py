@@ -92,8 +92,9 @@ def test_CustomCircuit():
 
     # check get_param_names()
     print(custom_circuit.get_param_names())
-    assert custom_circuit.get_param_names() == \
-        ['R0', 'R1', 'C1', 'R2', 'C2', 'W1_0', 'W1_1']
+    full_names, all_units = custom_circuit.get_param_names()
+    assert full_names == ['R0', 'R1', 'C1', 'R2', 'C2', 'W1_0', 'W1_1']
+    assert all_units == ['Ohm', 'Ohm', 'F', 'Ohm', 'F', 'Ohm', 'sec']
 
     # check _is_fit()
     assert not custom_circuit._is_fit()
