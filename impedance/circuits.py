@@ -9,7 +9,7 @@ import numpy as np
 
 class BaseCircuit:
     """ Base class for equivalent circuit models """
-    def __init__(self, initial_guess, name=None, bounds=None):
+    def __init__(self, initial_guess, constants=None, name=None, bounds=None):
         """ Base constructor for any equivalent circuit model
 
         Parameters
@@ -19,12 +19,17 @@ class BaseCircuit:
         """
 
         # if supplied, check that initial_guess is valid and store
+        initial_guess = list(filter(None, initial_guess))
         for i in initial_guess:
             assert isinstance(i, (float, int, np.int32, np.float64)),\
                 'value {} in initial_guess is not a number'.format(i)
 
         # initalize class attributes
         self.initial_guess = initial_guess
+        if constants is not None:
+            self.constants = constants
+        else:
+            self.constants = {}
         self.name = name
 
         # initialize fit parameters and confidence intervals
@@ -87,7 +92,8 @@ class BaseCircuit:
         if self.initial_guess is not None:
             parameters, conf = circuit_fit(frequencies, impedance,
                                            self.circuit, self.initial_guess,
-                                           method=method, bounds=bounds)
+                                           self.constants, method=method,
+                                           bounds=bounds)
             self.parameters_ = parameters
             if conf is not None:
                 self.conf_ = conf
@@ -133,83 +139,69 @@ class BaseCircuit:
 
         if self._is_fit() and not use_initial:
             return eval(buildCircuit(self.circuit, frequencies,
-                                     *self.parameters_, eval_string='',
+                                     *self.parameters_,
+                                     constants=self.constants, eval_string='',
                                      index=0)[0])
         else:
             print("Simulating circuit based on initial parameters")
             return eval(buildCircuit(self.circuit, frequencies,
-                                     *self.initial_guess, eval_string='',
+                                     *self.initial_guess,
+                                     constants=self.constants, eval_string='',
                                      index=0)[0])
 
     def get_param_names(self):
-        """Converts circuit string to names"""
+        """ Converts circuit string to names and units """
 
         # parse the element names from the circuit string
         names = self.circuit.replace('p', '').replace('(', '').replace(')', '')
         names = names.replace(',', '-').replace(' ', '').split('-')
 
-        full_names = []
+        full_names, all_units = [], []
         for name in names:
             num_params = check_and_eval(name[0]).num_params
+            units = check_and_eval(name[0]).units
             if num_params > 1:
                 for j in range(num_params):
-                    full_names.append('{}_{}'.format(name, j))
+                    full_name = '{}_{}'.format(name, j)
+                    if full_name not in self.constants.keys():
+                        full_names.append(full_name)
+                        all_units.append(units[j])
             else:
-                full_names.append(name)
+                if name not in self.constants.keys():
+                    full_names.append(name)
+                    all_units.append(units[0])
 
-        return full_names
-
-    def get_verbose_string(self):
-
-        """ Defines the pretty printing of all data in the circuit"""
-        names = self.get_param_names()
-
-        to_print  = '\n-------------------------------\n'  # noqa E222
-        to_print += 'Circuit: {}\n'.format(self.name)
-        to_print += 'Circuit string: {}\n'.format(self.circuit)
-
-        if self._is_fit():
-            to_print += "Fit: True\n"
-        else:
-            to_print += "Fit: False\n"
-
-        to_print += '\n-------------------------------\n'
-        to_print += 'Initial guesses:\n'
-        for name, param in zip(names, self.initial_guess):
-            to_print += '\t{} = {:.2e}\n'.format(name, param)
-        if self._is_fit():
-            to_print += '\n-------------------------------\n'
-            to_print += 'Fit parameters:\n'
-            for name, param, conf in zip(names, self.parameters_, self.conf_):
-                to_print += '\t{} = {:.2e}'.format(name, param)
-                to_print += '\t(+/- {:.2e})\n'.format(conf)
-
-        return to_print
+        return full_names, all_units
 
     def __str__(self):
-        """ Defines the pretty printing of the circuit """
+        """ Defines the pretty printing of the circuit"""
 
-        names = self.get_param_names()
-
-        to_print  = '\n-------------------------------\n'  # noqa E222
-        to_print += 'Circuit: {}\n'.format(self.name)
+        to_print = '\n'
+        if self.name is not None:
+            to_print += 'Name: {}\n'.format(self.name)
         to_print += 'Circuit string: {}\n'.format(self.circuit)
+        to_print += "Fit: {}\n".format(self._is_fit())
 
-        if self._is_fit():
-            to_print += "Fit: True\n"
-        else:
-            to_print += "Fit: False\n"
+        if len(self.constants) > 0:
+            to_print += '\nConstants:\n'
+            for name, value in self.constants.items():
+                units = check_and_eval(name[0]).units
+                if '_' in name:
+                    unit = units[int(name.split('_')[-1])]
+                else:
+                    unit = units[0]
+                to_print += '  {:>5} = {:.2e} [{}]\n'.format(name, value, unit)
 
+        names, units = self.get_param_names()
+        to_print += '\nInitial guesses:\n'
+        for name, unit, param in zip(names, units, self.initial_guess):
+            to_print += '  {:>5} = {:.2e} [{}]\n'.format(name, param, unit)
         if self._is_fit():
-            to_print += '\n-------------------------------\n'
-            to_print += 'Fit parameters:\n'
-            for values in zip(names, self.parameters_, self.conf_):
-                to_print += '\t{} = {:.2e} +/- {:.2e}\n'.format(*values)
-        else:
-            to_print += '\n-------------------------------\n'
-            to_print += 'Initial guesses:\n'
-            for name, param in zip(names, self.initial_guess):
-                to_print += '\t{} = {:.2e}\n'.format(name, param)
+            params, confs = self.parameters_, self.conf_
+            to_print += '\nFit parameters:\n'
+            for name, unit, param, conf in zip(names, units, params, confs):
+                to_print += '  {:>5} = {:.2e}'.format(name, param)
+                to_print += '  (+/- {:.2e}) [{}]\n'.format(conf, unit)
 
         return to_print
 
@@ -339,15 +331,14 @@ class Randles(BaseCircuit):
         if CPE:
             self.name = 'Randles w/ CPE'
             self.circuit = 'R0-p(R1,E1)-W1'
-            circuit_length = calculateCircuitLength(self.circuit)
-            assert len(self.initial_guess) == circuit_length, \
-                'Initial guess length needs to be equal to parameter length'
         else:
             self.name = 'Randles'
             self.circuit = 'R0-p(R1,C1)-W1'
-            circuit_length = calculateCircuitLength(self.circuit)
-            assert len(self.initial_guess) == circuit_length, \
-                'Initial guess length needs to be equal to parameter length'
+
+        circuit_len = calculateCircuitLength(self.circuit)
+        assert len(self.initial_guess) + len(self.constants) == circuit_len, \
+            'The number of initial guesses + the number of constants' + \
+            'needs to be equal to the circuit length ({})'.format(circuit_len)
 
 
 class CustomCircuit(BaseCircuit):
@@ -380,6 +371,7 @@ class CustomCircuit(BaseCircuit):
         super().__init__(**kwargs)
         self.circuit = circuit
 
-        circuit_length = calculateCircuitLength(self.circuit)
-        assert len(self.initial_guess) == circuit_length, \
-            'Initial guess length needs to be equal to {circuit_length}'
+        circuit_len = calculateCircuitLength(self.circuit)
+        assert len(self.initial_guess) + len(self.constants) == circuit_len, \
+            'The number of initial guesses + the number of constants' + \
+            'needs to be equal to the circuit length ({})'.format(circuit_len)

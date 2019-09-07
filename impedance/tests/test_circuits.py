@@ -91,33 +91,32 @@ def test_CustomCircuit():
                                    circuit=custom_string)
 
     # check get_param_names()
-    print(custom_circuit.get_param_names())
-    assert custom_circuit.get_param_names() == \
-        ['R0', 'R1', 'C1', 'R2', 'C2', 'W1_0', 'W1_1']
+    full_names, all_units = custom_circuit.get_param_names()
+    assert full_names == ['R0', 'R1', 'C1', 'R2', 'C2', 'W1_0', 'W1_1']
+    assert all_units == ['Ohm', 'Ohm', 'F', 'Ohm', 'F', 'Ohm', 'sec']
 
     # check _is_fit()
     assert not custom_circuit._is_fit()
 
     initial_guess = [.01, .005, .1]
-    custom_string = 'R_0-p(R_1,C_1)'
+    custom_string = 'R0-p(R1,C1)'
     custom_circuit = CustomCircuit(initial_guess=initial_guess,
                                    circuit=custom_string, name='Test')
 
-    line = '\n-------------------------------\n'
-    assert str(custom_circuit) == line + \
-        'Circuit: Test\n' + \
-        'Circuit string: R_0-p(R_1,C_1)\n' + \
-        'Fit: False\n' + line + \
-        'Initial guesses:\n' + \
-        '\tR_0 = 1.00e-02\n' + \
-        '\tR_1 = 5.00e-03\n' + \
-        '\tC_1 = 1.00e-01\n'
+    assert str(custom_circuit) == \
+        '\nName: Test\n' + \
+        'Circuit string: R0-p(R1,C1)\n' + \
+        'Fit: False\n' + \
+        '\nInitial guesses:\n' + \
+        '     R0 = 1.00e-02 [Ohm]\n' + \
+        '     R1 = 5.00e-03 [Ohm]\n' + \
+        '     C1 = 1.00e-01 [F]\n'
 
     # check that it rejects improper inputs
     # enforcing the length of initial_guess
     try:
         initial_guess = [.01, .005, .1, .005, .1, .001, 200]
-        custom_string = 'R_0-p(R_1,E_1/E_2)-p(R_1,C_1)-W_1/W_2'
+        custom_string = 'R0-p(R1,E1)-p(R1,C1)-W1'
         custom_circuit = CustomCircuit(initial_guess=initial_guess,
                                        circuit=custom_string)
     except(AssertionError):
