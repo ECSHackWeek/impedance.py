@@ -181,7 +181,7 @@ def K(p, f):
     return p[0]/(1 + 1j*omega*p[1])
 
 
-@element_metadata(num_params=4, units=['', '', '', ''])
+@element_metadata(num_params=4, units=['Ohm-m^2', 'Ohm-m^2', '', 'sec'])
 def T(p, f):
     """ A macrohomogeneous porous electrode model from Paasch et al. [1]
 
