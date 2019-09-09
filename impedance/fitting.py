@@ -38,6 +38,10 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess,
     initial_guess : list of floats
         initial guesses for the fit parameters
 
+    constants : dictionary
+        parameters and their values to hold constant during fitting
+        (e.g. {"RO": 0.1})
+
     method : {‘lm’, ‘trf’, ‘dogbox’}, optional
         Name of method to pass to scipy.optimize.curve_fit
 
@@ -106,6 +110,7 @@ def wrapCircuit(circuit, constants):
         Parameters
         ----------
         circuit : string
+        constants : dict
         parameters : list of floats
         frequencies : list of floats
 
@@ -133,8 +138,9 @@ def buildCircuit(circuit, frequencies, *parameters,
     Parameters
     ----------
     circuit: str
-    parameters: list/tuple/array of floats
     frequencies: list/tuple/array of floats
+    parameters: list/tuple/array of floats
+    constants: dict
 
     Returns
     -------

@@ -9,13 +9,20 @@ import numpy as np
 
 class BaseCircuit:
     """ Base class for equivalent circuit models """
-    def __init__(self, initial_guess, constants=None, name=None, bounds=None):
+    def __init__(self, initial_guess, constants=None, name=None):
         """ Base constructor for any equivalent circuit model
 
         Parameters
         ----------
         initial_guess: numpy array
             Initial guess of the circuit values
+
+        constants : dict
+            (Optional) Parameters and values to hold constant during fitting
+            (e.g. {"R0": 0.1})
+
+        name : str
+            (Optional) Name for the circuit
         """
 
         # if supplied, check that initial_guess is valid and store
@@ -363,8 +370,6 @@ class CustomCircuit(BaseCircuit):
 
         Example:
             Randles circuit is given by 'R0-p(R1,C1)-W1/W2'
-
-
 
         """
 
