@@ -150,20 +150,42 @@ def E(p, f):
     return 1.0/(Q*(1j*omega)**alpha)
 
 
-@element_metadata(num_params=2, units=['Ohm^-1 sec^1/2', 'sec^-1'])
+@element_metadata(num_params=2, units=['Ohm', 'sec'])
 def G(p, f):
-    """ defines a Gerischer Element
+    """ defines a Gerischer Element as represented in [1]
 
     Notes
     ---------
     .. math::
 
-        Z = \\frac{1}{Y \\times \\sqrt{K + j 2 \\pi f }}
+        Z = \\frac{R_G}{\\sqrt{1 + j 2 \\pi f t_G}}
 
+    where :math:`R_G` = p[0] and :math:`t_G` = p[1]
+
+    Gerischer impedance is also commonly represented as [2]:
+
+    .. math::
+
+        Z = \\frac{Z_o}{\\sqrt{K+ j 2 \\pi f}}
+
+    where :math:`Z_o = \\frac{R_G}{\\sqrt{t_G}}`
+    and :math:`K = \\frac{1}{t_G}`
+    with units :math:`\\Omega sec^{1/2}` and
+    :math:`sec^{-1}` , respectively.
+
+    [1] Y. Lu, C. Kreller, and S.B. Adler,
+    Journal of The Electrochemical Society, 156, B513-B525 (2009)
+    `doi:10.1149/1.3079337
+    <https://doi.org/10.1149/1.3079337>`_.
+
+    [2] M. González-Cuenca, W. Zipprich, B.A. Boukamp,
+    G. Pudmich, and F. Tietz, Fuel Cells, 1,
+    256-264 (2001) `doi:10.1016/0013-4686(93)85083-B
+    <https://doi.org/10.1016/0013-4686(93)85083-B>`_.
      """
     omega = 2*np.pi*np.array(f)
-    Z0, k = p
-    return Z0/np.sqrt(k + 1j*omega)
+    R_G, t_G = p
+    return R_G/np.sqrt(1 + 1j*omega*t_G)
 
 
 @element_metadata(num_params=2, units=['Ohm', 'sec'])
