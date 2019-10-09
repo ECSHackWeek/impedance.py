@@ -160,17 +160,18 @@ def G(p, f):
 
         Z = \\frac{R_G}{\\sqrt{1 + j 2 \\pi f t_G}}
 
-    where :math:`R_G` = p[0] and :math:`t_G` = p[1]  
-    
+    where :math:`R_G` = p[0] and :math:`t_G` = p[1]
+
     Gerischer impedance is also commonly represented as:
-    
+
     .. math::
-        
+
         Z = \\frac{Z_o}{\\sqrt{K+ j 2 \\pi f}}
-        
-    where :math:`Z_o = \\frac{R_G}{\\sqrt{t_G}}`  
+
+    where :math:`Z_o = \\frac{R_G}{\\sqrt{t_G}}`
     and :math:`K = \\frac{1}{t_G}`
-    with units :math:`\\Omega \: sec^{1/2}` and :math:`sec^{-1}` , respectively.
+    with units :math:`\\Omega \ sec^{1/2}` and 
+    :math:`sec^{-1}` , respectively.
      """
     omega = 2*np.pi*np.array(f)
     R_G, t_G = p
