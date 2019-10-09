@@ -150,7 +150,7 @@ def E(p, f):
     return 1.0/(Q*(1j*omega)**alpha)
 
 
-@element_metadata(num_params=2, units=['Ohm^-1 sec^1/2', 'sec^-1'])
+@element_metadata(num_params=2, units=['Ohm', 'sec'])
 def G(p, f):
     """ defines a Gerischer Element
 
@@ -158,12 +158,24 @@ def G(p, f):
     ---------
     .. math::
 
-        Z = \\frac{1}{Y \\times \\sqrt{K + j 2 \\pi f }}
+        Z = \\frac{R_G}{\\sqrt{1 + j 2 \\pi f t_G}}
 
+    where :math:`R_G` = p[0] and :math:`t_G` = p[1]
+    
+    
+    
+    Gerischer impedance is also commonly represented as:
+    
+    .. math::
+        
+        Z = \\frac{Z_o}{\\sqrt{K+ j 2 \\pi f}}
+        
+    where :math:`Z_o = \\frac{R_G}{\\sqrt{t_G}}`  and :math:`K = \\frac{1}{t_G}`
+    with units :math:`\\Omega\:sec^{1/2}` and :math:`sec^{-1}` , respectively.
      """
     omega = 2*np.pi*np.array(f)
-    Z0, k = p
-    return Z0/np.sqrt(k + 1j*omega)
+    R_G, t_G = p
+    return R_G/np.sqrt(1 + 1j*omega*t_G)
 
 
 @element_metadata(num_params=2, units=['Ohm', 'sec'])
