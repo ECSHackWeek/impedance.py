@@ -170,7 +170,7 @@ def G(p, f):
 
     where :math:`Z_o = \\frac{R_G}{\\sqrt{t_G}}`
     and :math:`K = \\frac{1}{t_G}`
-    with units :math:`\\Omega \ sec^{1/2}` and 
+    with units :math:`\\Omega \, sec^{1/2}` and
     :math:`sec^{-1}` , respectively.
      """
     omega = 2*np.pi*np.array(f)
