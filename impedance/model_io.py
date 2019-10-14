@@ -44,15 +44,22 @@ def model_export(model, filepath):
         json.dump(data_dict, f)
 
 
-def model_import(filepath):
+def model_import(filepath, fitted_as_initial = False):
     """ Imports a model from JSON
 
     Parameters
-    ---------
+    --------
 
-    as_initial_guess: bool
-        If True, imports the fitted parameters from json as an unfitted model
-        otherwise imports the data as a fitted model object
+    filepath: Path String
+        Destination for exporting model object
+
+    fitted_as_initial: bool
+        If true, loads the model's fitted parameters
+        as initial guesses
+
+        Otherwise, loads the model's initial and
+        fitted parameters as a completed model
+
 
     Returns
     ----------
@@ -70,6 +77,9 @@ def model_import(filepath):
         model_name = None
 
     model_string = json_data["Circuit String"]
+
+
+
     model_initial_guess = json_data["Initial Guess"]
 
     circuit_model = CustomCircuit(initial_guess=model_initial_guess,
@@ -77,7 +87,13 @@ def model_import(filepath):
                                   name=model_name)
 
     if json_data["Fit"]:
-        circuit_model.parameters_ = np.array(json_data["Parameters"])
-        circuit_model.conf_ = np.array(json_data["Confidence"])
+        if fitted_as_initial:
+
+            circuit_model.initial_guess = np.array(json_data['Parameters'])
+
+        else:
+
+            circuit_model.parameters_ = np.array(json_data["Parameters"])
+            circuit_model.conf_ = np.array(json_data["Confidence"])
 
     return circuit_model
