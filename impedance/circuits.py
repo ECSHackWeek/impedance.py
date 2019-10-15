@@ -344,8 +344,10 @@ class Randles(BaseCircuit):
 
         circuit_len = calculateCircuitLength(self.circuit)
         assert len(self.initial_guess) + len(self.constants) == circuit_len, \
-            'The number of initial guesses + the number of constants' + \
-            'needs to be equal to the circuit length ({})'.format(circuit_len)
+            'The number of initial guesses ' \
+            '({}) + '.format(len(self.initial_guess)) +\
+            'the number of constants needs to be equal to ' \
+            'the circuit length ({})'.format(circuit_len)
 
 
 class CustomCircuit(BaseCircuit):
@@ -377,6 +379,9 @@ class CustomCircuit(BaseCircuit):
         self.circuit = circuit
 
         circuit_len = calculateCircuitLength(self.circuit)
+
         assert len(self.initial_guess) + len(self.constants) == circuit_len, \
-            'The number of initial guesses + the number of constants' + \
-            'needs to be equal to the circuit length ({})'.format(circuit_len)
+            'The number of initial guesses ' \
+            '({}) + '.format(len(self.initial_guess)) +\
+            'the number of constants needs to be equal to ' \
+            'the circuit length ({})'.format(circuit_len)
