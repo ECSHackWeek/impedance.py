@@ -144,3 +144,28 @@ def readCSV(filename):
     Z = data[:, 1] + 1j*data[:, 2]
 
     return f, Z
+
+
+def ignoreBelowX(frequencies, Z):
+    """
+    Trim out all data points below the X-axis
+
+
+    Parameters
+    ----------
+    frequencies : np.ndarray
+        Array of frequencies
+    Z : np.ndarray of complex numbers
+        Array of complex impedances
+
+    Returns
+    -------
+    frequencies : np.ndarray
+        Array of frequencies after filtering
+    Z : np.ndarray of complex numbers
+        Array of complex impedances after filtering
+    """
+
+    frequencies = frequencies[np.imag(Z) < 0]
+    Z = Z[np.imag(Z) < 0]
+    return frequencies, Z
