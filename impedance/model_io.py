@@ -2,6 +2,7 @@ import json
 from .circuits import CustomCircuit
 import numpy as np
 
+
 def model_export(model, filepath):
     """ Exports a model to JSON
 
