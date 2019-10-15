@@ -169,3 +169,42 @@ def ignoreBelowX(frequencies, Z):
     frequencies = frequencies[np.imag(Z) < 0]
     Z = Z[np.imag(Z) < 0]
     return frequencies, Z
+
+
+def cropFrequencies(frequencies, Z, freqmin=0, freqmax=None):
+    """
+    Trim out all data points below the X-axis
+
+
+    Parameters
+    ----------
+    frequencies : np.ndarray
+        Array of frequencies
+    Z : np.ndarray of complex numbers
+        Array of complex impedances
+    freqmin : float
+        Minimum frequency, omit for no lower frequency limit
+    freqmax : float
+        Max frequency, omit for no upper frequency limit
+
+
+    Returns
+    -------
+    frequencies_final : np.ndarray
+        Array of frequencies after filtering
+    Z_final : np.ndarray of complex numbers
+        Array of complex impedances after filtering
+    """
+
+    frequencies_min = frequencies[frequencies >= freqmin]
+    Z_min = Z[frequencies >= freqmin]
+
+    # If no maximum is specified, return only samples filtered by minimum
+    if freqmax:
+        frequencies_final = frequencies_min[frequencies_min <= freqmax]
+        Z_final = Z_min[frequencies_min <= freqmax]
+    else:
+        frequencies_final = frequencies_min
+        Z_final = Z_min
+
+    return frequencies_final, Z_final

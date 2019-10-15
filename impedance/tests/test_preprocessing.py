@@ -1,4 +1,5 @@
 from impedance.preprocessing import readFile, readGamry, ignoreBelowX
+from impedance.preprocessing import cropFrequencies
 import numpy as np
 
 # store some global test data
@@ -194,3 +195,27 @@ def test_ignoreBelowX():
     filtered_freq, filtered_Z = ignoreBelowX(frequencies, Z_correct)
 
     assert (np.imag(filtered_Z) == imag_np).all()
+
+
+def test_cropFreq_maxonly():
+
+    filtered_freq, filtered_Z = cropFrequencies(frequencies, Z_correct,
+                                                freqmax=1e3)
+
+    assert (filtered_freq <= 1e3).all()
+
+
+def test_cropFreq_minonly():
+
+    filtered_freq, filtered_Z = cropFrequencies(frequencies, Z_correct,
+                                                freqmin=1)
+
+    assert (filtered_freq >= 1).all()
+
+
+def test_cropFreq_both():
+
+    filtered_freq, filtered_Z = cropFrequencies(frequencies, Z_correct,
+                                                freqmin=1, freqmax=1e3)
+
+    assert (filtered_freq >= 1).all() and (filtered_freq <= 1e3).all()
