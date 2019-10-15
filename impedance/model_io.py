@@ -2,7 +2,6 @@ import json
 from .circuits import CustomCircuit
 import numpy as np
 
-
 def model_export(model, filepath):
     """ Exports a model to JSON
 
@@ -44,7 +43,7 @@ def model_export(model, filepath):
         json.dump(data_dict, f)
 
 
-def model_import(filepath, fitted_as_initial = False):
+def model_import(filepath, fitted_as_initial=False):
     """ Imports a model from JSON
 
     Parameters
@@ -77,9 +76,6 @@ def model_import(filepath, fitted_as_initial = False):
         model_name = None
 
     model_string = json_data["Circuit String"]
-
-
-
     model_initial_guess = json_data["Initial Guess"]
 
     circuit_model = CustomCircuit(initial_guess=model_initial_guess,
@@ -88,11 +84,8 @@ def model_import(filepath, fitted_as_initial = False):
 
     if json_data["Fit"]:
         if fitted_as_initial:
-
             circuit_model.initial_guess = np.array(json_data['Parameters'])
-
         else:
-
             circuit_model.parameters_ = np.array(json_data["Parameters"])
             circuit_model.conf_ = np.array(json_data["Confidence"])
 
