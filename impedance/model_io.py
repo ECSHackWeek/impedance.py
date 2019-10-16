@@ -30,6 +30,7 @@ def model_export(model, filepath):
         data_dict = {"Name": model_name,
                      "Circuit String": model_string,
                      "Initial Guess": initial_guess,
+                     "Constants": model.constants,
                      "Fit": True,
                      "Parameters": parameters_,
                      "Confidence": model_conf_,
@@ -38,6 +39,7 @@ def model_export(model, filepath):
         data_dict = {"Name": model_name,
                      "Circuit String": model_string,
                      "Initial Guess": initial_guess,
+                     "Constants": model.constants,
                      "Fit": False}
 
     with open(filepath, 'w') as f:
@@ -78,9 +80,11 @@ def model_import(filepath, fitted_as_initial=False):
 
     model_string = json_data["Circuit String"]
     model_initial_guess = json_data["Initial Guess"]
+    model_constants = json_data["Constants"]
 
     circuit_model = CustomCircuit(initial_guess=model_initial_guess,
                                   circuit=model_string,
+                                  constants=model_constants,
                                   name=model_name)
 
     if json_data["Fit"]:
