@@ -10,8 +10,10 @@ def test_model_io():
     frequencies = data[:, 0]
     Z = data[:, 1] + 1j*data[:, 2]
 
-    randles = CustomCircuit(initial_guess=[.01, .005, .1, .005, .1, .001, 200],
-                            circuit='R0-p(R1,C1)-p(R1,C1)-W1')
+    randles = CustomCircuit(initial_guess=[None, .005, .1,
+                                           .005, .1, .001, 200],
+                            circuit='R0-p(R1,C1)-p(R1,C1)-W1',
+                            constants={'R0': 0.01})
     randles.fit(frequencies, Z)
 
     print(randles)
