@@ -39,6 +39,7 @@ def model_export(model, filepath):
         data_dict = {"Name": model_name,
                      "Circuit String": model_string,
                      "Initial Guess": initial_guess,
+                     "Constants": model.constants,
                      "Fit": False}
 
     with open(filepath, 'w') as f:
