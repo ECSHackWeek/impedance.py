@@ -8,4 +8,5 @@ Examples
 
     examples/fitting_example.ipynb
     examples/plotting_example.ipynb
+    examples/model_io_example.ipynb
     examples/validation_example.ipynb

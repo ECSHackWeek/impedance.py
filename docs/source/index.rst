@@ -56,12 +56,12 @@ is a great place to start) and the documentation can be found at
 
    getting-started
    examples
+   preprocessing
+   validation
    circuits
    circuit-elements
    fitting
-   validation
-   preprocessing
-
+   modelio
 
 Indices and tables
 ==================

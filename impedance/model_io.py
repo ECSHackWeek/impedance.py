@@ -30,6 +30,7 @@ def model_export(model, filepath):
         data_dict = {"Name": model_name,
                      "Circuit String": model_string,
                      "Initial Guess": initial_guess,
+                     "Constants": model.constants,
                      "Fit": True,
                      "Parameters": parameters_,
                      "Confidence": model_conf_,
@@ -38,21 +39,29 @@ def model_export(model, filepath):
         data_dict = {"Name": model_name,
                      "Circuit String": model_string,
                      "Initial Guess": initial_guess,
+                     "Constants": model.constants,
                      "Fit": False}
 
     with open(filepath, 'w') as f:
         json.dump(data_dict, f)
 
 
-def model_import(filepath):
+def model_import(filepath, fitted_as_initial=False):
     """ Imports a model from JSON
 
     Parameters
-    ---------
+    --------
 
-    as_initial_guess: bool
-        If True, imports the fitted parameters from json as an unfitted model
-        otherwise imports the data as a fitted model object
+    filepath: Path String
+        Destination for exporting model object
+
+    fitted_as_initial: bool
+        If true, loads the model's fitted parameters
+        as initial guesses
+
+        Otherwise, loads the model's initial and
+        fitted parameters as a completed model
+
 
     Returns
     ----------
@@ -71,13 +80,18 @@ def model_import(filepath):
 
     model_string = json_data["Circuit String"]
     model_initial_guess = json_data["Initial Guess"]
+    model_constants = json_data["Constants"]
 
     circuit_model = CustomCircuit(initial_guess=model_initial_guess,
                                   circuit=model_string,
+                                  constants=model_constants,
                                   name=model_name)
 
     if json_data["Fit"]:
-        circuit_model.parameters_ = np.array(json_data["Parameters"])
-        circuit_model.conf_ = np.array(json_data["Confidence"])
+        if fitted_as_initial:
+            circuit_model.initial_guess = np.array(json_data['Parameters'])
+        else:
+            circuit_model.parameters_ = np.array(json_data["Parameters"])
+            circuit_model.conf_ = np.array(json_data["Confidence"])
 
     return circuit_model
