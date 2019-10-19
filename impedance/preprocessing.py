@@ -137,6 +137,37 @@ def readParstat(filename):
     return np.array(f), np.array(Z)
 
 
+def readPowerSuite(filename):
+    """ function for reading the .txt file from Parstat
+
+    Parameters
+    ----------
+    filename: string
+        Filename of .txt file to extract impedance data from
+
+    Returns
+    -------
+    frequencies : np.ndarray
+        Array of frequencies
+    impedance : np.ndarray of complex numbers
+        Array of complex impedances
+
+    """
+
+    with open(filename, 'r') as input_file:
+        lines = input_file.readlines()
+
+    raw_data = lines[1:]
+    f, Z = [], []
+    for line in raw_data:
+        if not line.isspace():
+            freq, z_re, z_im = line.split('\t')
+            f.append(float(freq))
+            Z.append(complex(float(z_re), float(z_im)))
+
+    return np.array(f), np.array(Z)
+
+
 def readCSV(filename):
     data = np.genfromtxt(filename, delimiter=',')
 
