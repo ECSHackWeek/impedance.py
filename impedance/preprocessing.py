@@ -143,7 +143,7 @@ def readParstat(filename):
 
 def readVersaStudio(filename):
     """ function for reading the .PAR file from VersaStudio
-
+	
     Parameters
     ----------
     filename: string
@@ -236,6 +236,36 @@ def readZPlot(filename):
         each = line.split('\t')
         f.append(float(each[0]))
         Z.append(complex(float(each[4]), float(each[5])))
+    return np.array(f), np.array(Z)
+
+
+def readPowerSuite(filename):
+    """ function for reading the .txt file from Parstat
+
+    Parameters
+    ----------
+    filename: string
+
+    Returns
+    -------
+    frequencies : np.ndarray
+        Array of frequencies
+    impedance : np.ndarray of complex numbers
+        Array of complex impedances
+
+    """
+
+    with open(filename, 'r') as input_file:
+        lines = input_file.readlines()
+
+    raw_data = lines[1:]
+    f, Z = [], []
+    for line in raw_data:
+        if not line.isspace():
+            freq, z_re, z_im = line.split('\t')
+            f.append(float(freq))
+            Z.append(complex(float(z_re), float(z_im)))
+
     return np.array(f), np.array(Z)
 
 
