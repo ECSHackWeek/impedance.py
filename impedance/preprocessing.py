@@ -24,7 +24,7 @@ def readFile(filename, instrument=None):
 
     """
 
-    supported_types = ['gamry', 'autolab', 'parstat']
+    supported_types = ['gamry', 'autolab', 'parstat', 'zplot', 'versastudio']
 
     if instrument is not None:
         assert instrument in supported_types,\
@@ -37,6 +37,10 @@ def readFile(filename, instrument=None):
         f, Z = readAutolab(filename)
     elif instrument == 'parstat':
         f, Z = readParstat(filename)
+    elif instrument == 'zplot':
+        f, Z = readZPlot(filename)
+    elif instrument == 'versastudio':
+        f, Z = readVersaStudio(filename)
     elif instrument is None:
         f, Z = readCSV(filename)
 
@@ -134,6 +138,104 @@ def readParstat(filename):
         f.append(each[4])
         Z.append(complex(float(each[6]), float(each[7])))
 
+    return np.array(f), np.array(Z)
+
+
+def readVersaStudio(filename):
+    """ function for reading the .PAR file from VersaStudio
+
+    Parameters
+    ----------
+    filename: string
+        Filename of .PAR file to extract impedance data from
+
+    Returns
+    -------
+    frequencies : np.ndarray
+        Array of frequencies
+    impedance : np.ndarray of complex numbers
+        Array of complex impedances
+
+    """
+    from re import split
+    with open(filename, 'r', encoding="utf8") as input_file:
+        lines = input_file.readlines()
+
+    # List to track [segment index, segment start line, segment end line]
+    segments = list([])
+
+    for i, line in enumerate(lines):
+        if "Segments" in line:
+            if not segments:
+                segments = [[int(j) for j in split(r'[=\n]', line)
+                            if j.isdigit()]]
+
+            elif [int(j) for j in split(r'[=\n]', line) if j.isdigit()]:
+                segments.append([int(j) for j in split(r'[=\n]', line)
+                                if j.isdigit()])
+
+        if segments:
+            for j in segments:
+                if '<Segment' + str(segments[j[0]][0]) + '>' in line:
+                    segments[j[0]].append(i)
+                if '</Segment' + str(segments[j[0]][0]) + '>' in line:
+                    segments[j[0]].append(i)
+
+    # Started building for option of multiple segments,
+    # but that may be an unlikely scenario
+    # For the time being, assume only 1 segment of actual data (Segment1)
+    # Removing segments without apparent data
+    # for i in segments:
+    #     if np.size(i)==1:
+    #         segments.remove(i)
+    # for i in segments:
+    #     data_dum=lines[i[1]+4:i[2]]
+    #     f, Z= [], []
+    #     for line in data_dum:
+    #         each=line.split(',')
+    #         f.append(float(each[9]))
+    #         Z.append(complex(float(each[14]),float(each[15])))
+
+    raw_data = lines[segments[1][1]+4:segments[1][2]]
+    f, Z = [], []
+
+    for line in raw_data:
+        each = line.split(',')
+        f.append(float(each[9]))
+        Z.append(complex(float(each[14]), float(each[15])))
+
+    return np.array(f), np.array(Z)
+
+
+def readZPlot(filename):
+    """ function for reading the .z file from Scribner's ZPlot
+
+    Parameters
+    ----------
+    filename: string
+        Filename of .z file to extract impedance data from
+
+    Returns
+    -------
+    frequencies : np.ndarray
+        Array of frequencies
+    impedance : np.ndarray of complex numbers
+        Array of complex impedances
+
+    """
+    with open(filename, 'r', encoding="utf8") as input_file:
+        lines = input_file.readlines()
+
+    for i, line in enumerate(lines):
+        if "End Comments" in line:
+            start_line = i
+
+    raw_data = lines[start_line+1:]
+    f, Z = [], []
+    for line in raw_data:
+        each = line.split('\t')
+        f.append(float(each[0]))
+        Z.append(complex(float(each[4]), float(each[5])))
     return np.array(f), np.array(Z)
 
 

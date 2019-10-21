@@ -7,7 +7,7 @@ def model_export(model, filepath):
     """ Exports a model to JSON
 
     Parameters
-    ---------
+    ----------
 
     model: CustomCircuit
         Circuit model object
@@ -50,7 +50,7 @@ def model_import(filepath, fitted_as_initial=False):
     """ Imports a model from JSON
 
     Parameters
-    --------
+    ----------
 
     filepath: Path String
         Destination for exporting model object
@@ -64,7 +64,7 @@ def model_import(filepath, fitted_as_initial=False):
 
 
     Returns
-    ----------
+    -------
     circuit_model: CustomCircuit
         Circuit model object
 
