@@ -24,7 +24,8 @@ def readFile(filename, instrument=None):
 
     """
 
-    supported_types = ['gamry', 'autolab', 'parstat', 'zplot', 'versastudio']
+    supported_types = ['gamry', 'autolab', 'parstat', 'zplot', 'versastudio'
+                       'powersuite']
 
     if instrument is not None:
         assert instrument in supported_types,\
@@ -41,6 +42,8 @@ def readFile(filename, instrument=None):
         f, Z = readZPlot(filename)
     elif instrument == 'versastudio':
         f, Z = readVersaStudio(filename)
+    elif instrument == 'powersuite':
+        f, Z = readPowerSuite(filename)
     elif instrument is None:
         f, Z = readCSV(filename)
 
