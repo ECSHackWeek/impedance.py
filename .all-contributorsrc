@@ -94,6 +94,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "environmat",
+      "name": "environmat",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/9309353?v=4",
+      "profile": "https://github.com/environmat",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
