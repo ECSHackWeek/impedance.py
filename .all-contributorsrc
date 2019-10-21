@@ -6,6 +6,16 @@
   "commit": false,
   "contributors": [
     {
+      "login": "lktsui",
+      "name": "Lok-kun Tsui",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/22246069?v=4",
+      "profile": "https://github.com/lktsui",
+      "contributions": [
+        "code",
+        "test"
+      ]
+    },
+    {
       "login": "BGerwe",
       "name": "Brian Gerwe",
       "avatar_url": "https://avatars3.githubusercontent.com/u/38819321?v=4",
