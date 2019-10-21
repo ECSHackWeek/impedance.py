@@ -85,6 +85,15 @@
       "contributions": [
         "ideas"
       ]
+    },
+    {
+      "login": "Chebuskin",
+      "name": "Chebuskin",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/33787723?v=4",
+      "profile": "https://github.com/Chebuskin",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
