@@ -103,6 +103,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "abdullahsumbal",
+      "name": "Abdullah Sumbal",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/12946947?v=4",
+      "profile": "http://www.abdullahsumbal.com",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
