@@ -1,0 +1,122 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "lktsui",
+      "name": "Lok-kun Tsui",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/22246069?v=4",
+      "profile": "https://github.com/lktsui",
+      "contributions": [
+        "code",
+        "test",
+        "doc"
+      ]
+    },
+    {
+      "login": "BGerwe",
+      "name": "Brian Gerwe",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/38819321?v=4",
+      "profile": "https://github.com/BGerwe",
+      "contributions": [
+        "code",
+        "test",
+        "doc"
+      ]
+    },
+    {
+      "login": "nealde",
+      "name": "Neal",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/25877868?v=4",
+      "profile": "https://github.com/nealde",
+      "contributions": [
+        "review"
+      ]
+    },
+    {
+      "login": "mdmurbach",
+      "name": "Matt Murbach",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/9369020?v=4",
+      "profile": "http://mattmurbach.com",
+      "contributions": [
+        "doc",
+        "review",
+        "test",
+        "code"
+      ]
+    },
+    {
+      "login": "hkennyv",
+      "name": "Kenny Huynh",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/29909203?v=4",
+      "profile": "https://kennyvh.com",
+      "contributions": [
+        "bug",
+        "code"
+      ]
+    },
+    {
+      "login": "lawrencerenna",
+      "name": "lawrencerenna",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/49174337?v=4",
+      "profile": "https://github.com/lawrencerenna",
+      "contributions": [
+        "ideas"
+      ]
+    },
+    {
+      "login": "Rowin",
+      "name": "Rowin",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/1727478?v=4",
+      "profile": "https://github.com/Rowin",
+      "contributions": [
+        "bug",
+        "code"
+      ]
+    },
+    {
+      "login": "michaelplews",
+      "name": "Michael Plews",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/14098929?v=4",
+      "profile": "https://github.com/michaelplews",
+      "contributions": [
+        "ideas"
+      ]
+    },
+    {
+      "login": "Chebuskin",
+      "name": "Chebuskin",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/33787723?v=4",
+      "profile": "https://github.com/Chebuskin",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "environmat",
+      "name": "environmat",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/9309353?v=4",
+      "profile": "https://github.com/environmat",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "abdullahsumbal",
+      "name": "Abdullah Sumbal",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/12946947?v=4",
+      "profile": "http://www.abdullahsumbal.com",
+      "contributions": [
+        "bug"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "impedance.py",
+  "projectOwner": "ECSHackWeek",
+  "repoType": "github",
+  "repoHost": "https://github.com"
+}
