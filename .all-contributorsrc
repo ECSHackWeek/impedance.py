@@ -1,0 +1,24 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "BGerwe",
+      "name": "Brian Gerwe",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/38819321?v=4",
+      "profile": "https://github.com/BGerwe",
+      "contributions": [
+        "code",
+        "test"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "impedance.py",
+  "projectOwner": "ECSHackWeek",
+  "repoType": "github",
+  "repoHost": "https://github.com"
+}
