@@ -76,6 +76,15 @@
         "bug",
         "code"
       ]
+    },
+    {
+      "login": "michaelplews",
+      "name": "Michael Plews",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/14098929?v=4",
+      "profile": "https://github.com/michaelplews",
+      "contributions": [
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
