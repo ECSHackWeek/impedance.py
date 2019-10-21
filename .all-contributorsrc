@@ -47,6 +47,16 @@
         "test",
         "code"
       ]
+    },
+    {
+      "login": "hkennyv",
+      "name": "Kenny Huynh",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/29909203?v=4",
+      "profile": "https://kennyvh.com",
+      "contributions": [
+        "bug",
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
