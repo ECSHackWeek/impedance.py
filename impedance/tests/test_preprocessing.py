@@ -1,5 +1,6 @@
 from impedance.preprocessing import readFile, readGamry, ignoreBelowX
 from impedance.preprocessing import readZPlot, readVersaStudio
+from impedance.preprocessing import readPowerSuite
 from impedance.preprocessing import cropFrequencies
 import numpy as np
 
@@ -121,7 +122,7 @@ imag_np = [-0.020438698544418925,
            -0.0007287022309982213,
            -0.0002827724289657194]
 
-Z_correct = np.array(real) + 1j*np.array(imag)
+Z_correct = np.array(real) + 1j * np.array(imag)
 
 f_gamry = np.array([2.000156e+05, 1.589531e+05, 1.262344e+05, 1.002656e+05,
                     7.964063e+04, 6.332812e+04, 5.029688e+04, 3.998437e+04,
@@ -174,8 +175,38 @@ Zi_gamry = np.array([-1367.239, -1502.195, -1621.813, -1672.93, -1668.395,
                      -4165.968, -4477.789, -4931.03, -5301.367, -5703.416,
                      -6161.72, -6635.557])
 
-Z_gamry = Zr_gamry + 1j*Zi_gamry
+Z_gamry = Zr_gamry + 1j * Zi_gamry
 
+freq_powersuite = np.array([0.1,
+                            0.17854992,
+                            0.31880073,
+                            0.56921845,
+                            1.0163391,
+                            1.8146726,
+                            3.2400964,
+                            5.7851894,
+                            10.329451,
+                            18.443226,
+                            32.930365,
+                            58.79714,
+                            104.98225,
+                            187.44571,
+                            334.68417,
+                            597.57831,
+                            1066.9756,
+                            1905.084,
+                            3401.526,
+                            6073.4218,
+                            10844.09,
+                            19362.113,
+                            34571.037,
+                            61726.559,
+                            110212.72,
+                            196784.72,
+                            351358.96,
+                            627351.13,
+                            1120134.9,
+                            2000000])
 f_VerStu = np.array([100000, 77426.37, 59948.43, 46415.89, 35938.14,
                     27825.59, 21544.35, 16681.01, 12915.5, 10000, 7742.637,
                     5994.842, 4641.589, 3593.814, 2782.559, 2154.435, 1668.101,
@@ -188,6 +219,71 @@ f_VerStu = np.array([100000, 77426.37, 59948.43, 46415.89, 35938.14,
                     0.2154435, 0.1668101, 0.129155, 0.1, 0.07742637,
                     0.05994843, 0.04641589, 0.03593814, 0.02782559,
                     0.02154435])
+
+Zr_powersuite = np.array([423929.46,
+                          407724.77,
+                          393610.92,
+                          380855.3,
+                          368303.75,
+                          355620.08,
+                          342669.59,
+                          326400.15,
+                          310309.77,
+                          293257.73,
+                          272125.84,
+                          257101.27,
+                          246617.86,
+                          236526.34,
+                          229582.56,
+                          222018.3,
+                          215427.54,
+                          208362.26,
+                          200923.4,
+                          192890.56,
+                          181958.74,
+                          152457.91,
+                          98568.678,
+                          30854.758,
+                          4716.4675,
+                          4266.6691,
+                          4175.3844,
+                          4713.6726,
+                          -1075.6649,
+                          -470.54113])
+
+Zi_powersuite = np.array([-49014.063,
+                          -44951.636,
+                          -41207.904,
+                          -38609.417,
+                          -38403.847,
+                          -38865.422,
+                          -40856.382,
+                          -42072.753,
+                          -42701.163,
+                          -43531.868,
+                          -41773.454,
+                          -49735.17,
+                          -23804.949,
+                          -16131.9,
+                          -24428.137,
+                          -21951.26,
+                          -20820.892,
+                          -20101.991,
+                          -30050.48,
+                          -40284.586,
+                          -62039.679,
+                          -86830.249,
+                          -105476.2,
+                          -90093.313,
+                          -50840.594,
+                          -25846.006,
+                          -14003.348,
+                          -4331.2465,
+                          -713.75358,
+                          -1397.7358])
+
+Z_powersuite = Zr_powersuite + 1j * Zi_powersuite
+
 
 Zr_VerStu = np.array([55.31571, 56.93847, 58.32154, 59.73283, 60.96293,
                       62.34844, 63.46056, 64.4969, 65.37202, 66.43731,
@@ -263,17 +359,21 @@ Z_ZPlot = Zr_ZPlot + 1j * Zi_ZPlot
 
 
 def test_readFile():
-
     f, Z = readFile('./data/exampleData.csv')
 
     assert (f == frequencies).all() and (Z == Z_correct).all()
 
 
 def test_readGamry():
-
     f, Z = readGamry('./data/Chalco-in-buffer-50mV.DTA')
 
     assert (f == f_gamry).all() and (Z == Z_gamry).all()
+
+
+def test_readPowerSuite():
+    f, Z = readPowerSuite('./data/exampleDataPowersuite.txt')
+
+    assert (f == freq_powersuite).all() and (Z == Z_powersuite).all()
 
 
 def test_readVersaStudio():
@@ -291,14 +391,12 @@ def test_readZPlot():
 
 
 def test_ignoreBelowX():
-
     filtered_freq, filtered_Z = ignoreBelowX(frequencies, Z_correct)
 
     assert (np.imag(filtered_Z) == imag_np).all()
 
 
 def test_cropFreq_maxonly():
-
     filtered_freq, filtered_Z = cropFrequencies(frequencies, Z_correct,
                                                 freqmax=1e3)
 
@@ -306,7 +404,6 @@ def test_cropFreq_maxonly():
 
 
 def test_cropFreq_minonly():
-
     filtered_freq, filtered_Z = cropFrequencies(frequencies, Z_correct,
                                                 freqmin=1)
 
@@ -314,7 +411,6 @@ def test_cropFreq_minonly():
 
 
 def test_cropFreq_both():
-
     filtered_freq, filtered_Z = cropFrequencies(frequencies, Z_correct,
                                                 freqmin=1, freqmax=1e3)
 

@@ -24,7 +24,8 @@ def readFile(filename, instrument=None):
 
     """
 
-    supported_types = ['gamry', 'autolab', 'parstat', 'zplot', 'versastudio']
+    supported_types = ['gamry', 'autolab', 'parstat', 'zplot', 'versastudio'
+                       'powersuite']
 
     if instrument is not None:
         assert instrument in supported_types,\
@@ -41,6 +42,8 @@ def readFile(filename, instrument=None):
         f, Z = readZPlot(filename)
     elif instrument == 'versastudio':
         f, Z = readVersaStudio(filename)
+    elif instrument == 'powersuite':
+        f, Z = readPowerSuite(filename)
     elif instrument is None:
         f, Z = readCSV(filename)
 
@@ -236,6 +239,37 @@ def readZPlot(filename):
         each = line.split('\t')
         f.append(float(each[0]))
         Z.append(complex(float(each[4]), float(each[5])))
+    return np.array(f), np.array(Z)
+
+
+def readPowerSuite(filename):
+    """ function for reading the .txt file from Parstat
+
+    Parameters
+    ----------
+    filename: string
+        Filename of .txt file to extract impedance data from
+
+    Returns
+    -------
+    frequencies : np.ndarray
+        Array of frequencies
+    impedance : np.ndarray of complex numbers
+        Array of complex impedances
+
+    """
+
+    with open(filename, 'r') as input_file:
+        lines = input_file.readlines()
+
+    raw_data = lines[1:]
+    f, Z = [], []
+    for line in raw_data:
+        if not line.isspace():
+            freq, z_re, z_im = line.split('\t')
+            f.append(float(freq))
+            Z.append(complex(float(z_re), float(z_im)))
+
     return np.array(f), np.array(Z)
 
 
