@@ -126,6 +126,9 @@ For this dataset, importing the data looks something like:
   # keep only the impedance data in the first quandrant
   frequencies = frequencies[np.imag(Z) < 0]
   Z = Z[np.imag(Z) < 0]
+  
+.. tip::
+  Functions for reading in files from a variety of vendors (ZPlot, Gamry, Parstat, Autolab, ...) can be found in the `preprocessing module <preprocessing.html>`_!
 
 Step 3: Define your impedance model
 ===================================
