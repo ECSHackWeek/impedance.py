@@ -26,6 +26,15 @@
         "test",
         "doc"
       ]
+    },
+    {
+      "login": "nealde",
+      "name": "Neal",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/25877868?v=4",
+      "profile": "https://github.com/nealde",
+      "contributions": [
+        "review"
+      ]
     }
   ],
   "contributorsPerLine": 7,
