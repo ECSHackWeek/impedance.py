@@ -35,6 +35,18 @@
       "contributions": [
         "review"
       ]
+    },
+    {
+      "login": "mdmurbach",
+      "name": "Matt Murbach",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/9369020?v=4",
+      "profile": "http://mattmurbach.com",
+      "contributions": [
+        "doc",
+        "review",
+        "test",
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
