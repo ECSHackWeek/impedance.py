@@ -66,6 +66,16 @@
       "contributions": [
         "ideas"
       ]
+    },
+    {
+      "login": "Rowin",
+      "name": "Rowin",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/1727478?v=4",
+      "profile": "https://github.com/Rowin",
+      "contributions": [
+        "bug",
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
