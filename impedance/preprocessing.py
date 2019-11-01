@@ -25,7 +25,7 @@ def readFile(filename, instrument=None):
     """
 
     supported_types = ['gamry', 'autolab', 'parstat', 'zplot', 'versastudio'
-                       'powersuite']
+                       'powersuite', 'biologic']
 
     if instrument is not None:
         assert instrument in supported_types,\
@@ -36,6 +36,8 @@ def readFile(filename, instrument=None):
         f, Z = readGamry(filename)
     elif instrument == 'autolab':
         f, Z = readAutolab(filename)
+    elif instrument == 'biologic':
+        f, Z = readBioLogic(filename)
     elif instrument == 'parstat':
         f, Z = readParstat(filename)
     elif instrument == 'zplot':
@@ -110,6 +112,44 @@ def readAutolab(filename):
         each = line.split(',')
         f.append(each[0])
         Z.append(complex(float(each[1]), float(each[2])))
+
+    return np.array(f), np.array(Z)
+
+
+def readBioLogic(filename):
+    """ function for reading the .mpt file from Biologic
+        EC-lab software
+
+        Parameters
+        ----------
+        filename: string
+            Filename of .csv file to extract impedance data from
+
+        Returns
+        -------
+        frequencies : np.ndarray
+            Array of frequencies
+        impedance : np.ndarray of complex numbers
+            Array of complex impedances
+
+        """
+
+    with open(filename, 'r', encoding="latin-1") as input_file:
+        lines = input_file.readlines()
+
+    header_line = lines[1]
+
+    # MPT data format has variable number of header lines
+    number_header_lines = int(header_line.split(":")[1])
+
+    raw_data = lines[number_header_lines:]
+    f, Z = [], []
+    for line in raw_data:
+        each = line.split('\t')
+        f.append(float(each[0]))
+
+        # MPT data format saves the imaginary portion as -Im(Z) not Im(Z)
+        Z.append(complex(float(each[1]), -1*float(each[2])))
 
     return np.array(f), np.array(Z)
 
