@@ -134,7 +134,7 @@ def readBioLogic(filename):
 
         """
 
-    with open(filename, 'r') as input_file:
+    with open(filename, 'r', encoding="latin-1") as input_file:
         lines = input_file.readlines()
 
     header_line = lines[1]
