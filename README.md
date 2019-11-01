@@ -14,12 +14,13 @@ This project started at the [2018 Electrochemical Society (ECS) Hack Week in Sea
 
 Using a [scikit-learn-like API](https://arxiv.org/abs/1309.0238), we hope to make visualizing, fitting, and analyzing impedance spectra more intuitive and reproducible.
 
-<i>impedance.py is currently in a beta phase and new features are rapidly being added.</i>
+<i>impedance.py is currently under development and new features are rapidly being added.</i>
 If you have a feature request or find a bug, please feel free to [file an issue](https://github.com/ECSHackWeek/impedance.py/issues) or, better yet, make the code improvements and [submit a pull request](https://help.github.com/articles/creating-a-pull-request-from-a-fork/)! The goal is to build an open-source tool that the entire impedance community can improve and use!
 
 impedance.py currently provides:
+-   [preprocessing functions](https://impedancepy.readthedocs.io/en/latest/preprocessing.html) for easily loading in impedance data from a wide variety of file types
 -   a simple API for fitting, predicting, and plotting impedance
--   validation methods for checking measurement validity
+-   [validation methods](https://impedancepy.readthedocs.io/en/latest/validation.html) for checking measurement validity
 -   equivalent circuit fitting with customizable models
 -   convenient Nyquist plots including confidence interval estimation for fit circuits
 
