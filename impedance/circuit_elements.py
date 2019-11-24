@@ -139,7 +139,7 @@ def A(p, f):
 
 @element_metadata(num_params=2, units=['Ohm sec^-a', ''])
 def B(p, f):
-    """ defines a semi-infinite Warburg element with constant phase
+    """ defines a semi-infinite Warburg frequency element
 
     Notes
     -----
