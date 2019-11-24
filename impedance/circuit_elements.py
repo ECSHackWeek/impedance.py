@@ -110,6 +110,10 @@ def W(p, f):
     where :math:`R` = p[0] (Ohms) and
     :math:`T` = p[1] (sec) = :math:`\\frac{L^2}{D}`
 
+        [1] S. Cruz-Manzo and P. Greenwood,
+        Journal of The Electrochemical Society, 166, A1176-A1184 (2019)
+        `doi:10.1149/2.0841906jes
+        <https://doi.org/10.1149/2.0841906jes>`_.
     """
     omega = 2*np.pi*np.array(f)
     Zw = np.vectorize(lambda y: p[0]/(np.sqrt(p[1]*1j*y) *
