@@ -132,6 +132,7 @@ def A(p, f):
     Zw = Aw*(1-1j)/np.sqrt(omega)
     return Zw
 
+
 @element_metadata(num_params=2, units=['Ohm sec^-a', ''])
 def B(p, f):
     """ defines a semi-infinite Warburg element with constant phase
@@ -146,6 +147,7 @@ def B(p, f):
     Aw, alpha = p
     Zw = Aw*(1-1j)/((omega)**alpha)
     return Zw
+
 
 @element_metadata(num_params=2, units=['Ohm^-1 sec^a', ''])
 def E(p, f):
