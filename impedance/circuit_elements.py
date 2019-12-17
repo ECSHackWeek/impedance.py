@@ -110,6 +110,10 @@ def W(p, f):
     where :math:`R` = p[0] (Ohms) and
     :math:`T` = p[1] (sec) = :math:`\\frac{L^2}{D}`
 
+        [1] S. Cruz-Manzo and P. Greenwood,
+        Journal of The Electrochemical Society, 166, A1176-A1184 (2019)
+        `doi:10.1149/2.0841906jes
+        <https://doi.org/10.1149/2.0841906jes>`_.
     """
     omega = 2*np.pi*np.array(f)
     Zw = np.vectorize(lambda y: p[0]/(np.sqrt(p[1]*1j*y) *
@@ -130,6 +134,22 @@ def A(p, f):
     omega = 2*np.pi*np.array(f)
     Aw = p[0]
     Zw = Aw*(1-1j)/np.sqrt(omega)
+    return Zw
+
+
+@element_metadata(num_params=2, units=['Ohm sec^-a', ''])
+def B(p, f):
+    """ defines a semi-infinite Warburg frequency element
+
+    Notes
+    -----
+    .. math::
+
+        Z = \\frac{A_W}{\\() 2 \\pi f})^\\alpha (1-j)
+    """
+    omega = 2*np.pi*np.array(f)
+    Aw, alpha = p
+    Zw = Aw*(1-1j)/((omega)**alpha)
     return Zw
 
 
