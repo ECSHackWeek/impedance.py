@@ -1,4 +1,4 @@
-from .circuit_elements import R, C, L, W, A, E, G, T, s, p  # noqa: F401
+from .circuit_elements import R, C, L, W, A, B, E, G, T, s, p  # noqa: F401
 import numpy as np
 from scipy.optimize import curve_fit
 
@@ -242,7 +242,7 @@ def buildCircuit(circuit, frequencies, *parameters,
 
 
 def calculateCircuitLength(circuit):
-    elements = [R, C, L, W, A, E, G, T]
+    elements = [R, C, L, W, A, B, E, G, T]
     length = 0
     for element in elements:
         num_params = element.num_params
@@ -251,7 +251,7 @@ def calculateCircuitLength(circuit):
 
 
 def check_and_eval(element):
-    allowed_elements = ['R', 'C', 'L', 'W', 'A', 'E', 'G', 'T']
+    allowed_elements = ['R', 'C', 'L', 'W', 'A', 'B', 'E', 'G', 'T']
     if element not in allowed_elements or len(element) != 1:
         raise ValueError
     else:
