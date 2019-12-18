@@ -20,7 +20,7 @@ def rmse(a, b):
 
 
 def circuit_fit(frequencies, impedances, circuit, initial_guess,
-                constants, method='lm', bounds=None, bootstrap=False):
+                constants, method=None, bounds=None, bootstrap=False):
 
     """ Main function for fitting an equivalent circuit to data
 
@@ -95,7 +95,8 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess,
 
     popt, pcov = curve_fit(wrapCircuit(circuit, constants), f,
                            np.hstack([Z.real, Z.imag]), p0=initial_guess,
-                           bounds=bounds, maxfev=100000, ftol=1E-13)
+                           method=method, bounds=bounds, maxfev=100000,
+                           ftol=1E-13)
 
     perror = np.sqrt(np.diag(pcov))
 
