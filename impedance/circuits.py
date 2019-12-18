@@ -55,7 +55,7 @@ class BaseCircuit:
         else:
             raise TypeError('Comparing object is not of the same type.')
 
-    def fit(self, frequencies, impedance, method='lm', bounds=None):
+    def fit(self, frequencies, impedance, method=None, bounds=None):
         """ Fit the circuit model
 
         Parameters
