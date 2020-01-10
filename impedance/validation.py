@@ -5,7 +5,6 @@ from .fitting import rmse
 
 def linKK(f, Z, c=0.85, max_M=50):
     """ A method for implementing the Lin-KK test for validating linearity [1]
-
     Parameters
     ----------
     f: np.ndarray
@@ -16,7 +15,6 @@ def linKK(f, Z, c=0.85, max_M=50):
         cutoff for mu
     max_M: int
         the maximum number of RC elements
-
     Returns
     -------
     mu: np.float
@@ -25,55 +23,41 @@ def linKK(f, Z, c=0.85, max_M=50):
         the residuals of the fit at input frequencies
     Z_fit: np.ndarray of complex numbers
         impedance of fit at input frequencies
-
     Notes
     -----
-
     The lin-KK method from Schönleber et al. [1] is a quick test for checking
     the
     validity of EIS data. The validity of an impedance spectrum is analyzed by
     its reproducibility by a Kramers-Kronig (KK) compliant equivalent circuit.
     In particular, the model used in the lin-KK test is an ohmic resistor,
     :math:`R_{Ohm}`, and :math:`M` RC elements.
-
     .. math::
-
         \\hat Z = R_{Ohm} + \\sum_{k=1}^{M} \\frac{R_k}{1 + j \\omega \\tau_k}
-
     The :math:`M` time constants, :math:`\\tau_k`, are distributed
     logarithmically,
-
     .. math::
         \\tau_1 = \\frac{1}{\\omega_{max}} ; \\tau_M = \\frac{1}{\\omega_{min}}
         ; \\tau_k = 10^{\\log{(\\tau_{min}) + \\frac{k-1}{M-1}\\log{{(
             \\frac{\\tau_{max}}{\\tau_{min}}}})}}
-
     and are not fit during the test (only :math:`R_{Ohm}` and :math:`R_{k}`
     are free parameters).
-
     In order to prevent under- or over-fitting, Schönleber et al. propose using
     the ratio of positive resistor mass to negative resistor mass as a metric
     for finding the optimal number of RC elements.
-
     .. math::
-
         \\mu = 1 - \\frac{\\sum_{R_k \\ge 0} |R_k|}{\\sum_{R_k < 0} |R_k|}
-
     The argument :code:`c` defines the cutoff value for :math:`\\mu`. The
     algorithm starts at :code:`M = 3` and iterates up to :code:`max_M` until a
     :math:`\\mu < c` is reached. The default of 0.85 is simply a heuristic
     value based off of the experience of Schönleber et al.
-
     If the argument :code:`c` is :code:`None`, then the automatic determination
     of RC elements is turned off and the solution is calculated for
     :code:`max_M` RC elements. This manual mode should be used with caution as
     under- and over-fitting should be avoided.
-
     [1] Schönleber, M. et al. A Method for Improving the Robustness of
     linear Kramers-Kronig Validity Tests. Electrochimica Acta 131, 20–27 (2014)
     `doi: 10.1016/j.electacta.2014.01.034
     <https://doi.org/10.1016/j.electacta.2014.01.034>`_.
-
     """
 
     def get_tc_distribution(f, M):
@@ -107,7 +91,7 @@ def linKK(f, Z, c=0.85, max_M=50):
     else:
         M = max_M
         ts = get_tc_distribution(f, M)
-        p_values, mu = fitLinKK(f, M, Z)
+        p_values, mu = fitLinKK(f, ts, M, Z)
 
     return M, mu, eval_linKK(p_values, ts, f), \
         residuals_linKK(p_values, ts, Z, f, residuals='real'), \
