@@ -107,7 +107,7 @@ def linKK(f, Z, c=0.85, max_M=50):
     else:
         M = max_M
         ts = get_tc_distribution(f, M)
-        p_values, mu = fitLinKK(f, M, Z)
+        p_values, mu = fitLinKK(f, ts, M, Z)
 
     return M, mu, eval_linKK(p_values, ts, f), \
         residuals_linKK(p_values, ts, Z, f, residuals='real'), \
