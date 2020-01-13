@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="impedance",
-    version="0.5.0",
+    version="0.5.1",
     author="impedance.py developers",
     author_email="matt.murbach@gmail.com",
     description="A Python package for working with impedance data",
