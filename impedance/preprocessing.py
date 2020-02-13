@@ -24,7 +24,7 @@ def readFile(filename, instrument=None):
 
     """
 
-    supported_types = ['gamry', 'autolab', 'parstat', 'zplot', 'versastudio'
+    supported_types = ['gamry', 'autolab', 'parstat', 'zplot', 'versastudio',
                        'powersuite', 'biologic']
 
     if instrument is not None:
@@ -266,17 +266,27 @@ def readZPlot(filename):
         Array of complex impedances
 
     """
+    import re
     with open(filename, 'r', encoding="utf8") as input_file:
         lines = input_file.readlines()
 
     for i, line in enumerate(lines):
+        # For files that have metadata in the header
         if "End Comments" in line:
             start_line = i
+        # For files without metadata
+        if "Freq(Hz)" in line:
+            head_line = i
 
-    raw_data = lines[start_line+1:]
+    try:
+        raw_data = lines[start_line+1:]
+    except UnboundLocalError:
+        raw_data = lines[head_line+1:]
+
     f, Z = [], []
     for line in raw_data:
-        each = line.split('\t')
+        # Can use this approach if we don't mind importing re module
+        each = re.split('\t|, ', line)
         f.append(float(each[0]))
         Z.append(complex(float(each[4]), float(each[5])))
     return np.array(f), np.array(Z)
