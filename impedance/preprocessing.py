@@ -266,7 +266,7 @@ def readZPlot(filename):
         Array of complex impedances
 
     """
-    # import re
+    import re
     with open(filename, 'r', encoding="utf8") as input_file:
         lines = input_file.readlines()
 
@@ -286,16 +286,8 @@ def readZPlot(filename):
     f, Z = [], []
     for line in raw_data:
         # Can use this approach if we don't mind importing re module
-        # each = re.split('\t|, |', line)
-        # f.append(float(each[0]))
-
-        # Otherwise:
-        try:
-            each = line.split('\t')
-            f.append(float(each[0]))
-        except ValueError:
-            each = line.split(', ')
-            f.append(float(each[0]))
+        each = re.split('\t|, ', line)
+        f.append(float(each[0]))
         Z.append(complex(float(each[4]), float(each[5])))
     return np.array(f), np.array(Z)
 
