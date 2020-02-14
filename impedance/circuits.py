@@ -213,7 +213,7 @@ class BaseCircuit:
         return to_print
 
     def plot(self, ax=None, f_data=None, Z_data=None,
-             conf_bounds=None, scale=1, units='Ohms'):
+             conf_bounds=None, scale=1, units='Ohms', **kwargs):
         """ a convenience method for plotting Nyquist plots
 
 
@@ -230,6 +230,12 @@ class BaseCircuit:
             randomly sampled parameter sets where each of the parameters is
             sampled from a normal distribution
 
+        Other Parameters
+        ----------------
+        **kwargs : `matplotlib.pyplot.Line2D` properties, optional
+            Used to specify line properties like linewidth, line color,
+            marker color, and line labels.
+
         Returns
         -------
         ax: matplotlib.axes
@@ -240,8 +246,8 @@ class BaseCircuit:
             fig, ax = plt.subplots(figsize=(5, 5))
 
         if Z_data is not None:
-            ax = plot_nyquist(ax, f_data, Z_data,
-                              scale=scale, units=units, fmt='s')
+            ax = plot_nyquist(ax, Z_data,
+                              scale=scale, units=units, fmt='s', **kwargs)
 
         if self._is_fit():
 
@@ -251,8 +257,8 @@ class BaseCircuit:
                 f_pred = np.logspace(5, -3)
 
             Z_fit = self.predict(f_pred)
-            ax = plot_nyquist(ax, f_data, Z_fit,
-                              scale=scale, units=units, fmt='s')
+            ax = plot_nyquist(ax, Z_fit,
+                              scale=scale, units=units, fmt='s', **kwargs)
 
             base_ylim, base_xlim = ax.get_ylim(), ax.get_xlim()
 

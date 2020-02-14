@@ -15,7 +15,7 @@ class FixedOrderFormatter(ScalarFormatter):
         self.orderOfMagnitude = self._order_of_mag
 
 
-def plot_nyquist(ax, freq, Z, scale=1, units='Ohms', fmt='.-'):
+def plot_nyquist(ax, Z, scale=1, units='Ohms', fmt='.-', **kwargs):
     """ Convenience function for plotting nyquist plots
 
 
@@ -23,8 +23,6 @@ def plot_nyquist(ax, freq, Z, scale=1, units='Ohms', fmt='.-'):
         ----------
         ax: matplotlib.axes.Axes
             axes on which to plot the nyquist plot
-        freq: np.array of floats
-            frequencies
         Z: np.array of complex numbers
             impedance data
         scale: float
@@ -34,12 +32,18 @@ def plot_nyquist(ax, freq, Z, scale=1, units='Ohms', fmt='.-'):
         fmt: string
             format string passed to matplotlib (e.g. '.-' or 'o')
 
+        Other Parameters
+        ----------------
+        **kwargs : `matplotlib.pyplot.Line2D` properties, optional
+            Used to specify line properties like linewidth, line color,
+            marker color, and line labels.
+
         Returns
         -------
         ax: matplotlib.axes.Axes
     """
 
-    ax.plot(np.real(Z), -np.imag(Z), fmt, lw=3)
+    ax.plot(np.real(Z), -np.imag(Z), fmt, **kwargs)
 
     # Make the axes square
     ax.set_aspect('equal')
