@@ -246,7 +246,7 @@ class BaseCircuit:
                 fig, ax = plt.subplots(figsize=(5, 5))
 
             if Z_data is not None:
-                ax = plot_nyquist(ax, Z_data, marker='s', **kwargs)
+                ax = plot_nyquist(ax, Z_data, ls='', marker='s', **kwargs)
 
             if self._is_fit():
                 if f_data is not None:
@@ -255,14 +255,14 @@ class BaseCircuit:
                     f_pred = np.logspace(5, -3)
 
                 Z_fit = self.predict(f_pred)
-                ax = plot_nyquist(ax, Z_fit, ls='-', **kwargs)
+                ax = plot_nyquist(ax, Z_fit, ls='-', marker='', **kwargs)
             return ax
         elif kind == 'bode':
             if ax is None:
                 fig, ax = plt.subplots(nrows=2, figsize=(5, 5))
 
             if Z_data is not None:
-                ax = plot_bode(ax, f_data, Z_data, marker='s', **kwargs)
+                ax = plot_bode(ax, f_data, Z_data, ls='', marker='s', **kwargs)
 
             if self._is_fit():
                 if f_data is not None:
@@ -271,7 +271,7 @@ class BaseCircuit:
                     f_pred = np.logspace(5, -3)
 
                 Z_fit = self.predict(f_pred)
-                ax = plot_bode(ax, f_pred, Z_fit, ls='-', **kwargs)
+                ax = plot_bode(ax, f_pred, Z_fit, ls='-', marker='', **kwargs)
             return ax
         elif kind == 'altair':
             plot_dict = {}
