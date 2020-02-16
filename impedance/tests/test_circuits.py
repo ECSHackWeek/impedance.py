@@ -1,4 +1,5 @@
 from impedance.circuits import BaseCircuit, CustomCircuit, Randles
+import json
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -30,8 +31,15 @@ def test_Randles():
     # check that plotting returns a plt.Axes() object
     _, ax = plt.subplots()
     assert isinstance(randles.plot(ax, None, Z, kind='nyquist'), type(ax))
+    assert isinstance(randles.plot(None, None, Z, kind='nyquist'), type(ax))
     _, axes = plt.subplots(nrows=2)
     assert isinstance(randles.plot(axes, f, Z, kind='bode')[0], type(ax))
+    assert isinstance(randles.plot(None, f, Z, kind='bode')[0], type(ax))
+
+    chart = randles.plot(f_data=f, Z_data=Z)
+    datasets = json.loads(chart.to_json())['datasets']
+    for dataset in datasets.keys():
+        assert len(datasets[dataset]) == len(Z)
 
     # check that predicting impedance from fit works
     assert np.isclose(randles.predict(np.array([10.0])),
