@@ -17,11 +17,11 @@ def test_Randles():
     # get example data
     data = np.genfromtxt('./data/exampleData.csv', delimiter=',')
 
-    frequencies = data[:, 0]
+    f = data[:, 0]
     Z = data[:, 1] + 1j*data[:, 2]
 
     randles = Randles(initial_guess=[.01, .005, .1, .0001, 200])
-    randles.fit(frequencies[np.imag(Z) < 0], Z[np.imag(Z) < 0])
+    randles.fit(f[np.imag(Z) < 0], Z[np.imag(Z) < 0])
     np.testing.assert_almost_equal(randles.parameters_,
                                    np.array([1.86146620e-02, 1.15477171e-02,
                                              1.33331949e+00, 6.31473571e-02,
@@ -29,9 +29,9 @@ def test_Randles():
 
     # check that plotting returns a plt.Axes() object
     _, ax = plt.subplots()
-    assert isinstance(randles.plot(ax, frequencies, Z), type(ax))
-    assert isinstance(randles.plot(ax, frequencies, Z,
-                                   conf_bounds='error_bars'), type(ax))
+    assert isinstance(randles.plot(ax, None, Z, kind='nyquist'), type(ax))
+    _, axes = plt.subplots(nrows=2)
+    assert isinstance(randles.plot(axes, f, Z, kind='bode')[0], type(ax))
 
     # check that predicting impedance from fit works
     assert np.isclose(randles.predict(np.array([10.0])),
@@ -57,7 +57,7 @@ def test_Randles():
     # check that it rejects improper inputs - enforcing data lengths
     try:
         r = Randles(initial_guess=[.01, .005, .1, .0001, 200])
-        r.fit(frequencies[np.imag(Z) < 0][:5], Z[np.imag(Z) < 0])
+        r.fit(f[np.imag(Z) < 0][:5], Z[np.imag(Z) < 0])
     except(AssertionError):
         pass
     else:

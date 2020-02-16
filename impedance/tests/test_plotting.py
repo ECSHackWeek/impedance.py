@@ -1,7 +1,22 @@
 import matplotlib.pyplot as plt  # noqa E402
 import numpy as np
-from impedance.plotting import plot_nyquist, plot_altair
+from impedance.plotting import plot_altair, plot_bode, plot_nyquist
 import json
+
+
+def test_plot_bode():
+
+    f = [1, 10, 100]
+    Z = np.array([1, 2, 3]) + 1j*np.array([2, 3, 4])
+
+    _, axes = plt.subplots(nrows=2)
+    axes = plot_bode(axes, f, Z)
+
+    xs, ys = axes[0].lines[0].get_xydata().T
+    assert (xs == f).all() and (ys == np.abs(Z)).all()
+
+    xs, ys = axes[1].lines[0].get_xydata().T
+    assert (xs == f).all() and (ys == -np.angle(Z)).all()
 
 
 def test_plot_nyquist():
