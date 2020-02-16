@@ -18,8 +18,7 @@ class FixedOrderFormatter(ScalarFormatter):
 
 
 def plot_nyquist(ax, Z, scale=1, units='Ohms', fmt='.-', **kwargs):
-    """ Convenience function for plotting nyquist plots
-
+    """ Plots impedance as a Nyquist plot using matplotlib
 
         Parameters
         ----------
@@ -77,8 +76,71 @@ def plot_nyquist(ax, Z, scale=1, units='Ohms', fmt='.-', **kwargs):
     return ax
 
 
+def plot_bode(axes, f, Z, scale=1, units='Ohms', fmt='.-', **kwargs):
+    """ Plots impedance as a Bode plot using matplotlib
+
+        Parameters
+        ----------
+        axes: list of 2 matplotlib.axes.Axes
+            axes on which to plot the bode plot
+        f: np.array of floats
+            frequencies
+        Z: np.array of complex numbers
+            impedance data
+        scale: float
+            scale for the magnitude y-axis
+        units: string
+            units for :math:`|Z(\\omega)|`
+        fmt: string
+            format string passed to matplotlib (e.g. '.-' or 'o')
+
+        Other Parameters
+        ----------------
+        **kwargs : `matplotlib.pyplot.Line2D` properties, optional
+            Used to specify line properties like linewidth, line color,
+            marker color, and line labels.
+
+        Returns
+        -------
+        ax: matplotlib.axes.Axes
+    """
+
+    ax_mag, ax_phs = axes
+
+    ax_mag.plot(f, np.abs(Z), fmt, **kwargs)
+    ax_phs.plot(f, -np.angle(Z), fmt, **kwargs)
+
+    # Set the y-axis labels
+    ax_mag.set_ylabel(r'$|Z(\omega)|$ ' +
+                      '$[{}]$'.format(units), fontsize=20)
+    ax_phs.set_ylabel(r'$-\phi_Z(\omega)$ ' + r'$[^o]$', fontsize=20)
+
+    for ax in axes:
+        # Set the frequency axes title and make log scale
+        ax.set_xlabel('f [Hz]', fontsize=20)
+        ax.set_xscale('log')
+
+        # Make the tick labels larger
+        ax.tick_params(axis='both', which='major', labelsize=14)
+
+        # Change the number of labels on each axis to five
+        ax.locator_params(axis='y', nbins=5, tight=True)
+
+        # Add a light grid
+        ax.grid(b=True, which='major', axis='both', alpha=.5)
+
+    # Change axis units to 10**log10(scale) and resize the offset text
+    ax_mag.yaxis.set_major_formatter(FixedOrderFormatter(-np.log10(scale)))
+    y_offset = ax_mag.yaxis.get_offset_text()
+    y_offset.set_size(18)
+    t = ax_mag.xaxis.get_offset_text()
+    t.set_size(18)
+
+    return axes
+
+
 def plot_altair(data_dict, size=400):
-    """ Interactive altair Nyquist/Bode chart
+    """ Plots impedance as an interactive Nyquist/Bode plot using altair
 
         Parameters
         ----------

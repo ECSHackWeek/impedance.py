@@ -1,6 +1,6 @@
 from .fitting import circuit_fit, buildCircuit
 from .fitting import calculateCircuitLength, check_and_eval
-from .plotting import plot_nyquist
+from .plotting import plot_altair, plot_bode, plot_nyquist
 from .circuit_elements import R, C, L, W, A, E, G, T, s, p  # noqa: F401
 
 import matplotlib.pyplot as plt
@@ -212,29 +212,28 @@ class BaseCircuit:
 
         return to_print
 
-    def plot(self, ax=None, f_data=None, Z_data=None,
-             conf_bounds=None, scale=1, units='Ohms', **kwargs):
-        """ a convenience method for plotting Nyquist plots
-
+    def plot(self, ax=None, f_data=None, Z_data=None, kind='altair', **kwargs):
+        """ visualizes the model and optional data as a nyquist,
+            bode, or altair (interactive) plots
 
         Parameters
         ----------
+        ax: matplotlib.axes
+            axes to plot on
         f_data: np.array of type float
             Frequencies of input data (for Bode plots)
         Z_data: np.array of type complex
             Impedance data to plot
-        conf_bounds: {'error_bars', 'filled', 'filledx', 'filledy'}, optional
-            Include bootstrapped confidence bands (95%) on the predicted best
-            fit model shown as either error bars or a filled confidence area.
-            Confidence bands are estimated by simulating the spectra for 10000
-            randomly sampled parameter sets where each of the parameters is
-            sampled from a normal distribution
+        kind: {'altair', 'nyquist', 'bode'}
+            type of plot to visualize
 
         Other Parameters
         ----------------
-        **kwargs : `matplotlib.pyplot.Line2D` properties, optional
-            Used to specify line properties like linewidth, line color,
-            marker color, and line labels.
+        **kwargs : optional
+            If kind is 'nyquist' or 'bode', used to specify additional
+             `matplotlib.pyplot.Line2D` properties like linewidth,
+             line color, marker color, and labels.
+            If kind is 'altair', used to specify nyquist height as `size`
 
         Returns
         -------
@@ -242,88 +241,62 @@ class BaseCircuit:
             axes of the created nyquist plot
         """
 
-        if ax is None:
-            fig, ax = plt.subplots(figsize=(5, 5))
+        if kind == 'nyquist':
+            if ax is None:
+                fig, ax = plt.subplots(figsize=(5, 5))
 
-        if Z_data is not None:
-            ax = plot_nyquist(ax, Z_data,
-                              scale=scale, units=units, fmt='s', **kwargs)
+            if Z_data is not None:
+                ax = plot_nyquist(ax, Z_data, marker='s', **kwargs)
 
-        if self._is_fit():
+            if self._is_fit():
+                if f_data is not None:
+                    f_pred = f_data
+                else:
+                    f_pred = np.logspace(5, -3)
 
-            if f_data is not None:
-                f_pred = f_data
-            else:
-                f_pred = np.logspace(5, -3)
+                Z_fit = self.predict(f_pred)
+                ax = plot_nyquist(ax, Z_fit, ls='-', **kwargs)
+            return ax
+        elif kind == 'bode':
+            if ax is None:
+                fig, ax = plt.subplots(nrows=2, figsize=(5, 5))
 
-            Z_fit = self.predict(f_pred)
-            ax = plot_nyquist(ax, Z_fit,
-                              scale=scale, units=units, fmt='s', **kwargs)
+            if Z_data is not None:
+                ax = plot_bode(ax, f_data, Z_data, marker='s', **kwargs)
 
-            base_ylim, base_xlim = ax.get_ylim(), ax.get_xlim()
+            if self._is_fit():
+                if f_data is not None:
+                    f_pred = f_data
+                else:
+                    f_pred = np.logspace(5, -3)
 
-            if conf_bounds is not None:
-                N = 10000
-                n = len(self.parameters_)
-                f_pred = np.logspace(np.log10(min(f_data)),
-                                     np.log10(max(f_data)),
-                                     num=100)
+                Z_fit = self.predict(f_pred)
+                ax = plot_bode(ax, f_pred, Z_fit, ls='-', **kwargs)
+            return ax
+        elif kind == 'altair':
+            plot_dict = {}
 
-                params = self.parameters_
-                confs = self.conf_
+            if Z_data is not None and f_data is not None:
+                plot_dict['data'] = {'f': f_data, 'Z': Z_data}
 
-                full_range = np.ndarray(shape=(N, len(f_pred)), dtype=complex)
-                for i in range(N):
-                    self.parameters_ = params + \
-                                        confs*np.random.randn(n)
+            if self._is_fit():
+                if f_data is not None:
+                    f_pred = f_data
+                else:
+                    f_pred = np.logspace(5, -3)
 
-                    full_range[i, :] = self.predict(f_pred)
+                Z_fit = self.predict(f_pred)
+                if self.name is not None:
+                    name = self.name
+                else:
+                    name = 'fit'
+                plot_dict[name] = {'f': f_pred, 'Z': Z_fit, 'fmt': '-'}
 
-                self.parameters_ = params
-
-                min_Zr, min_Zi = [], []
-                max_Zr, max_Zi = [], []
-                xerr, yerr = [], []
-                for i, Z in enumerate(Z_fit):
-                    Zr, Zi = np.real(Z), np.imag(Z)
-                    yr, yi = [], []
-                    for run in full_range:
-                        yi.append(run[i].imag)
-                        yr.append(run[i].real)
-
-                    min_Zr.append(1j*Zi + (Zr - 2*np.std(yr)))
-                    max_Zr.append(1j*Zi + (Zr + 2*np.std(yr)))
-
-                    min_Zi.append(Zr + 1j*(Zi - 2*np.std(yi)))
-                    max_Zi.append(Zr + 1j*(Zi + 2*np.std(yi)))
-
-                    xerr.append(2*np.std(yr))
-                    yerr.append(2*np.std(yi))
-
-                conf_x, conf_y = False, False
-                if conf_bounds == 'error_bars':
-                    ax.errorbar(Z_fit.real, -Z_fit.imag, xerr=xerr, yerr=yerr,
-                                fmt='', color='#7f7f7f', zorder=-2)
-                elif conf_bounds == 'filled':
-                    conf_x = True
-                    conf_y = True
-                elif conf_bounds == 'filledx':
-                    conf_x = True
-                elif conf_bounds == 'filledy':
-                    conf_y = True
-
-                if conf_x:
-                    ax.fill_betweenx(-np.imag(min_Zr), np.real(min_Zr),
-                                     np.real(max_Zr), alpha='.2',
-                                     color='#7f7f7f', zorder=-2)
-                if conf_y:
-                    ax.fill_between(np.real(min_Zi), -np.imag(min_Zi),
-                                    -np.imag(max_Zi), alpha='.2',
-                                    color='#7f7f7f', zorder=-2)
-
-                ax.set_ylim(base_ylim)
-                ax.set_xlim(base_xlim)
-        return ax
+            chart = plot_altair(plot_dict, **kwargs)
+            return chart
+        else:
+            raise ValueError("Kind must be one of 'altair'," +
+                             f"'nyquist', or 'bode' (recieved {kind})")
 
 
 class Randles(BaseCircuit):
