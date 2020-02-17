@@ -108,7 +108,7 @@ def plot_bode(axes, f, Z, scale=1, units='Ohms', fmt='.-', **kwargs):
     ax_mag, ax_phs = axes
 
     ax_mag.plot(f, np.abs(Z), fmt, **kwargs)
-    ax_phs.plot(f, -np.angle(Z), fmt, **kwargs)
+    ax_phs.plot(f, -np.angle(Z, deg=True), fmt, **kwargs)
 
     # Set the y-axis labels
     ax_mag.set_ylabel(r'$|Z(\omega)|$ ' +
@@ -207,7 +207,7 @@ def plot_altair(data_dict, size=400):
             height=size/2 - 25
         ).transform_calculate(
             mag="sqrt(pow(datum.z_real,2) + pow(datum.z_imag,2))",
-            neg_phase="-atan(datum.z_imag/datum.z_real)"
+            neg_phase="-(180/PI)*atan(datum.z_imag/datum.z_real)"
         )
 
         bode_mag = bode.encode(y=alt.Y('mag:Q',
@@ -252,7 +252,7 @@ def plot_altair(data_dict, size=400):
             height=size/2 - 25
         ).transform_calculate(
             mag="sqrt(pow(datum.z_real,2) + pow(datum.z_imag,2))",
-            neg_phase="-atan(datum.z_imag/datum.z_real)"
+            neg_phase="-(180/PI)*atan(datum.z_imag/datum.z_real)"
         ).interactive()
 
         bode_mag = bode.encode(y=alt.Y('mag:Q',

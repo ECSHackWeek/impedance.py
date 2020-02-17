@@ -16,7 +16,7 @@ def test_plot_bode():
     assert (xs == f).all() and (ys == np.abs(Z)).all()
 
     xs, ys = axes[1].lines[0].get_xydata().T
-    assert (xs == f).all() and (ys == -np.angle(Z)).all()
+    assert (xs == f).all() and (ys == -np.angle(Z, deg=True)).all()
 
 
 def test_plot_nyquist():
