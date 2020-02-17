@@ -139,15 +139,20 @@ def plot_bode(axes, f, Z, scale=1, units='Ohms', fmt='.-', **kwargs):
     return axes
 
 
-def plot_altair(data_dict, size=400):
+def plot_altair(data_dict, size=400, background='#FFFFFF'):
     """ Plots impedance as an interactive Nyquist/Bode plot using altair
 
         Parameters
         ----------
-        freq: np.array of floats
-            frequencies
-        Z: np.array of complex numbers
-            impedance data
+        data_dict: dict
+            dictionary with keys
+            'f': frequencies
+            'Z': impedance
+            'fmt': {'-' for a line, else circles}
+        size: int
+            size in pixels of Nyquist height/width
+        background: str
+            hex color string for chart background (default = '#FFFFFF')
 
         Returns
         -------
@@ -266,4 +271,4 @@ def plot_altair(data_dict, size=400):
 
     full_bode = alt.layer(*bode_mags) & alt.layer(*bode_phss)
 
-    return (full_bode | alt.layer(*nyquists))
+    return (full_bode | alt.layer(*nyquists)).configure(background=background)
