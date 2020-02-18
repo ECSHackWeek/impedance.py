@@ -1,6 +1,5 @@
 import altair as alt
 import numpy as np
-from matplotlib.ticker import ScalarFormatter
 import pandas as pd
 
 
