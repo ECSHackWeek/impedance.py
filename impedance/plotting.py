@@ -4,19 +4,6 @@ from matplotlib.ticker import ScalarFormatter
 import pandas as pd
 
 
-class FixedOrderFormatter(ScalarFormatter):
-    """Formats axis ticks using scientific notation with a constant order of
-    magnitude"""
-    def __init__(self, order_of_mag=0, useOffset=True, useMathText=True):
-        self._order_of_mag = order_of_mag
-        ScalarFormatter.__init__(self, useOffset=useOffset,
-                                 useMathText=useMathText)
-
-    def _set_orderOfMagnitude(self, range):
-        """Over-riding this to avoid having orderOfMagnitude reset elsewhere"""
-        self.orderOfMagnitude = self._order_of_mag
-
-
 def plot_nyquist(ax, Z, scale=1, units='Ohms', fmt='.-', **kwargs):
     """ Plots impedance as a Nyquist plot using matplotlib
 
@@ -66,8 +53,10 @@ def plot_nyquist(ax, Z, scale=1, units='Ohms', fmt='.-', **kwargs):
     ax.grid(b=True, which='major', axis='both', alpha=.5)
 
     # Change axis units to 10**log10(scale) and resize the offset text
-    ax.xaxis.set_major_formatter(FixedOrderFormatter(-np.log10(scale)))
-    ax.yaxis.set_major_formatter(FixedOrderFormatter(-np.log10(scale)))
+    limits = -np.log10(scale)
+    if limits != 0:
+        ax.ticklabel_format(style='sci', axis='both',
+                            scilimits=(limits, limits))
     y_offset = ax.yaxis.get_offset_text()
     y_offset.set_size(18)
     t = ax.xaxis.get_offset_text()
@@ -130,11 +119,12 @@ def plot_bode(axes, f, Z, scale=1, units='Ohms', fmt='.-', **kwargs):
         ax.grid(b=True, which='major', axis='both', alpha=.5)
 
     # Change axis units to 10**log10(scale) and resize the offset text
-    ax_mag.yaxis.set_major_formatter(FixedOrderFormatter(-np.log10(scale)))
+    limits = -np.log10(scale)
+    if limits != 0:
+        ax_mag.ticklabel_format(style='sci', axis='y',
+                                scilimits=(limits, limits))
     y_offset = ax_mag.yaxis.get_offset_text()
     y_offset.set_size(18)
-    t = ax_mag.xaxis.get_offset_text()
-    t.set_size(18)
 
     return axes
 
