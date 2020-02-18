@@ -132,7 +132,7 @@ def fitLinKK(f, ts, M, Z):
 
 def eval_linKK(Rs, ts, f):
     """ Builds a circuit of RC elements to be used in LinKK """
-    from .circuit_elements import s, R, K  # noqa
+    from .analysis.circuit_elements import s, R, K  # noqa
 
     circuit_string = 's([R({},{}),'.format([Rs[0]], f.tolist())
 

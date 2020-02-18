@@ -1,4 +1,4 @@
-from impedance.circuits import BaseCircuit, CustomCircuit, Randles
+from impedance.analysis.circuits import BaseCircuit, CustomCircuit, Randles
 import json
 import matplotlib.pyplot as plt
 import numpy as np
@@ -83,12 +83,10 @@ def test_Randles():
     # check that it rejects missing input
     try:
         r = Randles()
-    except(TypeError):
+    except(AssertionError):
         pass
     else:
         raise Exception('unhandled error occured')
-
-    return
 
 
 def test_CustomCircuit():

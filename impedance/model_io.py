@@ -1,5 +1,5 @@
 import json
-from .circuits import CustomCircuit
+from .analysis.circuits import CustomCircuit
 import numpy as np
 
 

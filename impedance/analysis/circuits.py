@@ -1,15 +1,16 @@
-from .fitting import circuit_fit, buildCircuit
-from .fitting import calculateCircuitLength, check_and_eval
-from .plotting import plot_altair, plot_bode, plot_nyquist
+from ..fitting import circuit_fit, buildCircuit
+from ..fitting import calculateCircuitLength, check_and_eval
+from ..plotting import plot_altair, plot_bode, plot_nyquist
 from .circuit_elements import R, C, L, W, A, E, G, T, s, p  # noqa: F401
 
+import json
 import matplotlib.pyplot as plt
 import numpy as np
 
 
 class BaseCircuit:
     """ Base class for equivalent circuit models """
-    def __init__(self, initial_guess, constants=None, name=None):
+    def __init__(self, initial_guess=[], constants=None, name=None):
         """ Base constructor for any equivalent circuit model
 
         Parameters
@@ -298,6 +299,81 @@ class BaseCircuit:
             raise ValueError("Kind must be one of 'altair'," +
                              f"'nyquist', or 'bode' (recieved {kind})")
 
+    def save(self, filepath):
+        """ Exports a model to JSON
+
+        Parameters
+        ----------
+        filepath: str
+            Destination for exporting model object
+        """
+
+        model_string = self.circuit
+        model_name = self.name
+
+        initial_guess = self.initial_guess
+
+        if self._is_fit():
+            parameters_ = list(self.parameters_)
+            model_conf_ = list(self.conf_)
+
+            data_dict = {"Name": model_name,
+                         "Circuit String": model_string,
+                         "Initial Guess": initial_guess,
+                         "Constants": self.constants,
+                         "Fit": True,
+                         "Parameters": parameters_,
+                         "Confidence": model_conf_,
+                         }
+        else:
+            data_dict = {"Name": model_name,
+                         "Circuit String": model_string,
+                         "Initial Guess": initial_guess,
+                         "Constants": self.constants,
+                         "Fit": False}
+
+        with open(filepath, 'w') as f:
+            json.dump(data_dict, f)
+
+    def load(self, filepath, fitted_as_initial=False):
+        """ Imports a model from JSON
+
+        Parameters
+        ----------
+        filepath: str
+            filepath to JSON file to load model from
+
+        fitted_as_initial: bool
+            If true, loads the model's fitted parameters
+            as initial guesses
+
+            Otherwise, loads the model's initial and
+            fitted parameters as a completed model
+        """
+
+        json_data_file = open(filepath, 'r')
+        json_data = json.load(json_data_file)
+
+        model_name = json_data["Name"]
+        if model_name == 'None':
+            model_name = None
+
+        model_string = json_data["Circuit String"]
+        model_initial_guess = json_data["Initial Guess"]
+        model_constants = json_data["Constants"]
+
+        self.initial_guess = model_initial_guess
+        self.circuit = model_string
+        self.constants = model_constants
+        self.name = model_name
+
+        if json_data["Fit"]:
+            if fitted_as_initial:
+                self.initial_guess = np.array(json_data['Parameters'])
+            else:
+                self.parameters_ = np.array(json_data["Parameters"])
+                self.conf_ = np.array(json_data["Confidence"])
+
 
 class Randles(BaseCircuit):
     """ A Randles circuit model class """
@@ -331,7 +407,7 @@ class Randles(BaseCircuit):
 
 
 class CustomCircuit(BaseCircuit):
-    def __init__(self, circuit, **kwargs):
+    def __init__(self, circuit='', **kwargs):
         """ Constructor for a customizable equivalent circuit model
 
         Parameters
