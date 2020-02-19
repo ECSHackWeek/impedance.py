@@ -1,4 +1,4 @@
-from impedance.analysis.circuit_elements import R, C, L, W, A, E, G, T, s, p
+from impedance.models.circuits.elements import R, C, L, W, A, E, G, T, s, p
 import numpy as np
 
 

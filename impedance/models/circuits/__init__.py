@@ -1,7 +1,7 @@
-from ..fitting import circuit_fit, buildCircuit
-from ..fitting import calculateCircuitLength, check_and_eval
-from ..plotting import plot_altair, plot_bode, plot_nyquist
-from .circuit_elements import R, C, L, W, A, E, G, T, s, p  # noqa: F401
+from .fitting import circuit_fit, buildCircuit
+from .fitting import calculateCircuitLength, check_and_eval
+from impedance.plotting import plot_altair, plot_bode, plot_nyquist
+from .elements import R, C, L, W, A, E, G, T, s, p  # noqa: F401
 
 import json
 import matplotlib.pyplot as plt

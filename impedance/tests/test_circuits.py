@@ -1,4 +1,4 @@
-from impedance.analysis.circuits import BaseCircuit, CustomCircuit, Randles
+from impedance.models.circuits import BaseCircuit, CustomCircuit, Randles
 import json
 import matplotlib.pyplot as plt
 import numpy as np

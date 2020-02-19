@@ -1,5 +1,5 @@
 import numpy as np
-from impedance.analysis.circuits import CustomCircuit
+from impedance.models.circuits import CustomCircuit
 
 
 def test_model_io():
