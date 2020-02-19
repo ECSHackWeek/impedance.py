@@ -1,4 +1,4 @@
-import matplotlib.pyplot as plt  # noqa E402
+import matplotlib.pyplot as plt
 import numpy as np
 from impedance.plotting import plot_altair, plot_bode, plot_nyquist
 import json

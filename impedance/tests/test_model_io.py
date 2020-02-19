@@ -1,6 +1,5 @@
 import numpy as np
-from impedance.model_io import model_export, model_import
-from impedance.circuits import CustomCircuit
+from impedance.models.circuits import CustomCircuit
 
 
 def test_model_io():
@@ -16,10 +15,9 @@ def test_model_io():
                             constants={'R0': 0.01})
     randles.fit(frequencies, Z)
 
-    print(randles)
-
-    model_export(randles, './test_io.json')
-    randles2 = model_import('./test_io.json')
+    randles.save('./test_io.json')
+    randles2 = CustomCircuit()
+    randles2.load('./test_io.json')
     print(randles2)
 
     assert randles == randles2
