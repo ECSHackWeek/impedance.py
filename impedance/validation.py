@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.optimize import least_squares
-from .fitting import rmse
+from impedance.models.circuits.fitting import rmse
 
 
 def linKK(f, Z, c=0.85, max_M=50):
@@ -132,11 +132,11 @@ def fitLinKK(f, ts, M, Z):
 
 def eval_linKK(Rs, ts, f):
     """ Builds a circuit of RC elements to be used in LinKK """
-    from .circuit_elements import s, R, K  # noqa
+    from .models.circuits.elements import s, R, K  # noqa
 
     circuit_string = 's([R({},{}),'.format([Rs[0]], f.tolist())
 
-    for i, (Rk, tk) in enumerate(zip(Rs[1:], ts)):
+    for (Rk, tk) in zip(Rs[1:], ts):
         circuit_string += 'K({},{}),'.format([Rk, tk], f.tolist())
 
     circuit_string = circuit_string.strip(',')

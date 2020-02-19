@@ -1,15 +1,16 @@
 from .fitting import circuit_fit, buildCircuit
 from .fitting import calculateCircuitLength, check_and_eval
-from .plotting import plot_nyquist
-from .circuit_elements import R, C, L, W, A, E, G, T, s, p  # noqa: F401
+from impedance.plotting import plot_altair, plot_bode, plot_nyquist
+from .elements import R, C, L, W, A, E, G, T, s, p  # noqa: F401
 
+import json
 import matplotlib.pyplot as plt
 import numpy as np
 
 
 class BaseCircuit:
     """ Base class for equivalent circuit models """
-    def __init__(self, initial_guess, constants=None, name=None):
+    def __init__(self, initial_guess=[], constants=None, name=None):
         """ Base constructor for any equivalent circuit model
 
         Parameters
@@ -212,23 +213,28 @@ class BaseCircuit:
 
         return to_print
 
-    def plot(self, ax=None, f_data=None, Z_data=None,
-             conf_bounds=None, scale=1, units='Ohms'):
-        """ a convenience method for plotting Nyquist plots
-
+    def plot(self, ax=None, f_data=None, Z_data=None, kind='altair', **kwargs):
+        """ visualizes the model and optional data as a nyquist,
+            bode, or altair (interactive) plots
 
         Parameters
         ----------
+        ax: matplotlib.axes
+            axes to plot on
         f_data: np.array of type float
             Frequencies of input data (for Bode plots)
         Z_data: np.array of type complex
             Impedance data to plot
-        conf_bounds: {'error_bars', 'filled', 'filledx', 'filledy'}, optional
-            Include bootstrapped confidence bands (95%) on the predicted best
-            fit model shown as either error bars or a filled confidence area.
-            Confidence bands are estimated by simulating the spectra for 10000
-            randomly sampled parameter sets where each of the parameters is
-            sampled from a normal distribution
+        kind: {'altair', 'nyquist', 'bode'}
+            type of plot to visualize
+
+        Other Parameters
+        ----------------
+        **kwargs : optional
+            If kind is 'nyquist' or 'bode', used to specify additional
+             `matplotlib.pyplot.Line2D` properties like linewidth,
+             line color, marker color, and labels.
+            If kind is 'altair', used to specify nyquist height as `size`
 
         Returns
         -------
@@ -236,88 +242,137 @@ class BaseCircuit:
             axes of the created nyquist plot
         """
 
-        if ax is None:
-            fig, ax = plt.subplots(figsize=(5, 5))
+        if kind == 'nyquist':
+            if ax is None:
+                fig, ax = plt.subplots(figsize=(5, 5))
 
-        if Z_data is not None:
-            ax = plot_nyquist(ax, f_data, Z_data,
-                              scale=scale, units=units, fmt='s')
+            if Z_data is not None:
+                ax = plot_nyquist(ax, Z_data, ls='', marker='s', **kwargs)
+
+            if self._is_fit():
+                if f_data is not None:
+                    f_pred = f_data
+                else:
+                    f_pred = np.logspace(5, -3)
+
+                Z_fit = self.predict(f_pred)
+                ax = plot_nyquist(ax, Z_fit, ls='-', marker='', **kwargs)
+            return ax
+        elif kind == 'bode':
+            if ax is None:
+                fig, ax = plt.subplots(nrows=2, figsize=(5, 5))
+
+            if Z_data is not None:
+                ax = plot_bode(ax, f_data, Z_data, ls='', marker='s', **kwargs)
+
+            if self._is_fit():
+                if f_data is not None:
+                    f_pred = f_data
+                else:
+                    f_pred = np.logspace(5, -3)
+
+                Z_fit = self.predict(f_pred)
+                ax = plot_bode(ax, f_pred, Z_fit, ls='-', marker='', **kwargs)
+            return ax
+        elif kind == 'altair':
+            plot_dict = {}
+
+            if Z_data is not None and f_data is not None:
+                plot_dict['data'] = {'f': f_data, 'Z': Z_data}
+
+            if self._is_fit():
+                if f_data is not None:
+                    f_pred = f_data
+                else:
+                    f_pred = np.logspace(5, -3)
+
+                Z_fit = self.predict(f_pred)
+                if self.name is not None:
+                    name = self.name
+                else:
+                    name = 'fit'
+                plot_dict[name] = {'f': f_pred, 'Z': Z_fit, 'fmt': '-'}
+
+            chart = plot_altair(plot_dict, **kwargs)
+            return chart
+        else:
+            raise ValueError("Kind must be one of 'altair'," +
+                             f"'nyquist', or 'bode' (recieved {kind})")
+
+    def save(self, filepath):
+        """ Exports a model to JSON
+
+        Parameters
+        ----------
+        filepath: str
+            Destination for exporting model object
+        """
+
+        model_string = self.circuit
+        model_name = self.name
+
+        initial_guess = self.initial_guess
 
         if self._is_fit():
+            parameters_ = list(self.parameters_)
+            model_conf_ = list(self.conf_)
 
-            if f_data is not None:
-                f_pred = f_data
+            data_dict = {"Name": model_name,
+                         "Circuit String": model_string,
+                         "Initial Guess": initial_guess,
+                         "Constants": self.constants,
+                         "Fit": True,
+                         "Parameters": parameters_,
+                         "Confidence": model_conf_,
+                         }
+        else:
+            data_dict = {"Name": model_name,
+                         "Circuit String": model_string,
+                         "Initial Guess": initial_guess,
+                         "Constants": self.constants,
+                         "Fit": False}
+
+        with open(filepath, 'w') as f:
+            json.dump(data_dict, f)
+
+    def load(self, filepath, fitted_as_initial=False):
+        """ Imports a model from JSON
+
+        Parameters
+        ----------
+        filepath: str
+            filepath to JSON file to load model from
+
+        fitted_as_initial: bool
+            If true, loads the model's fitted parameters
+            as initial guesses
+
+            Otherwise, loads the model's initial and
+            fitted parameters as a completed model
+        """
+
+        json_data_file = open(filepath, 'r')
+        json_data = json.load(json_data_file)
+
+        model_name = json_data["Name"]
+        if model_name == 'None':
+            model_name = None
+
+        model_string = json_data["Circuit String"]
+        model_initial_guess = json_data["Initial Guess"]
+        model_constants = json_data["Constants"]
+
+        self.initial_guess = model_initial_guess
+        self.circuit = model_string
+        self.constants = model_constants
+        self.name = model_name
+
+        if json_data["Fit"]:
+            if fitted_as_initial:
+                self.initial_guess = np.array(json_data['Parameters'])
             else:
-                f_pred = np.logspace(5, -3)
-
-            Z_fit = self.predict(f_pred)
-            ax = plot_nyquist(ax, f_data, Z_fit,
-                              scale=scale, units=units, fmt='s')
-
-            base_ylim, base_xlim = ax.get_ylim(), ax.get_xlim()
-
-            if conf_bounds is not None:
-                N = 10000
-                n = len(self.parameters_)
-                f_pred = np.logspace(np.log10(min(f_data)),
-                                     np.log10(max(f_data)),
-                                     num=100)
-
-                params = self.parameters_
-                confs = self.conf_
-
-                full_range = np.ndarray(shape=(N, len(f_pred)), dtype=complex)
-                for i in range(N):
-                    self.parameters_ = params + \
-                                        confs*np.random.randn(n)
-
-                    full_range[i, :] = self.predict(f_pred)
-
-                self.parameters_ = params
-
-                min_Zr, min_Zi = [], []
-                max_Zr, max_Zi = [], []
-                xerr, yerr = [], []
-                for i, Z in enumerate(Z_fit):
-                    Zr, Zi = np.real(Z), np.imag(Z)
-                    yr, yi = [], []
-                    for run in full_range:
-                        yi.append(run[i].imag)
-                        yr.append(run[i].real)
-
-                    min_Zr.append(1j*Zi + (Zr - 2*np.std(yr)))
-                    max_Zr.append(1j*Zi + (Zr + 2*np.std(yr)))
-
-                    min_Zi.append(Zr + 1j*(Zi - 2*np.std(yi)))
-                    max_Zi.append(Zr + 1j*(Zi + 2*np.std(yi)))
-
-                    xerr.append(2*np.std(yr))
-                    yerr.append(2*np.std(yi))
-
-                conf_x, conf_y = False, False
-                if conf_bounds == 'error_bars':
-                    ax.errorbar(Z_fit.real, -Z_fit.imag, xerr=xerr, yerr=yerr,
-                                fmt='', color='#7f7f7f', zorder=-2)
-                elif conf_bounds == 'filled':
-                    conf_x = True
-                    conf_y = True
-                elif conf_bounds == 'filledx':
-                    conf_x = True
-                elif conf_bounds == 'filledy':
-                    conf_y = True
-
-                if conf_x:
-                    ax.fill_betweenx(-np.imag(min_Zr), np.real(min_Zr),
-                                     np.real(max_Zr), alpha='.2',
-                                     color='#7f7f7f', zorder=-2)
-                if conf_y:
-                    ax.fill_between(np.real(min_Zi), -np.imag(min_Zi),
-                                    -np.imag(max_Zi), alpha='.2',
-                                    color='#7f7f7f', zorder=-2)
-
-                ax.set_ylim(base_ylim)
-                ax.set_xlim(base_xlim)
-        return ax
+                self.parameters_ = np.array(json_data["Parameters"])
+                self.conf_ = np.array(json_data["Confidence"])
 
 
 class Randles(BaseCircuit):
@@ -352,7 +407,7 @@ class Randles(BaseCircuit):
 
 
 class CustomCircuit(BaseCircuit):
-    def __init__(self, circuit, **kwargs):
+    def __init__(self, circuit='', **kwargs):
         """ Constructor for a customizable equivalent circuit model
 
         Parameters

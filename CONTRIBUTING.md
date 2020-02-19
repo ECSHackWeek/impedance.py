@@ -13,15 +13,15 @@ If you find a bug in the code or a mistake in the [documentation](https://impeda
 
 ## Repository Setup
 
-1. To work on the impedance.py package, you should first fork the repository on GitHub using the button on the top right of the ECSHackWeek/impedance.py repository.
+1.  To work on the impedance.py package, you should first fork the repository on GitHub using the button on the top right of the ECSHackWeek/impedance.py repository.
 
-2. You can then clone the fork to your computer
+2.  You can then clone the fork to your computer
 
 ```bash
 git clone https://github.com/<GitHubUsername>/impedance.py
 ```
 
-3. Make your changes and commit them to your fork (for an introduction to git, checkout the [tutorial from the ECS Hack Week](https://github.com/ECSHackWeek/ECSHackWeek_Dallas/blob/master/Version_Control.pptx))
+3.  Make your changes and commit them to your fork (for an introduction to git, checkout the [tutorial from the ECS Hack Week](https://github.com/ECSHackWeek/ECSHackWeek_Dallas/blob/master/Version_Control.pptx))
 
 For example,
 ```bash
@@ -30,9 +30,9 @@ git commit
 git push
 ```
 
-4. [Submit a Pull Request](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests) (make sure to write a good message so the reviewer can understand what you're adding!) via GitHub.
+4.  [Submit a Pull Request](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests) (make sure to write a good message so the reviewer can understand what you're adding!) via GitHub.
 
-5. Add yourself to the list of collaborators (you can use the [all-contributors bot](https://allcontributors.org/docs/en/bot/usage))! You rock!
+5.  Add yourself to the list of collaborators (you can use the [all-contributors bot](https://allcontributors.org/docs/en/bot/usage))! You rock!
 
 ## Continuous Integration
 
@@ -49,6 +49,7 @@ flake8
 :warning: if there is any output here, fix the errors and try running flake8 again.
 
 To run the tests using py.test:
+
 ```
 conda install pytest
 cd impedance.py/
@@ -59,5 +60,3 @@ pytest
 ### Unit Tests
 
 `impedance.py` aims to have complete test coverage of our package code. If you're adding a new feature, consider writing the test first and then the code to ensure it passes. PRs which decrease code coverage will need to add tests before they can be merged.
-
-
