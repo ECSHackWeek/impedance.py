@@ -74,6 +74,7 @@ def test_RMSE():
     d = np.array([4 + 2*1j, 3 + 2*1j])
     assert np.isclose(rmse(c, d), 2*np.sqrt(2))
 
+
 def test_element_extraction():
     circuit = 'R0-p(RR0,C1)-p(R1,C2032478)-W1'
     extracted_elements = extract_circuit_elements(circuit)

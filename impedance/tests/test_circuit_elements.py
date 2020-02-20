@@ -3,6 +3,7 @@ import numpy as np
 
 from impedance.models.circuits.elements import circuit_elements, s, p
 
+
 def test_all():
     freqs = [0.001, 1.0, 1000]
     correct_vals = {'R': [0.1, 0.1, 0.1],
@@ -72,6 +73,7 @@ def test_p():
 
     answer = np.array([2.5 + 3*1j, 1 + 1.5*1j])
     assert np.isclose(p([a, b]), answer).all()
+
 
 def test_element_function_names():
     # run a simple check to ensure there are no integers or non-capital letters

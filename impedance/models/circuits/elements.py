@@ -85,6 +85,7 @@ def R(p, f):
     """
     return np.array(len(f)*[p[0]])
 
+
 @element_metadata(num_params=1, units=['Ohm'])
 def RR(p, f):
     """ defines a resistor
@@ -274,7 +275,8 @@ def T(p, f):
 
     return A/(beta*np.tanh(beta)) + B/(beta*np.array(sinh))
 
-circuit_elements = {key:eval(key) for key in set(globals())-set(initial_state) if key not in non_element_functions} # noqa
+circuit_elements = {key: eval(key) for key in set(globals())-set(initial_state) if key not in non_element_functions} # noqa
+
 
 def typeChecker(p, f, name, length):
     assert isinstance(p, list), \
