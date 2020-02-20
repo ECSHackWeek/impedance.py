@@ -240,6 +240,7 @@ def buildCircuit(circuit, frequencies, *parameters,
 
     return eval_string, index
 
+
 def extract_circuit_elements(circuit):
     extracted_elements = []
     p_string = [x for x in circuit if x not in 'ps(),-/']
@@ -251,7 +252,7 @@ def extract_circuit_elements(circuit):
             current_element.append(char)
         else:
             # min to prevent looking ahead past end of list
-            if p_string[min(i+1,length-1)] not in ints:
+            if p_string[min(i+1, length-1)] not in ints:
                 current_element.append(char)
                 extracted_elements.append(''.join(current_element))
                 current_element = []

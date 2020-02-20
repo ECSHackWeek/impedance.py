@@ -78,4 +78,4 @@ def test_RMSE():
 def test_element_extraction():
     circuit = 'R0-p(RR0,C1)-p(R1,C2032478)-W1'
     extracted_elements = extract_circuit_elements(circuit)
-    assert extracted_elements == ['R0','RR0','C1','R1','C2032478','W1']
+    assert extracted_elements == ['R0', 'RR0', 'C1', 'R1', 'C2032478', 'W1']

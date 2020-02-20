@@ -1,13 +1,14 @@
 from .fitting import circuit_fit, buildCircuit
 from .fitting import calculateCircuitLength, check_and_eval
 from impedance.plotting import plot_altair, plot_bode, plot_nyquist
-from .elements import circuit_elements, s, p
+from .elements import circuit_elements, s, p  # noqa: F401, F403
 
 import json
 import matplotlib.pyplot as plt
 import numpy as np
 
 globals().update(circuit_elements)
+
 
 class BaseCircuit:
     """ Base class for equivalent circuit models """

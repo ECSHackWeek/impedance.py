@@ -1,5 +1,4 @@
 import cmath
-import string
 
 import numpy as np
 
@@ -16,6 +15,7 @@ non_element_functions = ['element_metadata',
 # this maps ex. 'R' to the function R to always give us a list of
 # active elements in any context
 circuit_elements = {}
+
 
 def element_metadata(num_params, units):
     """ decorator to store metadata for a circuit element
