@@ -1,8 +1,7 @@
-from .elements import circuit_elements, s, p  # noqa: F401
+from .elements import circuit_elements  # noqa: F401
 import numpy as np
 from scipy.optimize import curve_fit
 
-globals().update(circuit_elements)
 ints = '0123456789'
 
 
@@ -120,7 +119,8 @@ def wrapCircuit(circuit, constants):
 
         x = eval(buildCircuit(circuit, frequencies, *parameters,
                               constants=constants, eval_string='',
-                              index=0)[0])
+                              index=0)[0],
+                 circuit_elements)
         y_real = np.real(x)
         y_imag = np.imag(x)
 
@@ -258,8 +258,7 @@ def extract_circuit_elements(circuit):
                 current_element = []
             else:
                 current_element.append(char)
-    else:
-        extracted_elements.append(''.join(current_element))
+    extracted_elements.append(''.join(current_element))
     return extracted_elements
 
 
@@ -280,4 +279,4 @@ def check_and_eval(element):
         print(element, allowed_elements)
         raise ValueError
     else:
-        return eval(element)
+        return eval(element, circuit_elements)

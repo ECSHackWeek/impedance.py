@@ -1,13 +1,11 @@
 from .fitting import circuit_fit, buildCircuit
 from .fitting import calculateCircuitLength, check_and_eval
 from impedance.plotting import plot_altair, plot_bode, plot_nyquist
-from .elements import circuit_elements, s, p  # noqa: F401, F403
+from .elements import circuit_elements  # noqa: F401, F403
 
 import json
 import matplotlib.pyplot as plt
 import numpy as np
-
-globals().update(circuit_elements)
 
 
 class BaseCircuit:
@@ -151,13 +149,15 @@ class BaseCircuit:
             return eval(buildCircuit(self.circuit, frequencies,
                                      *self.parameters_,
                                      constants=self.constants, eval_string='',
-                                     index=0)[0])
+                                     index=0)[0],
+                        circuit_elements)
         else:
             print("Simulating circuit based on initial parameters")
             return eval(buildCircuit(self.circuit, frequencies,
                                      *self.initial_guess,
                                      constants=self.constants, eval_string='',
-                                     index=0)[0])
+                                     index=0)[0],
+                        circuit_elements)
 
     def get_param_names(self):
         """ Converts circuit string to names and units """

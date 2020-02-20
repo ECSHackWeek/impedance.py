@@ -6,9 +6,6 @@ initial_state = globals().copy()
 non_element_functions = ['element_metadata',
                          'initial_state',
                          'non_element_functions',
-                         's',
-                         'p',
-                         'K',
                          'typeChecker',
                          'circuit_elements']
 # populated at the end of the file -
