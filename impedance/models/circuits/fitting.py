@@ -1,8 +1,10 @@
-from .elements import R, C, L, W
-from .elements import A, E, G, T, s, p  # noqa: F401
+from .elements import circuit_elements, s, p  # noqa: F401
 import numpy as np
+import string
 from scipy.optimize import curve_fit
 
+globals().update(circuit_elements)
+ints = '0123456789'
 
 def rmse(a, b):
     """
@@ -65,33 +67,28 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess,
     Currently, an error of -1 is returned.
 
     """
-
     circuit = circuit.replace('_', '')
+
 
     f = frequencies
     Z = impedances
 
+    # extract the elements from the circuit
+    extracted_elements = extract_circuit_elements(circuit)
+
+    # set upper and lower bounds on a per-element basis
     if bounds is None:
         lb, ub = [], []
-        p_string = [x for x in circuit if x not in 'ps(),-/']
-        for a, b in zip(p_string[::2], p_string[1::2]):
-            for i in range(check_and_eval(a).num_params):
-                if i == 0:
-                    if a + b in constants.keys():
-                        continue
-                    else:
-                        lb.append(0)
-                        ub.append(np.inf)
+        for elem in extracted_elements:
+            raw_element = ''.join(char for char in elem if char not in ints)
+            for i in range(check_and_eval(raw_element).num_params):
+                if elem in constants or elem + '_{}'.format(i) in constants:
+                    continue
+                if raw_element == 'E' and i == 1:
+                    ub.append(1)
                 else:
-                    if a + b + '_{}'.format(i) in constants.keys():
-                        continue
-                    else:
-                        lb.append(0)
-                        if a == "E" and i == 1:
-                            ub.append(1)
-                        else:
-                            ub.append(np.inf)
-
+                    ub.append(np.inf)
+                lb.append(0)
         bounds = ((lb), (ub))
 
     popt, pcov = curve_fit(wrapCircuit(circuit, constants), f,
@@ -175,6 +172,7 @@ def buildCircuit(circuit, frequencies, *parameters,
             special = '-'
 
         split = circuit.split(special)
+        # print(split)
         result = []
         skipped = []
         for i, sub_str in enumerate(split):
@@ -217,7 +215,8 @@ def buildCircuit(circuit, frequencies, *parameters,
                                               index=index)
         else:
             param_string = ""
-            elem_number = check_and_eval(elem[0]).num_params
+            raw_elem = ''.join(char for char in elem if char not in ints)
+            elem_number = check_and_eval(raw_elem).num_params
             param_list = []
             for j in range(elem_number):
                 if elem_number > 1:
@@ -232,29 +231,55 @@ def buildCircuit(circuit, frequencies, *parameters,
                     index += 1
 
             param_string += str(param_list)
-            new = elem[0] + '(' + param_string + ',' + str(frequencies) + ')'
+            new = raw_elem + '(' + param_string + ',' + str(frequencies) + ')'
             eval_string += new
 
         if i == len(split) - 1:
             eval_string += '])'
         else:
             eval_string += ','
+    # print(eval_string)
 
     return eval_string, index
 
+def extract_circuit_elements(circuit):
+    extracted_elements = []
+    p_string = [x for x in circuit if x not in 'ps(),-/']
+    extracted_elements = []
+    current_element = []
+    l = len(p_string)
+    for i, char in enumerate(p_string):
+        if char not in ints:
+            current_element.append(char)
+        else:
+            # min to prevent looking ahead past end of list
+            if p_string[min(i+1,l-1)] not in ints:
+                current_element.append(char)
+                extracted_elements.append(''.join(current_element))
+                current_element = []
+            else:
+                current_element.append(char)
+    else:
+        extracted_elements.append(''.join(current_element))
+    return extracted_elements
+
 
 def calculateCircuitLength(circuit):
-    elements = [R, C, L, W, A, E, G, T]
     length = 0
-    for element in elements:
-        num_params = element.num_params
-        length += num_params*circuit.count(element.__name__)
+    if circuit:
+        extracted_elements = extract_circuit_elements(circuit)
+        elements = circuit_elements.items()
+        for elem in extracted_elements:
+            raw_element = ''.join(char for char in elem if char not in ints)
+            num_params = check_and_eval(raw_element).num_params
+            length += num_params
     return length
 
 
 def check_and_eval(element):
-    allowed_elements = ['R', 'C', 'L', 'W', 'A', 'E', 'G', 'T']
-    if element not in allowed_elements or len(element) != 1:
+    allowed_elements = circuit_elements.keys()
+    if element not in allowed_elements:
+        print(element, allowed_elements)
         raise ValueError
     else:
         return eval(element)
