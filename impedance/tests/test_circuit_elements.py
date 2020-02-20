@@ -81,4 +81,4 @@ def test_element_function_names():
     for elem in circuit_elements.keys():
         for char in elem:
             assert char in string.ascii_uppercase, \
-                f'{char} in element {elem} is not in the allowed set of {string.ascii_uppercase}' # noqa
+                '{} in element {} is not in the allowed set of {}'.format(char, elem, string.ascii_uppercase) # noqa
