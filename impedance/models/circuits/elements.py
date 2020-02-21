@@ -1,5 +1,17 @@
-import numpy as np
 import cmath
+
+import numpy as np
+
+initial_state = globals().copy()
+non_element_functions = ['element_metadata',
+                         'initial_state',
+                         'non_element_functions',
+                         'typeChecker',
+                         'circuit_elements']
+# populated at the end of the file -
+# this maps ex. 'R' to the function R to always give us a list of
+# active elements in any context
+circuit_elements = {}
 
 
 def element_metadata(num_params, units):
@@ -69,6 +81,20 @@ def R(p, f):
 
     """
     return np.array(len(f)*[p[0]])
+
+
+@element_metadata(num_params=1, units=['Ohm'])
+def RR(p, f):
+    """ defines a resistor
+
+    Notes
+    ---------
+    .. math::
+
+        Z = R
+
+    """
+    return np.array(len(f)*[p[0]*100])
 
 
 @element_metadata(num_params=1, units=['F'])
@@ -245,6 +271,8 @@ def T(p, f):
             sinh.append(1e10)
 
     return A/(beta*np.tanh(beta)) + B/(beta*np.array(sinh))
+
+circuit_elements = {key: eval(key) for key in set(globals())-set(initial_state) if key not in non_element_functions} # noqa
 
 
 def typeChecker(p, f, name, length):
