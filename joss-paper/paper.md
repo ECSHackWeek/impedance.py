@@ -87,7 +87,7 @@ and (4) visualize the results
 circuit.plot()
 ```
 
-![Interactive impedance plots are as easy as `.plot()`!](./docs/source/examples/example.png)
+![Interactive impedance plots are as easy as `.plot()`!](./joss-paper/example.png)
 
 # Acknowledgements
 
