@@ -13,6 +13,8 @@ authors:
     orcid: 0000-0002-6583-5995
     affiliation: 1
   - name: Brian Gerwe
+    email: brian.s.gerwe@gmail.com
+    orcid: 0000-0002-1184-8483
     affiliation: 2
   - name: Neal Dawson-Elli
     affiliation: 3
@@ -21,7 +23,7 @@ authors:
 affiliations:
  - name: Hive Battery Labs
    index: 1
- - name: University of Washington
+ - name: University of Washington, Department of Chemical Engineering
    index: 2
  - name: PayScale, Inc.
    index: 3
@@ -49,7 +51,7 @@ on either instrument-specific, proprietary software or ad hoc, lab-specific code
 analysis pipeline from data management to parameter extraction to publication ready figures,
 `impedance.py` seeks to encourage reproducible, easy-to-use, and transparent analysis.
 
-Additionally, in addition to decades of electrochemimical research, many new methods for validating[@schonleber_method_2014] and analyzing[@murbach_analysis_2018; @buteau_analysis_2019] impedance spectra have been developed by researchers. By lowering the barrier to use
+In addition to decades of electrochemical research, many new methods for validating[@schonleber_method_2014] and analyzing[@murbach_analysis_2018; @buteau_analysis_2019] impedance spectra have been developed by researchers. By lowering the barrier to use
 tried-and-true methods along side cutting-edge analytical techniques via a consistent
 interface, `impedance.py` serves to grow as a community repository of best-practices while facilitating the adoption of new techniques.
 
