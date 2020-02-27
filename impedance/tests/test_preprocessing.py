@@ -359,7 +359,7 @@ example_files = {'gamry': 'exampleDataGamry.DTA',
                  'versastudio': 'exampleDataVersaStudio.par',
                  'powersuite': 'exampleDataPowersuite.txt',
                  'biologic': 'exampleDataBioLogic.mpt',
-                 'chinstruments': 'exampleDataChInstruments.txt',
+                 'chinstruments': 'exampleDataCHInstruments.txt',
                  None: 'exampleData.csv'}
 
 f_checks = {'gamry': f_gamry,
