@@ -33,7 +33,7 @@ several features are currently being improved upon:
 
 impedance.py requires:
 
--   Python (>=3.5)
+-   Python (>=3.6)
 -   SciPy (>=1.0)
 -   NumPy (>=1.14)
 -   Matplotlib (>=3.0)
