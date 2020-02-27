@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-def test_BaseCircuit():
 
+def test_BaseCircuit():
     initial_guess = [0.01, 0.02, 50]
     base_circuit = BaseCircuit(initial_guess)
 
@@ -16,10 +16,11 @@ def test_Randles():
     # check for proper functionality
 
     # get example data
-    data = np.genfromtxt(os.path.join("./data/","exampleData.csv"), delimiter=',')
+    data = np.genfromtxt(os.path.join("./data/",
+                                      "exampleData.csv"), delimiter=',')
 
     f = data[:, 0]
-    Z = data[:, 1] + 1j*data[:, 2]
+    Z = data[:, 1] + 1j * data[:, 2]
 
     randles = Randles(initial_guess=[.01, .005, .1, .0001, 200])
     randles.fit(f[np.imag(Z) < 0], Z[np.imag(Z) < 0])
@@ -90,7 +91,6 @@ def test_Randles():
 
 
 def test_CustomCircuit():
-
     initial_guess = [.01, .005, .1, .005, .1, .001, 200]
     custom_string = 'R0-p(R1,C1)-p(R2,C2)-W1'
     custom_circuit = CustomCircuit(initial_guess=initial_guess,
