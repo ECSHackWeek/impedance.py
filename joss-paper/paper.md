@@ -19,6 +19,8 @@ authors:
   - name: Neal Dawson-Elli
     affiliation: 3
   - name: Lok-kun Tsui
+    email: lktsui@unm.edu
+    orcid: 0000-0001-7381-0686
     affiliation: 4
 affiliations:
  - name: Hive Battery Labs
@@ -27,7 +29,7 @@ affiliations:
    index: 2
  - name: PayScale, Inc.
    index: 3
- - name: University of New Mexico
+ - name: University of New Mexico, Center for MicroEngineered Materials
    index: 4
 date: 19 February 2020
 bibliography: paper.bib
