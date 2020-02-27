@@ -2,7 +2,7 @@ from impedance.models.circuits import BaseCircuit, CustomCircuit, Randles
 import json
 import matplotlib.pyplot as plt
 import numpy as np
-
+import os
 
 def test_BaseCircuit():
 
@@ -16,7 +16,7 @@ def test_Randles():
     # check for proper functionality
 
     # get example data
-    data = np.genfromtxt('./data/exampleData.csv', delimiter=',')
+    data = np.genfromtxt(os.path.join("./data/","exampleData.csv"), delimiter=',')
 
     f = data[:, 0]
     Z = data[:, 1] + 1j*data[:, 2]

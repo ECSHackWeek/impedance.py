@@ -1,10 +1,10 @@
 import numpy as np
 from impedance.models.circuits import CustomCircuit
-
+import os
 
 def test_model_io():
     # get example data
-    data = np.genfromtxt('./data/exampleData.csv', delimiter=',')
+    data = np.genfromtxt(os.path.join("./data/","exampleData.csv"), delimiter=',')
 
     frequencies = data[:, 0]
     Z = data[:, 1] + 1j*data[:, 2]

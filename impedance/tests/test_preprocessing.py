@@ -1,9 +1,10 @@
 from impedance.preprocessing import readFile, readGamry, ignoreBelowX
 from impedance.preprocessing import readZPlot, readVersaStudio
 from impedance.preprocessing import readPowerSuite, readBioLogic, readCSV
+from impedance.preprocessing import readCHInstruments
 from impedance.preprocessing import cropFrequencies
 import numpy as np
-
+import os
 # store some global test data
 frequencies = np.array([0.0031623, 0.0039811, 0.0050119, 0.0063096,
                         0.0079433, 0.01, 0.012589, 0.015849, 0.019953,
@@ -379,59 +380,58 @@ Z_checks = {'gamry': Z_gamry,
             'biologic': Z_BioLogic,
             None: Z_correct}
 
-directory = './data/'
-
+directory = "data"
 
 def test_readFile():
     for inst in Z_checks:
         if example_files[inst]:
-            f, Z = readFile(directory + example_files[inst], inst)
+            f, Z = readFile(os.path.join(directory,example_files[inst]), inst)
 
             assert (f == f_checks[inst]).all() and (Z == Z_checks[inst]).all()
     # assert (f == frequencies).all() and (Z == Z_correct).all()
 
 
 def test_readBioLogic():
-    f, Z = readBioLogic(directory + example_files['biologic'])
+    f, Z = readBioLogic(os.path.join(directory, example_files['biologic']))
 
     assert (f == f_BioLogic).all() and (Z == Z_BioLogic).all()
 
 
 def test_readGamry():
-    f, Z = readGamry(directory + example_files['gamry'])
+    f, Z = readGamry(os.path.join(directory, example_files['gamry']))
 
     assert (f == f_gamry).all() and (Z == Z_gamry).all()
 
 
 def test_readPowerSuite():
-    f, Z = readPowerSuite(directory + example_files['powersuite'])
+    f, Z = readPowerSuite(os.path.join(".", directory,example_files['powersuite']))
 
     assert (f == f_powersuite).all() and (Z == Z_powersuite).all()
 
 
 def test_readVersaStudio():
-    f, Z = readVersaStudio(directory + example_files['versastudio'])
+    f, Z = readVersaStudio(os.path.join(".", directory,example_files['versastudio']))
 
     assert (f == f_VerStu).all() and (Z == Z_VerStu).all()
 
 
 def test_readCHInstruments():
-    f, Z = readVersaStudio(directory + example_files['CHInstruments'])
+    f, Z = readCHInstruments(os.path.join(".", directory,example_files['chinstruments']))
 
     assert (f == f_CHInstruments).all() and (Z == Z_CHInst).all()
 
 
 def test_readZPlot():
-    f, Z = readZPlot(directory + example_files['zplot'])
+    f, Z = readZPlot(os.path.join(".", directory, example_files['zplot']))
     # Separate file to test for no comments in header
-    f2, Z2 = readZPlot('./data/exampleDataZPlot_noComments.z')
+    f2, Z2 = readZPlot(os.path.join(".",directory,"exampleDataZPlot_noComments.z"))
 
     assert (f == f_ZPlot).all() and (Z == Z_ZPlot).all()
     assert (f2 == f_ZPlot2).all() and (Z2 == Z_ZPlot2).all()
 
 
 def test_readCSV():
-    f, Z = readCSV(directory + example_files[None])
+    f, Z = readCSV(os.path.join(".",directory,example_files[None]))
 
     assert (f == frequencies).all() and (Z == Z_correct).all()
 
