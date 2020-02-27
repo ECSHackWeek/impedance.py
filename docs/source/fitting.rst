@@ -1,5 +1,5 @@
 Fitting
 =======
 
-.. automodule:: impedance.fitting
+.. automodule:: impedance.models.circuits.fitting
    :members:
