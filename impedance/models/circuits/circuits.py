@@ -299,7 +299,7 @@ class BaseCircuit:
             return chart
         else:
             raise ValueError("Kind must be one of 'altair'," +
-                             f"'nyquist', or 'bode' (recieved {kind})")
+                             f"'nyquist', or 'bode' (received {kind})")
 
     def save(self, filepath):
         """ Exports a model to JSON
