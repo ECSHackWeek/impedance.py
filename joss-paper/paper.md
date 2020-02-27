@@ -38,9 +38,9 @@ bibliography: paper.bib
 `impedance.py` is a community-driven Python package for making the analysis of electrochemical
 impedance spectroscopy (EIS) data easier and more reproducible. `impedance.py` currently provides several useful features commonly used in the typical impedance analysis workflow:
 
-- _data ingestion_: functions for importing data from a wide variety of instruments and file types
+- _data ingestion_: functions for importing data from a variety of instruments and file types
 - _data validation_: easy-to-use methods for checking measurement validity
-- _model fitting_: a simple and powerful interface for quickly fitting models to quickly analyze data
+- _model fitting_: a simple and powerful interface for quickly fitting models to analyze data
 - _model selection_: parameter error estimates and model confidence bounds
 - _visualization_: interactive and publication-ready Nyquist and Bode plots
 
@@ -143,7 +143,7 @@ Fit parameters:
 circuit.plot()
 ```
 
-![Interactive impedance plots are as easy as .plot()`!](./example.png)
+![Interactive impedance plots are as easy as `.plot()`!](./example.png)
 
 # Acknowledgements
 
