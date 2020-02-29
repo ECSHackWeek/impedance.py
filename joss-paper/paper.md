@@ -58,8 +58,8 @@ probing the physicochemical processes governing complex electrochemical systems 
 
 # Statement of Need
 To date, typical impedance analysis solutions have relied on either instrument-specific, proprietary software or ad hoc, lab-specific code
- written for internal use. In addition to access barriers, these solutions can be restrictive to defining custom circuit elements and processing
- large datasets. By providing an open-source, community-driven package for the full impedance analysis pipeline from data management to parameter
+ written for internal use. These proprietary or home-grown solutions lack cross-platform support, and users of Linux or MacOS are unable to perform analysis on their computers. In addition to access barriers, these solutions can be restrictive to defining custom circuit elements and processing
+ large datasets. By providing an open-source, cross-platform (Windows, MacOS, and Linux), community-driven package for the full impedance analysis pipeline from data management to parameter
  extraction to publication ready figures, `impedance.py` seeks to encourage reproducible, easy-to-use, and transparent analysis. In addition to decades
  of electrochemical research, many new methods for validating [@schonleber_method_2014] and analyzing [@murbach_analysis_2018; @buteau_analysis_2019]
  impedance spectra have been developed by researchers. By lowering the barrier to use tried-and-true methods along side cutting-edge analytical
