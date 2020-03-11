@@ -25,7 +25,7 @@ def readFile(filename, instrument=None):
     """
 
     supported_types = ['gamry', 'autolab', 'parstat', 'zplot', 'versastudio',
-                       'powersuite', 'biologic']
+                       'powersuite', 'biologic', 'chinstruments']
 
     if instrument is not None:
         assert instrument in supported_types,\
@@ -46,6 +46,8 @@ def readFile(filename, instrument=None):
         f, Z = readVersaStudio(filename)
     elif instrument == 'powersuite':
         f, Z = readPowerSuite(filename)
+    elif instrument == 'chinstruments':
+        f, Z = readCHInstruments(filename)
     elif instrument is None:
         f, Z = readCSV(filename)
 
@@ -319,6 +321,43 @@ def readPowerSuite(filename):
             freq, z_re, z_im = line.split('\t')
             f.append(float(freq))
             Z.append(complex(float(z_re), float(z_im)))
+
+    return np.array(f), np.array(Z)
+
+
+def readCHInstruments(filename):
+    """ function for reading the .txt file from CHInstruments
+
+    Parameters
+    ----------
+    filename: string
+        Filename of .txt file to extract impedance data from
+
+    Returns
+    -------
+    frequencies : np.ndarray
+        Array of frequencies
+    impedance : np.ndarray of complex numbers
+        Array of complex impedances
+
+    """
+
+    with open(filename, 'r') as input_file:
+        lines = input_file.readlines()
+
+    # Locate the line where the data lives
+    for i, line in enumerate(lines):
+        if line.startswith('Freq/Hz'):
+            # CH instruments has an empty space b/w header
+            # and start of data line
+            start_line = i+2
+
+    raw_data = lines[start_line:]
+    f, Z = [], []
+    for line in raw_data:
+        each = line.split(',')
+        f.append(float(each[0]))
+        Z.append(complex(float(each[1]), float(each[2])))
 
     return np.array(f), np.array(Z)
 

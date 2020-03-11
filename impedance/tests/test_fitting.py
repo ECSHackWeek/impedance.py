@@ -1,4 +1,5 @@
-from impedance.models.circuits.fitting import buildCircuit, rmse
+from impedance.models.circuits.fitting import buildCircuit, rmse, \
+                                              extract_circuit_elements
 import numpy as np
 
 # def test_residuals():
@@ -72,3 +73,9 @@ def test_RMSE():
     c = np.array([2 + 4*1j, 1 + 4*1j])
     d = np.array([4 + 2*1j, 3 + 2*1j])
     assert np.isclose(rmse(c, d), 2*np.sqrt(2))
+
+
+def test_element_extraction():
+    circuit = 'R0-p(RR0,C1)-p(R1,C2032478)-W1'
+    extracted_elements = extract_circuit_elements(circuit)
+    assert extracted_elements == ['R0', 'RR0', 'C1', 'R1', 'C2032478', 'W1']
