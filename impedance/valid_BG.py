@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.optimize import least_squares
-from .fitting import rmse
+from .models.circuits.fitting import rmse
 
 
 def linKK(f, Z, c=0.85, max_M=50):
@@ -122,7 +122,7 @@ def fitLinKK(f, ts, M, Z):
                               ((max(np.real(Z))-min(np.real(Z)))/M))
 
     result = least_squares(residuals_linKK, initial_guess, method='lm',
-                           args=(ts, Z, f, 'real'),
+                           args=(ts, Z, f, 'both'),
                            ftol=1E-13, gtol=1E-10)
 
     p_values = result['x']
@@ -132,7 +132,7 @@ def fitLinKK(f, ts, M, Z):
 
 def eval_linKK(Rs, ts, f):
     """ Builds a circuit of RC elements to be used in LinKK """
-    from .circuit_elements import s, R  # noqa
+    from .models.circuits.elements import s, R  # noqa
 
     circuit_string = 's([R({},{}),'.format([Rs[0]], f.tolist())
 
