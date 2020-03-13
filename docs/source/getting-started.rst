@@ -157,7 +157,7 @@ circuit string and initial guesses.
 
 .. code-block:: python
 
-  from impedance.circuits import CustomCircuit
+  from impedance.models.circuits import CustomCircuit
 
   circuit = 'R0-p(R1,C1)-p(R2-W1,C2)'
   initial_guess = [.01, .01, 100, .01, .05, 100, 1]

@@ -7,15 +7,19 @@
 impedance.py
 =============
 
-:code:`impedance.py` is a Python module for working with impedance data.
+:code:`impedance.py` is a community-driven Python package for making the analysis of electrochemical
+impedance spectroscopy (EIS) data easier and more reproducible.
+The package currently provides several useful features commonly used in the typical impedance analysis workflow:
 
-This project started at the `2018 Electrochemical Society (ECS) Hack Week
-<https://www.electrochem.org/233/hack-week/>`_ and has grown from there.
-
-Using a `scikit-learn-like API <https://arxiv.org/abs/1309.0238>`_, we hope to make visualizing, fitting, and analyzing impedance spectra more intuitive and reproducible.
+- **data ingestion**: functions for importing data from a variety of instruments and file types
+- **data validation**: easy-to-use methods for checking measurement validity
+- **model fitting**: a simple and powerful interface for quickly fitting models to analyze data
+- **model selection**: parameter error estimates and model confidence bounds
+- **visualization**: interactive and publication-ready Nyquist and Bode plots
 
 .. note::
-  :code:`impedance.py` is currently in a beta phase and new features are rapidly being added.
+  🎉This project started at the `2018 Electrochemical Society (ECS) Hack Week
+  <https://www.electrochem.org/233/hack-week/>`_ and has grown from there. 🎉
 
 If you have a feature request or find a bug, please feel free to `file an issue <https://github.com/ECSHackWeek/impedance.py/issues>`_ or, better yet, make the code improvements and `submit a pull request
 <https://help.github.com/articles/creating-a-pull-request-from-a-fork/>`_! The goal is to build an open-source tool that the entire impedance community can improve and use!
@@ -61,7 +65,6 @@ is a great place to start) and the documentation can be found at
    circuits
    circuit-elements
    fitting
-   modelio
 
 Indices and tables
 ==================
