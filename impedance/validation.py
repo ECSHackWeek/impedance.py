@@ -135,7 +135,6 @@ def eval_linKK(Rs, R0, ts, f):
     circuit_string = 's([R({},{}),'.format([R0], f.tolist())
 
     for (Rk, tk) in zip(Rs, ts):
-        print(Rk, tk)
         circuit_string += 'K({},{}),'.format([Rk, tk], f.tolist())
 
     circuit_string = circuit_string.strip(',')
