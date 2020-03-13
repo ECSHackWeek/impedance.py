@@ -225,7 +225,7 @@ def K(p, f):
         Z = \\frac{R}{1 + j \\omega \\tau_k}
 
     """
-    omega = np.array(f)
+    omega = 2*np.pi*np.array(f)
     return p[0]/(1 + 1j*omega*p[1])
 
 
