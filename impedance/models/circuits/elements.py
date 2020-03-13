@@ -83,20 +83,6 @@ def R(p, f):
     return np.array(len(f)*[p[0]])
 
 
-@element_metadata(num_params=1, units=['Ohm'])
-def RR(p, f):
-    """ defines a resistor
-
-    Notes
-    ---------
-    .. math::
-
-        Z = R
-
-    """
-    return np.array(len(f)*[p[0]*100])
-
-
 @element_metadata(num_params=1, units=['F'])
 def C(p, f):
     """ defines a capacitor
@@ -124,7 +110,7 @@ def L(p, f):
 
 
 @element_metadata(num_params=2, units=['Ohm', 'sec'])
-def W(p, f):
+def Wo(p, f):
     """ defines a blocked boundary Finite-length Warburg Element
 
     Notes
@@ -144,7 +130,7 @@ def W(p, f):
 
 
 @element_metadata(num_params=1, units=['Ohm sec^-1/2'])
-def A(p, f):
+def W(p, f):
     """ defines a semi-infinite Warburg element
 
     Notes

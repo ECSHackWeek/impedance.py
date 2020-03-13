@@ -168,8 +168,9 @@ class BaseCircuit:
 
         full_names, all_units = [], []
         for name in names:
-            num_params = check_and_eval(name[0]).num_params
-            units = check_and_eval(name[0]).units
+            elem = ''.join(char for char in name if char not in '0123456789')
+            num_params = check_and_eval(elem).num_params
+            units = check_and_eval(elem).units
             if num_params > 1:
                 for j in range(num_params):
                     full_name = '{}_{}'.format(name, j)
@@ -395,10 +396,10 @@ class Randles(BaseCircuit):
 
         if CPE:
             self.name = 'Randles w/ CPE'
-            self.circuit = 'R0-p(R1,E1)-W1'
+            self.circuit = 'R0-p(R1,E1)-Wo1'
         else:
             self.name = 'Randles'
-            self.circuit = 'R0-p(R1,C1)-W1'
+            self.circuit = 'R0-p(R1,C1)-Wo1'
 
         circuit_len = calculateCircuitLength(self.circuit)
 

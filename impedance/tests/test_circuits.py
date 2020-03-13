@@ -92,13 +92,13 @@ def test_Randles():
 
 def test_CustomCircuit():
     initial_guess = [.01, .005, .1, .005, .1, .001, 200]
-    custom_string = 'R0-p(R1,C1)-p(R2,C2)-W1'
+    custom_string = 'R0-p(R1,C1)-p(R2,C2)-Wo1'
     custom_circuit = CustomCircuit(initial_guess=initial_guess,
                                    circuit=custom_string)
 
     # check get_param_names()
     full_names, all_units = custom_circuit.get_param_names()
-    assert full_names == ['R0', 'R1', 'C1', 'R2', 'C2', 'W1_0', 'W1_1']
+    assert full_names == ['R0', 'R1', 'C1', 'R2', 'C2', 'Wo1_0', 'Wo1_1']
     assert all_units == ['Ohm', 'Ohm', 'F', 'Ohm', 'F', 'Ohm', 'sec']
 
     # check _is_fit()
@@ -122,7 +122,7 @@ def test_CustomCircuit():
     # enforcing the length of initial_guess
     try:
         initial_guess = [.01, .005, .1, .005, .1, .001, 200]
-        custom_string = 'R0-p(R1,E1)-p(R1,C1)-W1'
+        custom_string = 'R0-p(R1,E1)-p(R1,C1)-Wo1'
         custom_circuit = CustomCircuit(initial_guess=initial_guess,
                                        circuit=custom_string)
     except(AssertionError):
