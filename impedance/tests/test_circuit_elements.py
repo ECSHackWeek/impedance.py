@@ -34,29 +34,15 @@ def test_all():
                     'T': [(1.00041-0.00837309j),
                           (0.0156037-0.114062j),
                           (0.00141056-0.00141039j)],
-                    'RR': [10, 10, 10],
                     'K': [(1e-1-2e-5j),
                           (9.6154e-02-1.9231e-02j),
                           (2.5e-6-5e-4j)]}
     input_vals = [0.1, 0.2, 0.3, 0.4]
-    inputs = {'R': 1,
-              'C': 1,
-              'L': 1,
-              'Wo': 2,
-              'W': 1,
-              'E': 2,
-              'G': 2,
-              'T': 4,
-              'RR': 1,
-              'K': 2}
     for key, f in circuit_elements.items():
         # don't test the outputs of series and parallel functions
-        print(key)
-        print(circuit_elements)
         if key not in ['s', 'p']:
-            val = f(input_vals[:inputs[key]], freqs)
-            print(f.__name__, val, correct_vals[key])
-            print(np.isclose(val, correct_vals[key]).all())
+            num_inputs = f.num_params
+            val = f(input_vals[:num_inputs], freqs)
             assert np.isclose(val, correct_vals[key]).all()
 
         # check for typing:
