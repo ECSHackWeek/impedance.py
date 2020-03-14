@@ -122,7 +122,7 @@ def test_CustomCircuit():
     # enforcing the length of initial_guess
     try:
         initial_guess = [.01, .005, .1, .005, .1, .001, 200]
-        custom_string = 'R0-p(R1,E1)-p(R1,C1)-Wo1'
+        custom_string = 'R0-p(R1,CPE1)-p(R1,C1)-Wo1'
         custom_circuit = CustomCircuit(initial_guess=initial_guess,
                                        circuit=custom_string)
     except(AssertionError):

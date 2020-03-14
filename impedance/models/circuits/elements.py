@@ -146,7 +146,7 @@ def W(p, f):
 
 
 @element_metadata(num_params=2, units=['Ohm^-1 sec^a', ''])
-def E(p, f):
+def CPE(p, f):
     """ defines a constant phase element
 
     Notes

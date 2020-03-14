@@ -396,7 +396,7 @@ class Randles(BaseCircuit):
 
         if CPE:
             self.name = 'Randles w/ CPE'
-            self.circuit = 'R0-p(R1,E1)-Wo1'
+            self.circuit = 'R0-p(R1,CPE1)-Wo1'
         else:
             self.name = 'Randles'
             self.circuit = 'R0-p(R1,C1)-Wo1'
