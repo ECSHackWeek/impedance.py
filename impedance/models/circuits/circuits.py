@@ -1,7 +1,7 @@
 from .fitting import circuit_fit, buildCircuit
 from .fitting import calculateCircuitLength, check_and_eval
 from impedance.plotting import plot_altair, plot_bode, plot_nyquist
-from .elements import circuit_elements
+from .elements import circuit_elements, get_element_from_name
 
 import json
 import matplotlib.pyplot as plt
@@ -168,7 +168,7 @@ class BaseCircuit:
 
         full_names, all_units = [], []
         for name in names:
-            elem = ''.join(char for char in name if char not in '0123456789')
+            elem = get_element_from_name(name)
             num_params = check_and_eval(elem).num_params
             units = check_and_eval(elem).units
             if num_params > 1:
@@ -196,7 +196,8 @@ class BaseCircuit:
         if len(self.constants) > 0:
             to_print += '\nConstants:\n'
             for name, value in self.constants.items():
-                units = check_and_eval(name[0]).units
+                elem = get_element_from_name(name)
+                units = check_and_eval(elem).units
                 if '_' in name:
                     unit = units[int(name.split('_')[-1])]
                 else:

@@ -280,7 +280,14 @@ def T(p, f):
 
     return A/(beta*np.tanh(beta)) + B/(beta*np.array(sinh))
 
-circuit_elements = {key: eval(key) for key in set(globals())-set(initial_state) if key not in non_element_functions} # noqa
+
+circuit_elements = {key: eval(key) for key in set(globals())-set(initial_state)
+                    if key not in non_element_functions}
+
+
+def get_element_from_name(name):
+    excluded_chars = '0123456789_'
+    return ''.join(char for char in name if char not in excluded_chars)
 
 
 def typeChecker(p, f, name, length):
