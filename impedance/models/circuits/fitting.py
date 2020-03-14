@@ -274,7 +274,7 @@ def calculateCircuitLength(circuit):
 def check_and_eval(element):
     allowed_elements = circuit_elements.keys()
     if element not in allowed_elements:
-        print(element, allowed_elements)
-        raise ValueError
+        raise ValueError(f'{element} not in ' +
+                         f'allowed elements ({allowed_elements})')
     else:
         return eval(element, circuit_elements)
