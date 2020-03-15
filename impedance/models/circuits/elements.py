@@ -1,5 +1,3 @@
-import cmath
-
 import numpy as np
 
 initial_state = globals().copy()
@@ -83,20 +81,6 @@ def R(p, f):
     return np.array(len(f)*[p[0]])
 
 
-@element_metadata(num_params=1, units=['Ohm'])
-def RR(p, f):
-    """ defines a resistor
-
-    Notes
-    ---------
-    .. math::
-
-        Z = R
-
-    """
-    return np.array(len(f)*[p[0]*100])
-
-
 @element_metadata(num_params=1, units=['F'])
 def C(p, f):
     """ defines a capacitor
@@ -123,28 +107,8 @@ def L(p, f):
     return p[0]*1j*omega
 
 
-@element_metadata(num_params=2, units=['Ohm', 'sec'])
-def W(p, f):
-    """ defines a blocked boundary Finite-length Warburg Element
-
-    Notes
-    ---------
-    .. math::
-        Z = \\frac{R}{\\sqrt{ T \\times j 2 \\pi f}}
-        \\coth{\\sqrt{T \\times j 2 \\pi f }}
-
-    where :math:`R` = p[0] (Ohms) and
-    :math:`T` = p[1] (sec) = :math:`\\frac{L^2}{D}`
-
-    """
-    omega = 2*np.pi*np.array(f)
-    Zw = np.vectorize(lambda y: p[0]/(np.sqrt(p[1]*1j*y) *
-                                      cmath.tanh(np.sqrt(p[1]*1j*y))))
-    return Zw(omega)
-
-
 @element_metadata(num_params=1, units=['Ohm sec^-1/2'])
-def A(p, f):
+def W(p, f):
     """ defines a semi-infinite Warburg element
 
     Notes
@@ -159,8 +123,52 @@ def A(p, f):
     return Zw
 
 
+@element_metadata(num_params=2, units=['Ohm', 'sec'])
+def Wo(p, f):
+    """ defines an open (finite-space) Warburg element
+
+    Notes
+    ---------
+    .. math::
+        Z = \\frac{Z_0}{\\sqrt{ j \\omega \\tau }}
+        \\coth{\\sqrt{j \\omega \\tau }}
+
+    where :math:`Z_0` = p[0] (Ohms) and
+    :math:`\\tau` = p[1] (sec) = :math:`\\frac{L^2}{D}`
+
+    """
+    omega = 2*np.pi*np.array(f)
+
+    Z0, tau = p[0], p[1]
+    Z = Z0/(np.sqrt(1j*omega*tau)*np.tanh(np.sqrt(1j*omega*tau)))
+
+    return Z  # Zw(omega)
+
+
+@element_metadata(num_params=2, units=['Ohm', 'sec'])
+def Ws(p, f):
+    """ defines a short (finite-length) Warburg element
+
+    Notes
+    ---------
+    .. math::
+        Z = \\frac{Z_0}{\\sqrt{ j \\omega \\tau }}
+        \\tanh{\\sqrt{j \\omega \\tau }}
+
+    where :math:`Z_0` = p[0] (Ohms) and
+    :math:`\\tau` = p[1] (sec) = :math:`\\frac{L^2}{D}`
+
+    """
+    omega = 2*np.pi*np.array(f)
+
+    Z0, tau = p[0], p[1]
+    Z = Z0*np.tanh(np.sqrt(1j*omega*tau))/np.sqrt(1j*omega*tau)
+
+    return Z
+
+
 @element_metadata(num_params=2, units=['Ohm^-1 sec^a', ''])
-def E(p, f):
+def CPE(p, f):
     """ defines a constant phase element
 
     Notes
@@ -272,7 +280,14 @@ def T(p, f):
 
     return A/(beta*np.tanh(beta)) + B/(beta*np.array(sinh))
 
-circuit_elements = {key: eval(key) for key in set(globals())-set(initial_state) if key not in non_element_functions} # noqa
+
+circuit_elements = {key: eval(key) for key in set(globals())-set(initial_state)
+                    if key not in non_element_functions}
+
+
+def get_element_from_name(name):
+    excluded_chars = '0123456789_'
+    return ''.join(char for char in name if char not in excluded_chars)
 
 
 def typeChecker(p, f, name, length):

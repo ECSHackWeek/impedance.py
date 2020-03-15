@@ -13,7 +13,7 @@ def test_model_io():
 
     randles = CustomCircuit(initial_guess=[None, .005, .1,
                                            .005, .1, .001, 200],
-                            circuit='R0-p(R1,C1)-p(R1,C1)-W1',
+                            circuit='R0-p(R1,C1)-p(R1,C1)-Wo1',
                             constants={'R0': 0.01})
     randles.fit(frequencies, Z)
 
