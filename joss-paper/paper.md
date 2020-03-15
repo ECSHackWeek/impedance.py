@@ -75,52 +75,56 @@ EIS is often qualitatively interpreted by examing the shape of a spectrum which 
 The documentation for `impedance.py` contains [a guide on getting started](https://impedancepy.readthedocs.io/en/latest/getting-started.html) and several examples of what a typical analysis workflow might look like using the package. Here we show how importing data, defining and fitting an equivalent circuit  model, and visualizing the results can be done with just a handful of lines in `impedance.py`:
 
 ```python
-# 1. loading in data
+# 1. loading in data:
 from impedance.preprocessing import readFile
 f, Z = readFile('exampleData.csv')
 
-# 2. importing and initializing a circuit:
+# 2. remove positive imaginary impedance data:
+from impedance.preprocessing import ignoreBelowX
+f, Z = ignoreBelowX(f, Z)
+
+# 3. importing and initializing a circuit:
 from impedance.models.circuits import CustomCircuit
-initial_guess = [1e-8, .01, .005, .1, .9, .005, .1, .9, .1, 200]
-circuit = CustomCircuit('L_0-R_0-p(R_1,CPE_1)-p(R_2,CPE_2)-Wo_1',
+initial_guess = [1e-8, .01, .005, .1, .9, .005, .1, 200, .1, .9]
+circuit = CustomCircuit('L_0-R_0-p(R_1,CPE_1)-p(R_2-Wo_1,CPE_2)',
                         initial_guess=initial_guess)
 
-# 3. fitting the circuit to the data
+# 4. fitting the circuit to the data:
 circuit.fit(f, Z)
 print(circuit)
 ```
 
 ```text
-Circuit string: L0-R0-p(R1,E1)-p(R2,E2)-W1
+Circuit string: L_0-R_0-p(R_1,CPE_1)-p(R_2-Wo_1,CPE_2)
 Fit: True
 
 Initial guesses:
-       L_0 = 1.00e-08 [H]
-       R_0 = 1.00e-02 [Ohm]
-       R_1 = 5.00e-03 [Ohm]
-   CPE_1_0 = 1.00e-01 [Ohm^-1 sec^a]
-   CPE_1_1 = 9.00e-01 []
-       R_2 = 5.00e-03 [Ohm]
-   CPE_2_0 = 1.00e-01 [Ohm^-1 sec^a]
-   CPE_2_1 = 9.00e-01 []
-    Wo_1_0 = 1.00e-01 [Ohm]
-    Wo_1_1 = 2.00e+02 [sec]
+    L_0 = 1.00e-08 [H]
+    R_0 = 1.00e-02 [Ohm]
+    R_1 = 5.00e-03 [Ohm]
+  CPE_1_0 = 1.00e-01 [Ohm^-1 sec^a]
+  CPE_1_1 = 9.00e-01 []
+    R_2 = 5.00e-03 [Ohm]
+  Wo_1_0 = 1.00e-01 [Ohm]
+  Wo_1_1 = 2.00e+02 [sec]
+  CPE_2_0 = 1.00e-01 [Ohm^-1 sec^a]
+  CPE_2_1 = 9.00e-01 []
 
 Fit parameters:
-       L_0 = 1.34e-07  (+/- 4.68e-08) [H]
-       R_0 = 1.48e-02  (+/- 8.24e-04) [Ohm]
-       R_1 = 7.94e-03  (+/- 2.04e-03) [Ohm]
-   CPE_1_0 = 1.15e+00  (+/- 7.75e-01) [Ohm^-1 sec^a]
-   CPE_1_1 = 6.79e-01  (+/- 1.22e-01) []
-       R_2 = 8.21e-03  (+/- 1.29e-03) [Ohm]
-   CPE_2_0 = 4.88e+00  (+/- 5.25e-01) [Ohm^-1 sec^a]
-   CPE_2_1 = 9.24e-01  (+/- 4.47e-02) []
-    Wo_1_0 = 1.39e-01  (+/- 8.95e-02) [Ohm]
-    Wo_1_1 = 1.26e+03  (+/- 1.60e+03) [sec]
+    L_0 = 1.28e-07  (+/- 4.92e-08) [H]
+    R_0 = 1.49e-02  (+/- 8.31e-04) [Ohm]
+    R_1 = 8.31e-03  (+/- 2.24e-03) [Ohm]
+  CPE_1_0 = 1.13e+00  (+/- 8.07e-01) [Ohm^-1 sec^a]
+  CPE_1_1 = 6.85e-01  (+/- 1.27e-01) []
+    R_2 = 7.92e-03  (+/- 1.51e-03) [Ohm]
+  Wo_1_0 = 1.37e-01  (+/- 9.09e-02) [Ohm]
+  Wo_1_1 = 1.23e+03  (+/- 1.62e+03) [sec]
+  CPE_2_0 = 3.69e+00  (+/- 3.09e-01) [Ohm^-1 sec^a]
+  CPE_2_1 = 9.79e-01  (+/- 6.02e-02) []
 ```
 
 ```python
-# 4. visualize the results
+# 5. visualize the results:
 circuit.plot()
 ```
 
