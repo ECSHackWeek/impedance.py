@@ -1,6 +1,6 @@
 import string
 import numpy as np
-
+import pytest
 from impedance.models.circuits.elements import circuit_elements, s, p
 
 letters = string.ascii_uppercase + string.ascii_lowercase
@@ -46,20 +46,18 @@ def test_all():
             assert np.isclose(val, correct_vals[key]).all()
 
         # check for typing:
-        try:
+        with pytest.raises(AssertionError):
             f = circuit_elements['R']
             f(1, 2)
-        except(AssertionError):
-            pass
-        else:
-            raise Exception('unhandled error occurred')
+
         # test for handling more wrong inputs
-        try:
+        with pytest.raises(AssertionError):
             f(['hi'], ['yes', 'hello'])
-        except(AssertionError):
-            pass
-        else:
-            raise Exception('unhandled error occurred')
+
+    # Test no overflow in T at high frequencies
+    with pytest.warns(None) as record:
+        circuit_elements['T']([1, 2, 50, 100], [10000])
+    assert not record
 
 
 def test_s():
