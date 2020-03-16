@@ -192,7 +192,7 @@ def G(p, f):
     ---------
     .. math::
 
-        Z = \\frac{R_G}{\\sqrt{1 + j 2 \\pi f t_G}}
+        Z = \\frac{R_G}{\\sqrt{1 + j \\, 2 \\pi f \\, t_G}}
 
     where :math:`R_G` = p[0] and :math:`t_G` = p[1]
 
@@ -200,7 +200,7 @@ def G(p, f):
 
     .. math::
 
-        Z = \\frac{Z_o}{\\sqrt{K+ j 2 \\pi f}}
+        Z = \\frac{Z_o}{\\sqrt{K+ j \\, 2 \\pi f}}
 
     where :math:`Z_o = \\frac{R_G}{\\sqrt{t_G}}`
     and :math:`K = \\frac{1}{t_G}`
@@ -220,6 +220,32 @@ def G(p, f):
     omega = 2*np.pi*np.array(f)
     R_G, t_G = p
     return R_G/np.sqrt(1 + 1j*omega*t_G)
+
+
+@element_metadata(num_params=3, units=['Ohm', 'sec', ''])
+def Gs(p, f):
+    """ defines a finite-length Gerischer Element as represented in [1]
+
+    Notes
+    ---------
+    .. math::
+
+        Z = \\frac{R_G}{\\sqrt{1 + j \\, 2 \\pi f \\, t_G} \\,
+        tanh(\\phi \\sqrt{1 + j \\, 2 \\pi f \\, t_G})}
+
+    where :math:`R_G` = p[0], :math:`t_G` = p[1] and :math:`\\phi` = p[2]
+
+    [1] R.D. Green, C.C Liu, and S.B. Adler,
+    Solid State Ionics, 179, 647-660 (2008)
+    `doi:10.1016/j.ssi.2008.04.024
+    <https://doi.org/10.1016/j.ssi.2008.04.024>`_.
+     """
+    omega = 2*np.pi*np.array(f)
+    R_G, t_G, phi = p
+
+    Z = R_G/(np.sqrt(1 + 1j*omega*t_G) *
+             np.tanh(phi * np.sqrt(1 + 1j*omega*t_G)))
+    return Z
 
 
 @element_metadata(num_params=2, units=['Ohm', 'sec'])
