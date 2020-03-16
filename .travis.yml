@@ -20,7 +20,7 @@ before_script:
    - flake8 impedance --exclude=*.ipynb_checkpoints
 
 script:
-   - nosetests --with-coverage --cover-erase --cover-package=impedance
+   - pytest --cov=impedance impedance/tests
 
 after_success:
    - coverage report
