@@ -263,7 +263,8 @@ def plot_altair(data_dict, size=400, background='#FFFFFF'):
     return (full_bode | alt.layer(*nyquists)).configure(background=background)
 
 
-def plot_residuals(ax, f, res_real, res_imag, fmt='.-', **kwargs):
+def plot_residuals(ax, f, res_real, res_imag, fmt='.-', y_limits=(-5, 5),
+                   **kwargs):
     """ Plots residuals from a validation method using matplotlib
 
         Parameters
@@ -278,6 +279,8 @@ def plot_residuals(ax, f, res_real, res_imag, fmt='.-', **kwargs):
             imaginary component of Kramers-Kronig validation residuals
         fmt: string
             format string passed to matplotlib (e.g. '.-' or 'o')
+        y_limits: tuple
+            limits of y-axis on residuals plot
 
         Other Parameters
         ----------------
@@ -312,7 +315,7 @@ def plot_residuals(ax, f, res_real, res_imag, fmt='.-', **kwargs):
     ax.grid(b=True, which='major', axis='both', alpha=.5)
     ax.legend(fontsize=14)
 
-    ax.set_ylim(-5, 5)
+    ax.set_ylim(y_limits)
     ax.set_xlim(np.min(f), np.max(f))
 
     return ax
