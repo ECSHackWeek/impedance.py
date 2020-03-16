@@ -1,7 +1,8 @@
 altair>=3.0
 matplotlib>=3.0
-nose>=1.3
 numpy>=1.14
 numpydoc
 nbsphinx
+pytest
+pytest-cov
 scipy>=1.0
