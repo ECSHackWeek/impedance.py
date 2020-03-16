@@ -1,6 +1,6 @@
 from .fitting import circuit_fit, buildCircuit
 from .fitting import calculateCircuitLength, check_and_eval
-from impedance.plotting import plot_altair, plot_bode, plot_nyquist
+from impedance.visualization import plot_altair, plot_bode, plot_nyquist
 from .elements import circuit_elements, get_element_from_name
 
 import json
