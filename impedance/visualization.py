@@ -261,3 +261,58 @@ def plot_altair(data_dict, size=400, background='#FFFFFF'):
     full_bode = alt.layer(*bode_mags) & alt.layer(*bode_phss)
 
     return (full_bode | alt.layer(*nyquists)).configure(background=background)
+
+
+def plot_residuals(ax, f, res_real, res_imag, fmt='.-', **kwargs):
+    """ Plots residuals from a validation method using matplotlib
+
+        Parameters
+        ----------
+        ax: matplotlib.axes.Axes
+            axes on which to plot the nyquist plot
+        f: np.array of floats
+            frequencies
+        res_real: np.array of floats
+            real component of Kramers-Kronig validation residuals
+        res_imag: np.array of floats
+            imaginary component of Kramers-Kronig validation residuals
+        fmt: string
+            format string passed to matplotlib (e.g. '.-' or 'o')
+
+        Other Parameters
+        ----------------
+        **kwargs : `matplotlib.pyplot.Line2D` properties, optional
+            Used to specify line properties like linewidth, line color,
+            marker color, and line labels.
+
+        Returns
+        -------
+        ax: matplotlib.axes.Axes
+    """
+
+    ax.plot(f, res_real*100, fmt, label=r'$\Delta_{\,\mathrm{Re}}$',
+            **kwargs)
+    ax.plot(f, res_imag*100, fmt, label=r'$\Delta_{\,\mathrm{Im}}$',
+            **kwargs)
+
+    # Make x axis log scale
+    ax.set_xscale('log')
+
+    # Set the labels to delta vs f
+    ax.set_ylabel('$\\Delta$ $(\\%)$', fontsize=14)
+    ax.set_xlabel('$f$ [Hz]', fontsize=14)
+
+    # Make the tick labels larger
+    ax.tick_params(axis='both', which='major', labelsize=14)
+
+    # Change the number of labels on y axis to four
+    ax.locator_params(axis='y', nbins=4, tight=True)
+
+    # Add a light grid
+    ax.grid(b=True, which='major', axis='both', alpha=.5)
+    ax.legend(fontsize=14)
+
+    ax.set_ylim(-5, 5)
+    ax.set_xlim(np.min(f), np.max(f))
+
+    return ax
