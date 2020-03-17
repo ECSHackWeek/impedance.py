@@ -97,7 +97,7 @@ class BaseCircuit:
         assert len(frequencies) == len(impedance),\
             'mismatch in length of input frequencies and impedances'
 
-        if self.initial_guess is not None:
+        if self.initial_guess != []:
             parameters, conf = circuit_fit(frequencies, impedance,
                                            self.circuit, self.initial_guess,
                                            self.constants, method=method,
@@ -119,31 +119,28 @@ class BaseCircuit:
             return False
 
     def predict(self, frequencies, use_initial=False):
-        """ Predict impedance using a fit equivalent circuit model
+        """ Predict impedance using an equivalent circuit model
 
         Parameters
         ----------
-        frequencies: numpy array
-            Frequencies
+        frequencies: ndarray of numeric dtype
 
         use_initial: boolean
-            If true and a fit was already completed,
-            use the initial parameters instead
+            If true and the model was previously fit use the initial
+            parameters instead
 
         Returns
         -------
-        impedance: numpy array of dtype 'complex128'
+        impedance: ndarray of dtype 'complex128'
             Predicted impedance
-
         """
-
-        # check that inputs are valid:
-        #    frequencies: array of numbers
-
         assert isinstance(frequencies, np.ndarray),\
-            'frequencies is not of type np.ndarray'
-        assert isinstance(frequencies[0], (float, int, np.int32, np.float64)),\
-            'frequencies does not contain a number'
+            'frequencies is not of type np.ndarray' + \
+            f' (currently {type(frequencies)})'
+        assert (np.issubdtype(frequencies.dtype, np.integer) or
+                np.issubdtype(frequencies.dtype, np.floating)), \
+            'frequencies array should have a numeric dtype' + \
+            f' (currently {frequencies.dtype})'
 
         if self._is_fit() and not use_initial:
             return eval(buildCircuit(self.circuit, frequencies,
@@ -266,15 +263,17 @@ class BaseCircuit:
             if ax is None:
                 fig, ax = plt.subplots(nrows=2, figsize=(5, 5))
 
+            if f_data is not None:
+                f_pred = f_data
+            else:
+                f_pred = np.logspace(5, -3)
+
             if Z_data is not None:
+                assert f_data is not None, \
+                    'f_data must be specified with Z_data for a Bode plot'
                 ax = plot_bode(ax, f_data, Z_data, ls='', marker='s', **kwargs)
 
             if self._is_fit():
-                if f_data is not None:
-                    f_pred = f_data
-                else:
-                    f_pred = np.logspace(5, -3)
-
                 Z_fit = self.predict(f_pred)
                 ax = plot_bode(ax, f_pred, Z_fit, ls='-', marker='', **kwargs)
             return ax
@@ -359,9 +358,6 @@ class BaseCircuit:
         json_data = json.load(json_data_file)
 
         model_name = json_data["Name"]
-        if model_name == 'None':
-            model_name = None
-
         model_string = json_data["Circuit String"]
         model_initial_guess = json_data["Initial Guess"]
         model_constants = json_data["Constants"]
