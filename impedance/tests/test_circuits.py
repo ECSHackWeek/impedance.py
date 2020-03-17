@@ -127,10 +127,11 @@ def test_CustomCircuit():
         '     R1 = 5.00e-03 [Ohm]\n' + \
         '     C1 = 1.00e-01 [F]\n'
 
-    customConstantCircuit = CustomCircuit(initial_guess=[None, .005, .1, .005, .1, .001, None],
-                                            constants={'R_0': 0.02, 'Wo_1_1': 200},
-                                            circuit='R_0-p(R_1,C_1)-p(R_2,C_2)-Wo_1')
-    print(customConstantCircuit)
+    custom_circuit = CustomCircuit(initial_guess=[None, .005, .1, .005,
+                                                  .1, .001, None],
+                                   constants={'R_0': 0.02, 'Wo_1_1': 200},
+                                   circuit='R_0-p(R_1,C_1)-p(R_2,C_2)-Wo_1')
+    print(custom_circuit)
 
     initial_guess = [.01, .005, .1]
     custom_string = 'R0-p(R1,C1)'
