@@ -29,8 +29,8 @@ class BaseCircuit:
         # if supplied, check that initial_guess is valid and store
         initial_guess = list(filter(None, initial_guess))
         for i in initial_guess:
-            assert isinstance(i, (float, int, np.int32, np.float64)),\
-                'value {} in initial_guess is not a number'.format(i)
+            if not isinstance(i, (float, int, np.int32, np.float64)):
+                raise TypeError(f'value {i} in initial_guess is not a number')
 
         # initalize class attributes
         self.initial_guess = initial_guess
@@ -86,16 +86,19 @@ class BaseCircuit:
         #    impedance: array of complex numbers
         #    impedance and frequency match in length
 
-        assert isinstance(frequencies, np.ndarray),\
-            'frequencies is not of type np.ndarray'
-        assert isinstance(frequencies[0], (float, int, np.int32, np.float64)),\
-            'frequencies does not contain a number'
-        assert isinstance(impedance, np.ndarray),\
-            'impedance is not of type np.ndarray'
-        assert isinstance(impedance[0], (complex, np.complex128)),\
-            'impedance does not contain complex numbers'
-        assert len(frequencies) == len(impedance),\
-            'mismatch in length of input frequencies and impedances'
+        if not isinstance(frequencies, np.ndarray):
+            raise TypeError('frequencies is not of type np.ndarray')
+        if not (np.issubdtype(frequencies.dtype, np.integer) or
+                np.issubdtype(frequencies.dtype, np.floating)):
+                raise TypeError('frequencies array should have a numeric ' +
+                                f'dtype (currently {frequencies.dtype})')
+        if not isinstance(impedance, np.ndarray):
+            raise TypeError('impedance is not of type np.ndarray')
+        if impedance.dtype != np.complex:
+                raise TypeError('impedance array should have a complex ' +
+                                f'dtype (currently {impedance.dtype})')
+        if len(frequencies) != len(impedance):
+            raise TypeError('length of frequencies and impedance do not match')
 
         if self.initial_guess != []:
             parameters, conf = circuit_fit(frequencies, impedance,
@@ -106,7 +109,7 @@ class BaseCircuit:
             if conf is not None:
                 self.conf_ = conf
         else:
-            # TODO auto calc guess
+            # TODO auto calculate initial guesses
             raise ValueError('no initial guess supplied')
 
         return self
@@ -134,13 +137,12 @@ class BaseCircuit:
         impedance: ndarray of dtype 'complex128'
             Predicted impedance
         """
-        assert isinstance(frequencies, np.ndarray),\
-            'frequencies is not of type np.ndarray' + \
-            f' (currently {type(frequencies)})'
-        assert (np.issubdtype(frequencies.dtype, np.integer) or
-                np.issubdtype(frequencies.dtype, np.floating)), \
-            'frequencies array should have a numeric dtype' + \
-            f' (currently {frequencies.dtype})'
+        if not isinstance(frequencies, np.ndarray):
+            raise TypeError('frequencies is not of type np.ndarray')
+        if not (np.issubdtype(frequencies.dtype, np.integer) or
+                np.issubdtype(frequencies.dtype, np.floating)):
+                raise TypeError('frequencies array should have a numeric ' +
+                                f'dtype (currently {frequencies.dtype})')
 
         if self._is_fit() and not use_initial:
             return eval(buildCircuit(self.circuit, frequencies,
@@ -269,8 +271,9 @@ class BaseCircuit:
                 f_pred = np.logspace(5, -3)
 
             if Z_data is not None:
-                assert f_data is not None, \
-                    'f_data must be specified with Z_data for a Bode plot'
+                if f_data is None:
+                    raise ValueError('f_data must be specified if' +
+                                     ' Z_data for a Bode plot')
                 ax = plot_bode(ax, f_data, Z_data, ls='', marker='s', **kwargs)
 
             if self._is_fit():
@@ -400,11 +403,13 @@ class Randles(BaseCircuit):
 
         circuit_len = calculateCircuitLength(self.circuit)
 
-        assert len(self.initial_guess) + len(self.constants) == circuit_len, \
-            'The number of initial guesses + ' + \
-            'the number of constants ({})'.format(len(self.initial_guess)) + \
-            ' needs to be equal to ' + \
-            'the circuit length ({})'.format(circuit_len)
+        if len(self.initial_guess) + len(self.constants) != circuit_len:
+            raise ValueError('The number of initial guesses ' +
+                             f'({len(self.initial_guess)}) + ' +
+                             'the number of constants ' +
+                             f'({len(self.constants)})' +
+                             ' must be equal to ' +
+                             f'the circuit length ({circuit_len})')
 
 
 class CustomCircuit(BaseCircuit):
@@ -419,16 +424,16 @@ class CustomCircuit(BaseCircuit):
         circuit: string
             A string that should be interpreted as an equivalent circuit
 
-
         Notes
         -----
         A custom circuit is defined as a string comprised of elements in series
         (separated by a `-`) and elements in parallel (grouped as (x,y)).
-        Elements with two or more parameters are separated by a forward slash
-        (`/`).
+        Each element can be appended with an integer (e.g. R0) or an underscore
+        and an integer (e.g. CPE_1) to make keeping track of multiple elements
+        of the same type easier.
 
         Example:
-            Randles circuit is given by 'R0-p(R1,C1)-W1/W2'
+            Randles circuit is given by 'R0-p(R1,C1)-Wo1'
 
         """
 
@@ -437,8 +442,10 @@ class CustomCircuit(BaseCircuit):
 
         circuit_len = calculateCircuitLength(self.circuit)
 
-        assert len(self.initial_guess) + len(self.constants) == circuit_len, \
-            'The number of initial guesses + ' + \
-            'the number of constants ({})'.format(len(self.initial_guess)) + \
-            ' needs to be equal to ' + \
-            'the circuit length ({})'.format(circuit_len)
+        if len(self.initial_guess) + len(self.constants) != circuit_len:
+            raise ValueError('The number of initial guesses ' +
+                             f'({len(self.initial_guess)}) + ' +
+                             'the number of constants ' +
+                             f'({len(self.constants)})' +
+                             ' must be equal to ' +
+                             f'the circuit length ({circuit_len})')

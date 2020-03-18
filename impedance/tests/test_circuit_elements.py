@@ -3,10 +3,8 @@ import numpy as np
 import pytest
 from impedance.models.circuits.elements import circuit_elements, s, p
 
-letters = string.ascii_uppercase + string.ascii_lowercase
 
-
-def test_all():
+def test_each_element():
     freqs = [0.001, 1.0, 1000]
     correct_vals = {'R': [0.1, 0.1, 0.1],
                     'C': [-1591.5494309189532j,
@@ -79,7 +77,9 @@ def test_p():
 def test_element_function_names():
     # run a simple check to ensure there are no integers
     # in the function names
+    letters = string.ascii_uppercase + string.ascii_lowercase
+
     for elem in circuit_elements.keys():
         for char in elem:
             assert char in letters, \
-                '{} in element {} is not in the allowed set of {}'.format(char, elem, letters) # noqa
+                f'{char} in {elem} is not in the allowed set of {letters}'
