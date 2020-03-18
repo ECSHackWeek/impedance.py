@@ -90,13 +90,13 @@ class BaseCircuit:
             raise TypeError('frequencies is not of type np.ndarray')
         if not (np.issubdtype(frequencies.dtype, np.integer) or
                 np.issubdtype(frequencies.dtype, np.floating)):
-                raise TypeError('frequencies array should have a numeric ' +
-                                f'dtype (currently {frequencies.dtype})')
+            raise TypeError('frequencies array should have a numeric ' +
+                            f'dtype (currently {frequencies.dtype})')
         if not isinstance(impedance, np.ndarray):
             raise TypeError('impedance is not of type np.ndarray')
         if impedance.dtype != np.complex:
-                raise TypeError('impedance array should have a complex ' +
-                                f'dtype (currently {impedance.dtype})')
+            raise TypeError('impedance array should have a complex ' +
+                            f'dtype (currently {impedance.dtype})')
         if len(frequencies) != len(impedance):
             raise TypeError('length of frequencies and impedance do not match')
 
@@ -141,8 +141,8 @@ class BaseCircuit:
             raise TypeError('frequencies is not of type np.ndarray')
         if not (np.issubdtype(frequencies.dtype, np.integer) or
                 np.issubdtype(frequencies.dtype, np.floating)):
-                raise TypeError('frequencies array should have a numeric ' +
-                                f'dtype (currently {frequencies.dtype})')
+            raise TypeError('frequencies array should have a numeric ' +
+                            f'dtype (currently {frequencies.dtype})')
 
         if self._is_fit() and not use_initial:
             return eval(buildCircuit(self.circuit, frequencies,
