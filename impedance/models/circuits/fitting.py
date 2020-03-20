@@ -1,4 +1,4 @@
-from .elements import circuit_elements  # noqa: F401
+from .elements import circuit_elements, get_element_from_name
 import numpy as np
 from scipy.optimize import curve_fit
 
@@ -66,8 +66,6 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess,
     Currently, an error of -1 is returned.
 
     """
-    circuit = circuit.replace('_', '')
-
     f = frequencies
     Z = impedances
 
@@ -78,11 +76,11 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess,
     if bounds is None:
         lb, ub = [], []
         for elem in extracted_elements:
-            raw_element = ''.join(char for char in elem if char not in ints)
+            raw_element = get_element_from_name(elem)
             for i in range(check_and_eval(raw_element).num_params):
                 if elem in constants or elem + '_{}'.format(i) in constants:
                     continue
-                if raw_element == 'E' and i == 1:
+                if raw_element == 'CPE' and i == 1:
                     ub.append(1)
                 else:
                     ub.append(np.inf)
@@ -214,7 +212,7 @@ def buildCircuit(circuit, frequencies, *parameters,
                                               index=index)
         else:
             param_string = ""
-            raw_elem = ''.join(char for char in elem if char not in ints)
+            raw_elem = get_element_from_name(elem)
             elem_number = check_and_eval(raw_elem).num_params
             param_list = []
             for j in range(elem_number):
@@ -243,7 +241,7 @@ def buildCircuit(circuit, frequencies, *parameters,
 
 def extract_circuit_elements(circuit):
     extracted_elements = []
-    p_string = [x for x in circuit if x not in 'ps(),-/']
+    p_string = [x for x in circuit if x not in 'p(),-']
     extracted_elements = []
     current_element = []
     length = len(p_string)
@@ -267,7 +265,7 @@ def calculateCircuitLength(circuit):
     if circuit:
         extracted_elements = extract_circuit_elements(circuit)
         for elem in extracted_elements:
-            raw_element = ''.join(char for char in elem if char not in ints)
+            raw_element = get_element_from_name(elem)
             num_params = check_and_eval(raw_element).num_params
             length += num_params
     return length
@@ -276,7 +274,7 @@ def calculateCircuitLength(circuit):
 def check_and_eval(element):
     allowed_elements = circuit_elements.keys()
     if element not in allowed_elements:
-        print(element, allowed_elements)
-        raise ValueError
+        raise ValueError(f'{element} not in ' +
+                         f'allowed elements ({allowed_elements})')
     else:
         return eval(element, circuit_elements)

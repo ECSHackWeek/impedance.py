@@ -80,8 +80,8 @@ def linKK(f, Z, c=0.85, max_M=50):
     def get_tc_distribution(f, M):
         """ Returns the distribution of time constants for the linKK method """
 
-        t_max = 1/np.min(f)
-        t_min = 1/np.max(f)
+        t_max = 1/(2 * np.pi * np.min(f))
+        t_min = 1/(2 * np.pi * np.max(f))
 
         ts = np.zeros(shape=(M,))
         ts[0] = t_min
@@ -91,10 +91,9 @@ def linKK(f, Z, c=0.85, max_M=50):
                 ts[k-1] = 10**(np.log10(t_min) +
                                ((k-1)/(M-1))*np.log10(t_max/t_min))
 
-        ts *= 2*np.pi
-
         return ts
 
+    R0 = min(np.real(Z))
     if c is not None:
         M = 0
         mu = 1
@@ -104,38 +103,38 @@ def linKK(f, Z, c=0.85, max_M=50):
             p_values, mu = fitLinKK(f, ts, M, Z)
 
             if M % 10 == 0:
-                print(M, mu, rmse(eval_linKK(p_values, ts, f), Z))
+                print(M, mu, rmse(eval_linKK(p_values, R0, ts, f), Z))
     else:
         M = max_M
         ts = get_tc_distribution(f, M)
         p_values, mu = fitLinKK(f, ts, M, Z)
 
-    return M, mu, eval_linKK(p_values, ts, f), \
-        residuals_linKK(p_values, ts, Z, f, residuals='real'), \
-        residuals_linKK(p_values, ts, Z, f, residuals='imag')
+    return M, mu, eval_linKK(p_values, R0, ts, f), \
+        residuals_linKK(p_values, R0, ts, Z, f, residuals='real'), \
+        residuals_linKK(p_values, R0, ts, Z, f, residuals='imag')
 
 
 def fitLinKK(f, ts, M, Z):
     """ Fits the linKK model using scipy.optimize.least_squares """
-    initial_guess = np.append(min(np.real(Z)),
-                              np.ones(shape=(M,)) *
-                              ((max(np.real(Z))-min(np.real(Z)))/M))
+    R0 = min(np.real(Z))
+    initial_guess = np.ones(shape=(M,)) * \
+                           ((max(np.real(Z))-min(np.real(Z)))/M)
 
     result = least_squares(residuals_linKK, initial_guess, method='lm',
-                           args=(ts, Z, f, 'both'),
+                           args=(R0, ts, Z, f, 'both'),
                            ftol=1E-13, gtol=1E-10)
 
     p_values = result['x']
-    mu = calc_mu(p_values[1:])
+    mu = calc_mu(p_values)
 
     return p_values, mu
 
 
-def eval_linKK(Rs, ts, f):
+def eval_linKK(Rs, R0, ts, f):
     """ Builds a circuit of RC elements to be used in LinKK """
-    circuit_string = 's([R({},{}),'.format([Rs[0]], f.tolist())
+    circuit_string = 's([R({},{}),'.format([R0], f.tolist())
 
-    for (Rk, tk) in zip(Rs[1:], ts):
+    for (Rk, tk) in zip(Rs, ts):
         circuit_string += 'K({},{}),'.format([Rk, tk], f.tolist())
 
     circuit_string = circuit_string.strip(',')
@@ -144,10 +143,10 @@ def eval_linKK(Rs, ts, f):
     return eval(circuit_string, circuit_elements)
 
 
-def residuals_linKK(Rs, ts, Z, f, residuals='real'):
+def residuals_linKK(Rs, R0, ts, Z, f, residuals='real'):
     """ Calculates the residual between the data and a LinKK fit """
 
-    err = Z - eval_linKK(Rs, ts, f)
+    err = Z - eval_linKK(Rs, R0, ts, f)
 
     if residuals == 'real':
         return err.real/(np.abs(Z))
