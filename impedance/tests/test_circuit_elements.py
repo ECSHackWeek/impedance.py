@@ -1,12 +1,10 @@
 import string
 import numpy as np
-
+import pytest
 from impedance.models.circuits.elements import circuit_elements, s, p
 
-letters = string.ascii_uppercase + string.ascii_lowercase
 
-
-def test_all():
+def test_each_element():
     freqs = [0.001, 1.0, 1000]
     correct_vals = {'R': [0.1, 0.1, 0.1],
                     'C': [-1591.5494309189532j,
@@ -46,20 +44,18 @@ def test_all():
             assert np.isclose(val, correct_vals[key]).all()
 
         # check for typing:
-        try:
+        with pytest.raises(AssertionError):
             f = circuit_elements['R']
             f(1, 2)
-        except(AssertionError):
-            pass
-        else:
-            raise Exception('unhandled error occurred')
+
         # test for handling more wrong inputs
-        try:
+        with pytest.raises(AssertionError):
             f(['hi'], ['yes', 'hello'])
-        except(AssertionError):
-            pass
-        else:
-            raise Exception('unhandled error occurred')
+
+    # Test no overflow in T at high frequencies
+    with pytest.warns(None) as record:
+        circuit_elements['T']([1, 2, 50, 100], [10000])
+    assert not record
 
 
 def test_s():
@@ -81,7 +77,9 @@ def test_p():
 def test_element_function_names():
     # run a simple check to ensure there are no integers
     # in the function names
+    letters = string.ascii_uppercase + string.ascii_lowercase
+
     for elem in circuit_elements.keys():
         for char in elem:
             assert char in letters, \
-                '{} in element {} is not in the allowed set of {}'.format(char, elem, letters) # noqa
+                f'{char} in {elem} is not in the allowed set of {letters}'
