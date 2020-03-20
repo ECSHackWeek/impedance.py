@@ -74,11 +74,19 @@ def readGamry(filename):
     with open(filename, 'r', encoding='ISO-8859-1') as input_file:
         lines = input_file.readlines()
 
+    end_line = 0
+
     for i, line in enumerate(lines):
         if 'ZCURVE' in line:
             start_line = i
+        if 'EXPERIMENTABORTED' in line:
+            end_line = i
 
-    raw_data = lines[start_line + 3:]
+    if end_line != 0:
+        raw_data = lines[start_line + 3:end_line]
+    else:
+        raw_data = lines[start_line + 3:]
+
     f, Z = [], []
     for line in raw_data:
         each = line.split()
