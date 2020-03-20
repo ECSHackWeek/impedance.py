@@ -353,6 +353,7 @@ Zi_CHInst = np.array([-2.748e+0, 1.603e+0, 7.538e-1, 6.836e-1, -7.515e-1,
 Z_CHInst = Zr_CHInst + 1j * Zi_CHInst
 
 example_files = {'gamry': 'exampleDataGamry.DTA',
+                 'gamry_abort': 'exampleDataGamryABORT.DTA',
                  'autolab': '',
                  'parstat': '',
                  'zplot': 'exampleDataZPlot.z',
@@ -401,8 +402,11 @@ def test_readBioLogic():
 
 def test_readGamry():
     f, Z = readGamry(os.path.join(directory, example_files['gamry']))
+    f_abort, Z_abort = readGamry(os.path.join(directory,
+                                              example_files['gamry_abort']))
 
     assert (f == f_gamry).all() and (Z == Z_gamry).all()
+    assert (f_abort == f_gamry).all() and (Z_abort == Z_gamry).all()
 
 
 def test_readPowerSuite():
