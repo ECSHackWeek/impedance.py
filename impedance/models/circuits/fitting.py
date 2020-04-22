@@ -241,7 +241,7 @@ def buildCircuit(circuit, frequencies, *parameters,
 
 def extract_circuit_elements(circuit):
     extracted_elements = []
-    p_string = [x for x in circuit if x not in 'ps(),-/']
+    p_string = [x for x in circuit if x not in 'p(),-']
     extracted_elements = []
     current_element = []
     length = len(p_string)
