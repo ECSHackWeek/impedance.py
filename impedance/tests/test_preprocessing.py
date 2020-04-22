@@ -1,8 +1,5 @@
 from impedance.preprocessing import readFile, readGamry, ignoreBelowX
-from impedance.preprocessing import readZPlot, readVersaStudio
-from impedance.preprocessing import readPowerSuite, readBioLogic, readCSV
-from impedance.preprocessing import readCHInstruments
-from impedance.preprocessing import cropFrequencies
+from impedance.preprocessing import readZPlot, cropFrequencies
 import numpy as np
 import os
 
@@ -352,10 +349,37 @@ Zi_CHInst = np.array([-2.748e+0, 1.603e+0, 7.538e-1, 6.836e-1, -7.515e-1,
 
 Z_CHInst = Zr_CHInst + 1j * Zi_CHInst
 
+f_Parstat = \
+    np.array([10000., 7943.28222656, 6309.57324219, 5011.87304688,
+              3981.07202148, 3162.27807617, 2511.88598633, 1995.26196289,
+              1584.89294434, 1258.92504883, 1000., 794.32818604, 630.95727539,
+              501.18719482, 398.10720825, 316.22781372, 251.18859863,
+              199.52619934, 158.48930359, 125.89250183, 100., 79.43282318,
+              63.09572983, 50.11872101, 39.81071854, 31.62277985, 25.11886024,
+              19.95261955, 15.84893036, 12.58924961, 10.])
+Z_Parstat = \
+    np.array([-0.00049816,  0.03113425,  0.03085655,  0.02750344,  0.02587598,
+              0.02262978,  0.0163767,  0.01642007,  0.01641888,  0.01648767,
+              0.01664307,  0.01675913,  0.01708486,  0.01743512,  0.01784903,
+              0.01840109,  0.01886718,  0.01942232,  0.01993291,  0.02046922,
+              0.02103856,  0.02155352,  0.02209521,  0.02254164,  0.02316423,
+              0.02369809,  0.02432287,  0.02493612,  0.02567521,  0.02636954,
+              0.02709465]) + \
+    np.array([1.75143480e-02, 1.14148268e-02, 1.30274916e-02, 9.78105741e-03,
+              9.01670213e-03, 5.71952550e-03, 3.52889603e-03, 2.53371177e-03,
+              1.65629638e-03, 8.17670784e-04, -5.96813004e-06,
+              -6.22442740e-04, -1.19255408e-03, -1.68640339e-03,
+              -2.08737738e-03, -2.44086429e-03, -2.70580579e-03,
+              -2.90602728e-03, -3.10230667e-03, -3.23357190e-03,
+              -3.31775800e-03, -3.45947806e-03, -3.55014394e-03,
+              -3.64250600e-03, -3.73602406e-03, -3.85300213e-03,
+              -3.95614285e-03, -4.05710706e-03, -4.05976692e-03,
+              -4.07387413e-03, -3.99791080e-03]) * 1j
+
 example_files = {'gamry': 'exampleDataGamry.DTA',
                  'gamry_abort': 'exampleDataGamryABORT.DTA',
                  'autolab': '',
-                 'parstat': '',
+                 'parstat': 'exampleDataParstat.txt',
                  'zplot': 'exampleDataZPlot.z',
                  'versastudio': 'exampleDataVersaStudio.par',
                  'powersuite': 'exampleDataPowersuite.txt',
@@ -365,7 +389,7 @@ example_files = {'gamry': 'exampleDataGamry.DTA',
 
 f_checks = {'gamry': f_gamry,
             'autolab': '',
-            'parstat': '',
+            'parstat': f_Parstat,
             'zplot': f_ZPlot,
             'versastudio': f_VerStu,
             'powersuite': f_powersuite,
@@ -375,11 +399,12 @@ f_checks = {'gamry': f_gamry,
 
 Z_checks = {'gamry': Z_gamry,
             'autolab': '',
-            'parstat': '',
+            'parstat': Z_Parstat,
             'zplot': Z_ZPlot,
             'versastudio': Z_VerStu,
             'powersuite': Z_powersuite,
             'biologic': Z_BioLogic,
+            'chinstruments': Z_CHInst,
             None: Z_correct}
 
 directory = "data"
@@ -389,15 +414,9 @@ def test_readFile():
     for inst in Z_checks:
         if example_files[inst]:
             f, Z = readFile(os.path.join(directory, example_files[inst]), inst)
-
-            assert (f == f_checks[inst]).all() and (Z == Z_checks[inst]).all()
+            assert (np.isclose(f, f_checks[inst])).all() \
+                and (np.isclose(Z, Z_checks[inst])).all()
     # assert (f == frequencies).all() and (Z == Z_correct).all()
-
-
-def test_readBioLogic():
-    f, Z = readBioLogic(os.path.join(directory, example_files['biologic']))
-
-    assert (f == f_BioLogic).all() and (Z == Z_BioLogic).all()
 
 
 def test_readGamry():
@@ -409,27 +428,6 @@ def test_readGamry():
     assert (f_abort == f_gamry).all() and (Z_abort == Z_gamry).all()
 
 
-def test_readPowerSuite():
-    f, Z = readPowerSuite(os.path.join(".", directory,
-                                       example_files['powersuite']))
-
-    assert (f == f_powersuite).all() and (Z == Z_powersuite).all()
-
-
-def test_readVersaStudio():
-    f, Z = readVersaStudio(os.path.join(".", directory,
-                                        example_files['versastudio']))
-
-    assert (f == f_VerStu).all() and (Z == Z_VerStu).all()
-
-
-def test_readCHInstruments():
-    f, Z = readCHInstruments(os.path.join(".", directory,
-                                          example_files['chinstruments']))
-
-    assert (f == f_CHInstruments).all() and (Z == Z_CHInst).all()
-
-
 def test_readZPlot():
     f, Z = readZPlot(os.path.join(".", directory, example_files['zplot']))
     # Separate file to test for no comments in header
@@ -438,12 +436,6 @@ def test_readZPlot():
 
     assert (f == f_ZPlot).all() and (Z == Z_ZPlot).all()
     assert (f2 == f_ZPlot2).all() and (Z2 == Z_ZPlot2).all()
-
-
-def test_readCSV():
-    f, Z = readCSV(os.path.join(".", directory, example_files[None]))
-
-    assert (f == frequencies).all() and (Z == Z_correct).all()
 
 
 def test_ignoreBelowX():

@@ -185,11 +185,13 @@ def readParstat(filename):
         lines = input_file.readlines()
 
     raw_data = lines[1:]
-    f, Z = [], []
+    f, Z, Vac = [], [], []
     for line in raw_data:
         each = line.split()
-        f.append(each[4])
-        Z.append(complex(float(each[6]), float(each[7])))
+        if float(each[3]) != 0:
+            f.append(float(each[3]))
+            Vac.append(float(each[6]))
+            Z.append(complex(float(each[4]), float(each[5])))
 
     return np.array(f), np.array(Z)
 
