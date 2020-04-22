@@ -131,7 +131,7 @@ def test_linKK():
     assert np.isclose(resids_true_re, resids_re).all()
     assert np.isclose(resids_true_im, resids_im).all()
     assert M == 10
-    assert mu == 0.7449249499209258
+    assert np.isclose(mu, 0.7449249499209258)
 
     # Test linKK with added capacitance
     resids_true_re = (Z - fit_true_cap).real / np.abs(Z)
@@ -143,7 +143,7 @@ def test_linKK():
     assert np.isclose(resids_true_re, resids_re).all()
     assert np.isclose(resids_true_im, resids_im).all()
     assert M == 10
-    assert mu == 0.744924949920926
+    assert np.isclose(mu, 0.744924949920926)
 
     # Specifing M should give same results as above
     M, mu, Z_fit, resids_re, resids_im = \
@@ -153,7 +153,7 @@ def test_linKK():
     assert np.isclose(resids_true_re, resids_re).all()
     assert np.isclose(resids_true_im, resids_im).all()
     assert M == 10
-    assert mu == 0.744924949920926
+    assert np.isclose(mu, 0.7449249499209261)
 
 
 def test_fit_linKK():
