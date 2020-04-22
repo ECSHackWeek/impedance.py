@@ -88,34 +88,20 @@ def linKK(f, Z, c=0.85, max_M=50, fit_type='real', add_cap=False):
 
     """
 
-    def get_tc_distribution(f, M):
-        """ Returns the distribution of time constants for the linKK method """
-
-        t_max = 1/(2 * np.pi * np.min(f))
-        t_min = 1/(2 * np.pi * np.max(f))
-        ts = np.zeros(shape=(M,))
-        ts[0] = t_min
-        ts[-1] = t_max
-        if M > 1:
-            for k in range(2, M):
-                ts[k-1] = 10**(np.log10(t_min) +
-                               ((k-1)/(M-1))*np.log10(t_max/t_min))
-        return ts
-
     if c is not None:
         M = 0
         mu = 1
         while mu > c and M <= max_M:
             M += 1
             ts = get_tc_distribution(f, M)
-            p_values, mu = fitLinKK(f, ts, M, Z, fit_type, add_cap)
+            p_values, mu = fit_linKK(f, ts, M, Z, fit_type, add_cap)
 
             if M % 10 == 0:
                 print(M, mu, rmse(eval_linKK(p_values, ts, f), Z))
     else:
         M = max_M
         ts = get_tc_distribution(f, M)
-        p_values, mu = fitLinKK(f, ts, M, Z, fit_type, add_cap)
+        p_values, mu = fit_linKK(f, ts, M, Z, fit_type, add_cap)
 
     Z_fit = eval_linKK(p_values, ts, f)
     resids_real = residuals_linKK(p_values, ts, Z, f, residuals='real')
@@ -123,7 +109,22 @@ def linKK(f, Z, c=0.85, max_M=50, fit_type='real', add_cap=False):
     return M, mu, Z_fit, resids_real, resids_imag
 
 
-def fitLinKK(f, ts, M, Z, fit_type='real', add_cap=False):
+def get_tc_distribution(f, M):
+    """ Returns the distribution of time constants for the linKK method """
+
+    t_max = 1/(2 * np.pi * np.min(f))
+    t_min = 1/(2 * np.pi * np.max(f))
+    ts = np.zeros(shape=(M,))
+    ts[0] = t_min
+    ts[-1] = t_max
+    if M > 1:
+        for k in range(2, M):
+            ts[k-1] = 10**(np.log10(t_min) +
+                           ((k-1)/(M-1))*np.log10(t_max/t_min))
+    return ts
+
+
+def fit_linKK(f, ts, M, Z, fit_type='real', add_cap=False):
     """ Fits the linKK model using linear regression
 
     Parameters
