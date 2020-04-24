@@ -97,12 +97,12 @@ def readGamry(filename):
 
 
 def readAutolab(filename):
-    """ function for reading the .csv file from Autolab
+    """ function for reading comma-delimited files from Autolab
 
     Parameters
     ----------
     filename: string
-        Filename of .csv file to extract impedance data from
+        Filename of file to extract impedance data from
 
     Returns
     -------
@@ -113,15 +113,19 @@ def readAutolab(filename):
 
     """
 
-    with open(filename, 'r') as input_file:
+    with open(filename, 'r', encoding="utf8") as input_file:
         lines = input_file.readlines()
 
-    raw_data = lines[1:]
+    for i, line in enumerate(lines):
+        if line.find('Freq') != -1:
+            start_line = i
+
+    raw_data = lines[start_line+1:]
     f, Z = [], []
     for line in raw_data:
         each = line.split(',')
-        f.append(each[0])
-        Z.append(complex(float(each[1]), float(each[2])))
+        f.append(float(each[0]))
+        Z.append(complex(float(each[4]), float(each[5])))
 
     return np.array(f), np.array(Z)
 
