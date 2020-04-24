@@ -94,18 +94,18 @@ def linKK(f, Z, c=0.85, max_M=50, fit_type='real', add_cap=False):
         while mu > c and M <= max_M:
             M += 1
             ts = get_tc_distribution(f, M)
-            p_values, mu = fit_linKK(f, ts, M, Z, fit_type, add_cap)
+            elements, mu = fit_linKK(f, ts, M, Z, fit_type, add_cap)
 
             if M % 10 == 0:
-                print(M, mu, rmse(eval_linKK(p_values, ts, f), Z))
+                print(M, mu, rmse(eval_linKK(elements, ts, f), Z))
     else:
         M = max_M
         ts = get_tc_distribution(f, M)
-        p_values, mu = fit_linKK(f, ts, M, Z, fit_type, add_cap)
+        elements, mu = fit_linKK(f, ts, M, Z, fit_type, add_cap)
 
-    Z_fit = eval_linKK(p_values, ts, f)
-    resids_real = residuals_linKK(p_values, ts, Z, f, residuals='real')
-    resids_imag = residuals_linKK(p_values, ts, Z, f, residuals='imag')
+    Z_fit = eval_linKK(elements, ts, f)
+    resids_real = residuals_linKK(elements, ts, Z, f, residuals='real')
+    resids_imag = residuals_linKK(elements, ts, Z, f, residuals='imag')
     return M, mu, Z_fit, resids_real, resids_imag
 
 
@@ -146,8 +146,8 @@ def fit_linKK(f, ts, M, Z, fit_type='real', add_cap=False):
 
     Returns
     -------
-    p_values: np.ndarray
-        values of fit R_k in RC elements
+    elements: np.ndarray
+        values of fit R_k in RC elements and series R_0, L, and optionally C.
     mu: np.float
         under- or over-fitting measure
 
@@ -200,7 +200,7 @@ def fit_linKK(f, ts, M, Z, fit_type='real', add_cap=False):
         a_im[:, i+1] = K([1, tau], f).imag / np.abs(Z)
 
     if fit_type == 'real':
-        p_values = np.linalg.pinv(a_re).dot(Z.real / np.abs(Z))
+        elements = np.linalg.pinv(a_re).dot(Z.real / np.abs(Z))
 
         # After fitting real part, need to use imaginary component of fit to
         # find values of series inductance and capacitance
@@ -208,22 +208,22 @@ def fit_linKK(f, ts, M, Z, fit_type='real', add_cap=False):
         a_im[:, -1] = w / np.abs(Z)
         if add_cap:
             a_im[:, -2] = -1 / (w * np.abs(Z))
-            p_values[-2] = 1e-18  # nullifies series C without dividing by 0
+            elements[-2] = 1e-18  # nullifies series C without dividing by 0
 
-        Z_fit_re = eval_linKK(p_values, ts, f)
+        Z_fit_re = eval_linKK(elements, ts, f)
         coefs = np.linalg.pinv(a_im).dot((Z.imag - Z_fit_re.imag) / np. abs(Z))
 
         if add_cap:
-            p_values[-2:] = coefs
+            elements[-2:] = coefs
         else:
-            p_values[-1] = coefs[-1]
+            elements[-1] = coefs[-1]
     elif fit_type == 'imag':
-        p_values = np.linalg.pinv(a_im).dot(Z.imag / np.abs(Z))
+        elements = np.linalg.pinv(a_im).dot(Z.imag / np.abs(Z))
 
         # Calculates real part of impedance from fitting to imaginary parts
         # without ohmic resistance, i.e. only the real parts of series RC
         # elements.
-        z_re = eval_linKK(p_values, ts, f)
+        z_re = eval_linKK(elements, ts, f)
 
         # Weighting used in Boukamp et al - "A Linear Kronig-Kramers
         # Transform for Immittance Data Validation" 1995, J. Electrochem
@@ -232,33 +232,33 @@ def fit_linKK(f, ts, M, Z, fit_type='real', add_cap=False):
 
         # Finds ohmic resistance for imaginary part fit according to Eq 7
         # of Boukamp et al.
-        p_values[0] = np.sum(ws * (Z.real - z_re.real)) / np.sum(ws)
+        elements[0] = np.sum(ws * (Z.real - z_re.real)) / np.sum(ws)
     elif fit_type == 'complex':
         x = np.linalg.inv(a_re.T.dot(a_re) + a_im.T.dot(a_im))
         y = a_re.T.dot(Z.real / np.abs(Z)) + a_im.T.dot(Z.imag / np.abs(Z))
-        p_values = x.dot(y)
+        elements = x.dot(y)
     else:
         raise ValueError("Invalid choice of fit_type, please choose from "
                          "\'real\', \'imag\', or \'complex\'")
 
     if add_cap:
-        mu = calc_mu(p_values[:-2])
+        mu = calc_mu(elements[1:-2])
     else:
-        mu = calc_mu(p_values[:-1])
+        mu = calc_mu(elements[1:-1])
 
-    return p_values, mu
+    return elements, mu
 
 
-def eval_linKK(Rs, ts, f):
+def eval_linKK(elements, ts, f):
     """ Builds a circuit of RC elements to be used in LinKK """
-    circuit_string = 's([R({},{}),'.format([Rs[0]], f.tolist())
+    circuit_string = 's([R({},{}),'.format([elements[0]], f.tolist())
 
-    for (Rk, tk) in zip(Rs[1:], ts):
-        circuit_string += 'K({},{}),'.format([Rk, tk], f.tolist())
+    for (Rk, tk) in zip(elements[1:], ts):
+        circuit_string += f'K({[Rk, tk]},{f.tolist()}),'
 
-    circuit_string += 'L({},{}),'.format([Rs[-1]], f.tolist())
-    if Rs.size == (ts.size + 3):
-        circuit_string += 'C({},{}),'.format([1/Rs[-2]], f.tolist())
+    circuit_string += 'L({},{}),'.format([elements[-1]], f.tolist())
+    if elements.size == (ts.size + 3):
+        circuit_string += 'C({},{}),'.format([1/elements[-2]], f.tolist())
 
     circuit_string = circuit_string.strip(',')
     circuit_string += '])'
@@ -266,10 +266,10 @@ def eval_linKK(Rs, ts, f):
     return eval(circuit_string, circuit_elements)
 
 
-def residuals_linKK(Rs, ts, Z, f, residuals='real'):
+def residuals_linKK(elements, ts, Z, f, residuals='real'):
     """ Calculates the residual between the data and a LinKK fit """
 
-    err = (Z - eval_linKK(Rs, ts, f))/np.abs(Z)
+    err = (Z - eval_linKK(elements, ts, f))/np.abs(Z)
 
     if residuals == 'real':
         return err.real
