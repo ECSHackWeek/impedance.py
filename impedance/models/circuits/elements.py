@@ -195,12 +195,11 @@ def La(p, f):
         Z = L \\times (j 2 \\pi f)^\\alpha
 
     where :math:`L` = p[0] and :math:`\\alpha` = p[1]
-    
+
     [1] Bio-Logic Science instruments,
     Bio-Logic Application Note 42 (2019)
     `Battery-EIS-modified-inductance-element_Electrochemistry-AN42
     <https://www.biologic.net/documents/battery-eis-modified-inductance-element-electrochemsitry-application-note-42>`_.
-    
     """
     omega = 2*np.pi*np.array(f)
     L, alpha = p
