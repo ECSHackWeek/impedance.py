@@ -80,7 +80,7 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess,
             for i in range(check_and_eval(raw_element).num_params):
                 if elem in constants or elem + '_{}'.format(i) in constants:
                     continue
-                if raw_element == 'CPE' and i == 1:
+                if raw_element in ['CPE', 'La'] and i == 1:
                     ub.append(1)
                 else:
                     ub.append(np.inf)
