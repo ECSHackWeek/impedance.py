@@ -184,6 +184,29 @@ def CPE(p, f):
     return 1.0/(Q*(1j*omega)**alpha)
 
 
+@element_metadata(num_params=2, units=['H sec', ''])
+def La(p, f):
+    """ defines a modified inductance element as represented in [1]
+
+    Notes
+    -----
+    .. math::
+
+        Z = L \\times (j 2 \\pi f)^\\alpha
+
+    where :math:`L` = p[0] and :math:`\\alpha` = p[1]
+    
+    [1] Bio-Logic Science instruments,
+    Bio-Logic Application Note 42 (2019)
+    `Battery-EIS-modified-inductance-element_Electrochemistry-AN42
+    <https://www.biologic.net/documents/battery-eis-modified-inductance-element-electrochemsitry-application-note-42>`_.
+    
+    """
+    omega = 2*np.pi*np.array(f)
+    L, alpha = p
+    return (L*1j*omega)**alpha
+
+
 @element_metadata(num_params=2, units=['Ohm', 'sec'])
 def G(p, f):
     """ defines a Gerischer Element as represented in [1]
