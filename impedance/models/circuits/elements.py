@@ -196,9 +196,7 @@ def La(p, f):
 
     where :math:`L` = p[0] and :math:`\\alpha` = p[1]
 
-    [1] Bio-Logic Science instruments,
-    Bio-Logic Application Note 42 (2019)
-    `Battery-EIS-modified-inductance-element_Electrochemistry-AN42
+    [1] `EC-Lab Application Note 42, BioLogic Instruments (2019)
     <https://www.biologic.net/documents/battery-eis-modified-inductance-element-electrochemsitry-application-note-42>`_.
     """
     omega = 2*np.pi*np.array(f)
