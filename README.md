@@ -8,27 +8,24 @@
 impedance.py
 ------------
 
-`impedance.py` is a Python module for working with impedance data.
+`impedance.py` is a Python package for making electrochemical impedance spectroscopy (EIS) analysis reproducible and easy-to-use.
 
-This project started at the [2018 Electrochemical Society (ECS) Hack Week in Seattle](https://www.electrochem.org/233/hack-week) and has grown from there.
+Aiming to create a consistent, [scikit-learn-like API](https://arxiv.org/abs/1309.0238) for impedance analysis, impedance.py contains modules for data preprocessing, validation, model fitting, and visualization.
 
-Using a [scikit-learn-like API](https://arxiv.org/abs/1309.0238), we hope to make visualizing, fitting, and analyzing impedance spectra more intuitive and reproducible.
+For a little more in-depth discussion of the package background and capabilities, check out our (soon-to-be submitted) [Journal of Open Source Software paper](https://github.com/ECSHackWeek/impedance.py/blob/master/joss-paper/paper.md).
 
-<i>impedance.py is currently under development and new features are rapidly being added.</i>
-If you have a feature request or find a bug, please feel free to [file an issue](https://github.com/ECSHackWeek/impedance.py/issues) or, better yet, make the code improvements and [submit a pull request](https://help.github.com/articles/creating-a-pull-request-from-a-fork/)! The goal is to build an open-source tool that the entire impedance community can improve and use!
-
-impedance.py currently provides:
--   [preprocessing functions](https://impedancepy.readthedocs.io/en/latest/preprocessing.html) for easily loading in impedance data from a wide variety of file types
--   a simple API for fitting, predicting, and plotting impedance
--   [validation methods](https://impedancepy.readthedocs.io/en/latest/validation.html) for checking measurement validity
--   equivalent circuit fitting with customizable models
--   convenient Nyquist plots including confidence interval estimation for fit circuits
-
-several features are currently being improved upon:
--   interactive plotting with altair
--   physics-based impedance models for lithium-ion batteries
+If you have a feature request or find a bug, please [file an issue](https://github.com/ECSHackWeek/impedance.py/issues) or, better yet, make the code improvements and [submit a pull request](https://help.github.com/articles/creating-a-pull-request-from-a-fork/)! The goal is to build an open-source tool that the entire impedance community can improve and use!
 
 ### Installation
+
+The easiest way to install impedance.py is from [PyPI](https://pypi.org/project/impedance/) using pip.
+
+```bash
+pip install impedance
+```
+
+See [Getting started with impedance.py](https://impedancepy.readthedocs.io/en/latest/getting-started.html)for instructions on getting started from scratch.
+
 #### Dependencies
 
 impedance.py requires:
@@ -41,17 +38,13 @@ impedance.py requires:
 
 Several example notebooks are provided in the examples/ directory. Opening these will require Jupyter notebook or Jupyter lab.
 
-#### User Installation
-
-The easiest way to install impedance.py is from [PyPI](https://pypi.org/project/impedance/) using pip (see [Getting started with impedance.py](https://impedancepy.readthedocs.io/en/latest/getting-started.html) for instructions).
-
 #### Examples and Documentation
 
-Several examples can be found in the `examples/` directory (the [fitting_tutorial.ipynb](https://github.com/ECSHackWeek/impedance.py/blob/master/docs/source/examples/fitting_example.ipynb) is a great place to start) and the documentation can be found at [impedancepy.readthedocs.io](https://impedancepy.readthedocs.io/en/latest/).
+Several examples can be found in the `examples/` directory (the [Fitting impedance spectra notebook](https://impedancepy.readthedocs.io/en/latest/examples/fitting_example.html) is a great place to start) and the documentation can be found at [impedancepy.readthedocs.io](https://impedancepy.readthedocs.io/en/latest/).
 
 ## Contributors ✨
 
-Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+This project started at the [2018 Electrochemical Society (ECS) Hack Week in Seattle](https://www.electrochem.org/233/hack-week) and has benefited from a community of users and contributors since. Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
