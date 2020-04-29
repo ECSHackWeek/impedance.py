@@ -24,7 +24,7 @@ The easiest way to install impedance.py is from [PyPI](https://pypi.org/project/
 pip install impedance
 ```
 
-See [Getting started with impedance.py](https://impedancepy.readthedocs.io/en/latest/getting-started.html)for instructions on getting started from scratch.
+See [Getting started with impedance.py](https://impedancepy.readthedocs.io/en/latest/getting-started.html) for instructions on getting started from scratch.
 
 #### Dependencies
 
