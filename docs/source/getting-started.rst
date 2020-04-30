@@ -157,7 +157,7 @@ circuit string and initial guesses.
 
 .. code-block:: python
 
-  from impedance.circuits import CustomCircuit
+  from impedance.models.circuits import CustomCircuit
 
   circuit = 'R0-p(R1,C1)-p(R2-W1,C2)'
   initial_guess = [.01, .01, 100, .01, .05, 100, 1]
@@ -205,11 +205,11 @@ To easily visualize the fit, the :code:`plot_nyquist()` function can be handy.
 .. code-block:: python
 
   import matplotlib.pyplot as plt
-  from impedance.plotting import plot_nyquist
+  from impedance.visualization import plot_nyquist
 
   fig, ax = plt.subplots()
-  plot_nyquist(ax, frequencies, Z, fmt='o')
-  plot_nyquist(ax, frequencies, Z_fit, fmt='-')
+  plot_nyquist(ax, Z, fmt='o')
+  plot_nyquist(ax, Z_fit, fmt='-')
 
   plt.legend(['Data', 'Fit'])
   plt.show()
