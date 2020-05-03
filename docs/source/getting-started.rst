@@ -116,16 +116,14 @@ For this dataset, importing the data looks something like:
 
 .. code-block:: python
 
-  import numpy as np
+  from impedance import preprocessing
 
-  from impedance.preprocessing import readFile
-
-  frequencies, Z = readFile('./exampleData.csv')
+  # Load data from the example EIS result
+  frequencies, Z = preprocessing.readCSV('./exampleData.csv')
 
   # keep only the impedance data in the first quandrant
-  frequencies = frequencies[np.imag(Z) < 0]
-  Z = Z[np.imag(Z) < 0]
-  
+  frequencies, Z = preprocessing.ignoreBelowX(frequencies, Z)
+
 .. tip::
   Functions for reading in files from a variety of vendors (ZPlot, Gamry, Parstat, Autolab, ...) can be found in the `preprocessing module <preprocessing.html>`_!
 
