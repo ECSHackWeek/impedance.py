@@ -118,10 +118,9 @@ For this dataset, importing the data looks something like:
 
   import numpy as np
 
-  data = np.genfromtxt('./exampleData.csv', delimiter=',')
+  from impedance.preprocessing import readFile
 
-  frequencies = data[:,0]
-  Z = data[:,1] + 1j*data[:,2]
+  frequencies, Z = readFile('./exampleData.csv')
 
   # keep only the impedance data in the first quandrant
   frequencies = frequencies[np.imag(Z) < 0]
