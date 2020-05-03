@@ -116,17 +116,14 @@ For this dataset, importing the data looks something like:
 
 .. code-block:: python
 
-  import numpy as np
+  from impedance import preprocessing
 
-  data = np.genfromtxt('./exampleData.csv', delimiter=',')
-
-  frequencies = data[:,0]
-  Z = data[:,1] + 1j*data[:,2]
+  # Load data from the example EIS result
+  frequencies, Z = preprocessing.readCSV('./exampleData.csv')
 
   # keep only the impedance data in the first quandrant
-  frequencies = frequencies[np.imag(Z) < 0]
-  Z = Z[np.imag(Z) < 0]
-  
+  frequencies, Z = preprocessing.ignoreBelowX(frequencies, Z)
+
 .. tip::
   Functions for reading in files from a variety of vendors (ZPlot, Gamry, Parstat, Autolab, ...) can be found in the `preprocessing module <preprocessing.html>`_!
 
@@ -145,7 +142,7 @@ For example, the circuit below:
 
 .. image:: _static/two_time_constants.png
 
-would be defined as :code:`R0-p(R1,C1)-p(R2-W1,C2)`.
+would be defined as :code:`R0-p(R1,C1)-p(R2-Wo1,C2)`.
 
 Each circuit, we want to fit also needs to have an initial guess for each
 of the parameters. These inital guesses are passed in as a list in order the
@@ -157,9 +154,9 @@ circuit string and initial guesses.
 
 .. code-block:: python
 
-  from impedance.circuits import CustomCircuit
+  from impedance.models.circuits import CustomCircuit
 
-  circuit = 'R0-p(R1,C1)-p(R2-W1,C2)'
+  circuit = 'R0-p(R1,C1)-p(R2-Wo1,C2)'
   initial_guess = [.01, .01, 100, .01, .05, 100, 1]
 
   circuit = CustomCircuit(circuit, initial_guess=initial_guess)
@@ -182,17 +179,17 @@ Step 5: Analyze/Visualize the results
 
 For this dataset, the resulting fit parameters are
 
-=============== ========
-   Parameter     Value
---------------- --------
-:math:`R_0`     1.65e-02
-:math:`R_1`     8.68e-03
-:math:`C_1`     3.32e+00
-:math:`R_2`     5.39e-03
-:math:`W_{1,0}` 6.31e-02
-:math:`W_{1,1}` 2.33e+02
-:math:`C_2`     2.20e-01
-=============== ========
+================ ========
+   Parameter      Value
+---------------- --------
+:math:`R_0`      1.65e-02
+:math:`R_1`      8.68e-03
+:math:`C_1`      3.32e+00
+:math:`R_2`      5.39e-03
+:math:`Wo_{1,0}` 6.31e-02
+:math:`Wo_{1,1}` 2.33e+02
+:math:`C_2`      2.20e-01
+================ ========
 
 We can get the resulting fit impedance by passing a list of frequencies to the :code:`.predict()` method.
 
@@ -205,11 +202,11 @@ To easily visualize the fit, the :code:`plot_nyquist()` function can be handy.
 .. code-block:: python
 
   import matplotlib.pyplot as plt
-  from impedance.plotting import plot_nyquist
+  from impedance.visualization import plot_nyquist
 
   fig, ax = plt.subplots()
-  plot_nyquist(ax, frequencies, Z, fmt='o')
-  plot_nyquist(ax, frequencies, Z_fit, fmt='-')
+  plot_nyquist(ax, Z, fmt='o')
+  plot_nyquist(ax, Z_fit, fmt='-')
 
   plt.legend(['Data', 'Fit'])
   plt.show()
