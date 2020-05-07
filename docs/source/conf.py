@@ -24,9 +24,9 @@ copyright = '2019, impedance.py developers'
 author = ''
 
 # The short X.Y version
-version = '0.5'
+version = '1.0'
 # The full version, including alpha/beta/rc tags
-release = '0.5.1'
+release = '1.0.0'
 
 
 # -- General configuration ---------------------------------------------------
