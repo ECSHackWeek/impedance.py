@@ -65,6 +65,7 @@ This project started at the [2018 Electrochemical Society (ECS) Hack Week in Sea
     <td align="center"><a href="https://github.com/environmat"><img src="https://avatars0.githubusercontent.com/u/9309353?v=4" width="100px;" alt=""/><br /><sub><b>environmat</b></sub></a><br /><a href="https://github.com/ECSHackWeek/impedance.py/issues?q=author%3Aenvironmat" title="Bug reports">🐛</a></td>
     <td align="center"><a href="http://www.abdullahsumbal.com"><img src="https://avatars2.githubusercontent.com/u/12946947?v=4" width="100px;" alt=""/><br /><sub><b>Abdullah Sumbal</b></sub></a><br /><a href="https://github.com/ECSHackWeek/impedance.py/issues?q=author%3Aabdullahsumbal" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/nobkat"><img src="https://avatars3.githubusercontent.com/u/29077445?v=4" width="100px;" alt=""/><br /><sub><b>nobkat</b></sub></a><br /><a href="https://github.com/ECSHackWeek/impedance.py/commits?author=nobkat" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/nickbrady"><img src="https://avatars1.githubusercontent.com/u/7471367?v=4" width="100px;" alt=""/><br /><sub><b>Nick</b></sub></a><br /><a href="https://github.com/ECSHackWeek/impedance.py/issues?q=author%3Anickbrady" title="Bug reports">🐛</a> <a href="https://github.com/ECSHackWeek/impedance.py/commits?author=nickbrady" title="Code">💻</a></td>
   </tr>
 </table>
 
