@@ -155,7 +155,7 @@ def readBioLogic(filename):
 
     # MPT data format has variable number of header lines
     number_header_lines = int(header_line.split(":")[1])
-    
+
     # find the freq and Z columns
     headers = lines[number_header_lines-1].split('\t')
 
