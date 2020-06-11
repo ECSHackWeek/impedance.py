@@ -497,9 +497,10 @@ def test_cropFreq_both():
 
     assert (filtered_freq >= 1).all() and (filtered_freq <= 1e3).all()
 
+
 def test_readBioLogic():
     with pytest.raises(AssertionError,
-                        match=r'.*"freq/Hz" not found in column headers.*'):
+                       match=r'.*"freq/Hz" not found in column headers.*'):
 
         f, Z = readBioLogic(os.path.join(directory,
-                                        'exampleDataBioLogic_MissingFreq.mpt',))
+                            'exampleDataBioLogic_MissingFreq.mpt',))
