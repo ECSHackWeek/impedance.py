@@ -121,6 +121,16 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "nickbrady",
+      "name": "Nick",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/7471367?v=4",
+      "profile": "https://github.com/nickbrady",
+      "contributions": [
+        "bug",
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
