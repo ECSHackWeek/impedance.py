@@ -2,6 +2,8 @@ from impedance.preprocessing import readFile, readGamry, ignoreBelowX
 from impedance.preprocessing import readZPlot, cropFrequencies
 import numpy as np
 import os
+from impedance.preprocessing import readBioLogic
+import pytest
 
 # store some global test data
 frequencies = np.array([0.0031623, 0.0039811, 0.0050119, 0.0063096,
@@ -494,3 +496,11 @@ def test_cropFreq_both():
                                                 freqmin=1, freqmax=1e3)
 
     assert (filtered_freq >= 1).all() and (filtered_freq <= 1e3).all()
+
+
+def test_readBioLogic():
+    with pytest.raises(AssertionError,
+                       match=r'.*"freq/Hz" not found in column headers.*'):
+
+        f, Z = readBioLogic(os.path.join(directory,
+                            'exampleDataBioLogic_MissingFreq.mpt',))

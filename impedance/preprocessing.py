@@ -156,14 +156,29 @@ def readBioLogic(filename):
     # MPT data format has variable number of header lines
     number_header_lines = int(header_line.split(":")[1])
 
+    # find the freq and Z columns
+    headers = lines[number_header_lines-1].split('\t')
+
+    freq_cols = [o for o, h in enumerate(headers) if h == 'freq/Hz']
+    ReZ_cols = [o for o, h in enumerate(headers) if h == 'Re(Z)/Ohm']
+    ImZ_cols = [o for o, h in enumerate(headers) if h == '-Im(Z)/Ohm']
+
+    col_heads = ['freq/Hz', 'Re(Z)/Ohm', '-Im(Z)/Ohm']
+    for cols, ch in zip([freq_cols, ReZ_cols, ImZ_cols], col_heads):
+        assert len(cols) > 0, f'"{ch}" not found in column headers'
+
+    freq_col = freq_cols[0]
+    ReZ_col = ReZ_cols[0]
+    ImZ_col = ImZ_cols[0]
+
     raw_data = lines[number_header_lines:]
     f, Z = [], []
     for line in raw_data:
         each = line.split('\t')
-        f.append(float(each[0]))
+        f.append(float(each[freq_col]))
 
         # MPT data format saves the imaginary portion as -Im(Z) not Im(Z)
-        Z.append(complex(float(each[1]), -1*float(each[2])))
+        Z.append(complex(float(each[ReZ_col]), -1*float(each[ImZ_col])))
 
     return np.array(f), np.array(Z)
 
