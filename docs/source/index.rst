@@ -73,6 +73,7 @@ The documentation can be found at
    circuits
    circuit-elements
    fitting
+   faq
 
 Indices and tables
 ==================
