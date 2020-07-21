@@ -1,9 +1,8 @@
-![GitHub release](https://img.shields.io/github/release/ECSHackWeek/impedance.py) ![PyPI - Downloads](https://img.shields.io/pypi/dm/impedance?style=flat-square)
-[![All Contributors](https://img.shields.io/badge/all_contributors-11-orange.svg?style=flat-square)](#contributors)
+[![DOI](https://zenodo.org/badge/136110609.svg)](https://zenodo.org/badge/latestdoi/136110609)  ![GitHub release](https://img.shields.io/github/release/ECSHackWeek/impedance.py)
 
-[![Build Status](https://travis-ci.org/ECSHackWeek/impedance.py.svg?branch=master&kill_cache=1)](https://travis-ci.org/ECSHackWeek/impedance.py) [![Documentation Status](https://readthedocs.org/projects/impedancepy/badge/?version=latest&kill_cache=1)](https://impedancepy.readthedocs.io/en/latest/?badge=latest)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/impedance?style=flat-square)  [![All Contributors](https://img.shields.io/badge/all_contributors-11-orange.svg?style=flat-square)](#contributors)
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/cd7e6ee6f638458bb1bc9e1cab025409)](https://www.codacy.com/app/mdmurbach/impedance.py?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ECSHackWeek/impedance.py&amp;utm_campaign=Badge_Grade) [![Coverage Status](https://coveralls.io/repos/github/ECSHackWeek/impedance.py/badge.svg?branch=master&kill_cache=1)](https://coveralls.io/github/ECSHackWeek/impedance.py?branch=master)
+[![Build Status](https://travis-ci.org/ECSHackWeek/impedance.py.svg?branch=master&kill_cache=1)](https://travis-ci.org/ECSHackWeek/impedance.py)  [![Documentation Status](https://readthedocs.org/projects/impedancepy/badge/?version=latest&kill_cache=1)](https://impedancepy.readthedocs.io/en/latest/?badge=latest) [![Coverage Status](https://coveralls.io/repos/github/ECSHackWeek/impedance.py/badge.svg?branch=master&kill_cache=1)](https://coveralls.io/github/ECSHackWeek/impedance.py?branch=master)
 
 impedance.py
 ------------
