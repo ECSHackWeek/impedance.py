@@ -36,11 +36,11 @@ impedance.py requires:
 -   Matplotlib (>=3.0)
 -   Altair (>=3.0)
 
-Several example notebooks are provided in the examples/ directory. Opening these will require Jupyter notebook or Jupyter lab.
+Several example notebooks are provided in the `docs/source/examples/` directory. Opening these will require Jupyter notebook or Jupyter lab.
 
 #### Examples and Documentation
 
-Several examples can be found in the `examples/` directory (the [Fitting impedance spectra notebook](https://impedancepy.readthedocs.io/en/latest/examples/fitting_example.html) is a great place to start) and the documentation can be found at [impedancepy.readthedocs.io](https://impedancepy.readthedocs.io/en/latest/).
+Several examples can be found in the `docs/source/examples/` directory (the [Fitting impedance spectra notebook](https://impedancepy.readthedocs.io/en/latest/examples/fitting_example.html) is a great place to start) and the documentation can be found at [impedancepy.readthedocs.io](https://impedancepy.readthedocs.io/en/latest/).
 
 ## Contributors ✨
 
