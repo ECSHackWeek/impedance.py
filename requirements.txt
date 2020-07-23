@@ -3,6 +3,6 @@ matplotlib>=3.0
 numpy>=1.14
 numpydoc
 nbsphinx
-pytest
+pytest>=4.6
 pytest-cov
 scipy>=1.0
