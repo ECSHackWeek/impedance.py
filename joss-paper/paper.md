@@ -25,13 +25,13 @@ authors:
     orcid: 0000-0001-7381-0686
     affiliation: 4
 affiliations:
- - name: Hive Battery Labs
+ - name: Hive Battery Labs, Seattle, WA, USA
    index: 1
- - name: University of Washington, Department of Chemical Engineering
+ - name: University of Washington, Department of Chemical Engineering, Seattle, WA, USA
    index: 2
- - name: PayScale, Inc.
+ - name: PayScale, Seattle, WA, USA
    index: 3
- - name: University of New Mexico, Center for MicroEngineered Materials
+ - name: University of New Mexico, Center for MicroEngineered Materials, Albuquerque, NM, USA
    index: 4
 date: 14 March 2020
 bibliography: paper.bib
