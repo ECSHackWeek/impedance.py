@@ -27,3 +27,26 @@ for more details and options.
 [1] Virtanen, P., Gommers, R., Oliphant, T.E. et al.
 SciPy 1.0: fundamental algorithms for scientific computing in Python.
 Nat Methods 17, 261–272 (2020). `doi: 10.1038/s41592-019-0686-2 <https://doi.org/10.1038/s41592-019-0686-2>`_
+
+How do I cite impedance.py?
+---------------------------
+
+.. image:: https://joss.theoj.org/papers/10.21105/joss.02349/status.svg
+    :target: https://doi.org/10.21105/joss.02349
+
+If you use impedance.py in published work, please consider citing https://joss.theoj.org/papers/10.21105/joss.02349 as
+
+.. code:: bash
+
+    @article{Murbach2020,
+        doi = {10.21105/joss.02349},
+        url = {https://doi.org/10.21105/joss.02349},
+        year = {2020},
+        publisher = {The Open Journal},
+        volume = {5},
+        number = {52},
+        pages = {2349},
+        author = {Matthew D. Murbach and Brian Gerwe and Neal Dawson-Elli and Lok-kun Tsui},
+        title = {impedance.py: A Python package for electrochemical impedance analysis},
+        journal = {Journal of Open Source Software}
+    }
