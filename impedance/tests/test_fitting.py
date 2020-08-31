@@ -63,6 +63,15 @@ def test_buildCircuit():
         'p([C([0.2],[1000.0,5.0,0.01]),' + \
         'R([0.3],[1000.0,5.0,0.01])])])'
 
+    # Test single element circuit
+    circuit = 'R1'
+    params = [100]
+    frequencies = [1000.0, 5.0, 0.01]
+
+    assert buildCircuit(circuit, frequencies, *params,
+                        constants={})[0].replace(' ', '') == \
+        '([R([100],[1000.0,5.0,0.01])])'
+
 
 def test_RMSE():
     a = np.array([2 + 4*1j, 3 + 2*1j])
