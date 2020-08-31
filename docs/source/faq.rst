@@ -50,3 +50,31 @@ If you use impedance.py in published work, please consider citing https://joss.t
         title = {impedance.py: A Python package for electrochemical impedance analysis},
         journal = {Journal of Open Source Software}
     }
+
+How can I contribute to impedance.py?
+-------------------------------------
+
+First off, thank you for your interest in contributing to the
+open-source electrochemical community! We're excited to welcome all
+contributions including suggestions for new features, bug reports/fixes,
+examples/documentation, and additional impedance analysis functionality.
+
+Feature requests and bug reports
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you want to make a suggestion for a new feature, please `make an
+issue <https://github.com/ECSHackWeek/impedance.py/issues/new/choose>`_
+including as much detail as possible. If you're requesting a
+new circuit element or data file type, there are special issue templates
+that you can select and use.
+
+Contributing code
+~~~~~~~~~~~~~~~~~
+
+The prefered method for contributing code to impedance.py is to fork
+the repository on GitHub and submit a "pull request" (PR).
+More detailed information on how to get started developing impedance.py
+can be found in
+`CONTRBUTING.md <https://github.com/ECSHackWeek/impedance.py/blob/master/CONTRIBUTING.md>`_.
+
+Feel free to reach out via GitHub issues with any questions!
