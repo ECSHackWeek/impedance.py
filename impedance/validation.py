@@ -155,14 +155,14 @@ def fit_linKK(f, ts, M, Z, fit_type='real', add_cap=False):
     -----
     Solving this as a system of equations that's linear wrt :math:`R_k`, where
     Ax ~= b and we are trying to minimize :math:`r = ||Ax - b||^2`. Fitting to
-    the real or imaginary parts, b = :math:`Re(Z)/|Z|` or :math:`Im(Z)/|Z|`, 
-    respectively, and Ax is our model fit, :math:`\\hat{Z}`. 
+    the real or imaginary parts, b = :math:`Re(Z)/|Z|` or :math:`Im(Z)/|Z|`,
+    respectively, and Ax is our model fit, :math:`\\hat{Z}`.
     :math:`\\hat{Z} = R_o + \\sum^M_{k=1}(R_k / |Z|(1 + j * w * \\tau_k))`.
     x is an (M+1) x 1 matrix where the first row contains :math:`R_o` and
     subsequent rows contain :math:`R_k` values. A is an N x (M+1) matrix,
     where N is the number of data points, and M is the number of RC elements.
     Example: fitting the real part of data, the first column of A contains
-    values of `1 / |Z|`, the second column contains 
+    values of `1 / |Z|`, the second column contains
     :math:`Re(1 / |Z| (1 + j * w * \\tau_1))`, the third contains
     :math:`Re(1 / |Z| (1 + j * w * \\tau_k))` and so on. The :math:`R_k` values
     within the x matrix are found using numpy.linalg.pinv when fit_type =
