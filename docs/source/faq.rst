@@ -2,7 +2,7 @@ Frequently Asked Questions
 ==========================
 
 What method does impedance.py use for fitting equivalent circuit models?
-----------------------------------------------------------------
+------------------------------------------------------------------------
 Fitting is performed by non-linear least squares regression of
 the circuit model to impedance data via
 `curve_fit <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html>`_
