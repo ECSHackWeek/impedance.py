@@ -36,7 +36,7 @@ How do I cite impedance.py?
 
 If you use impedance.py in published work, please consider citing https://joss.theoj.org/papers/10.21105/joss.02349 as
 
-.. code:: bash
+.. code:: text
 
     @article{Murbach2020,
         doi = {10.21105/joss.02349},
