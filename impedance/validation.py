@@ -147,25 +147,36 @@ def fit_linKK(f, ts, M, Z, fit_type='real', add_cap=False):
     Returns
     -------
     elements: np.ndarray
-        values of fit R_k in RC elements and series R_0, L, and optionally C.
+        values of fit :math:`R_k` in RC elements and series :math:`R_0`,
+        L, and optionally C.
     mu: np.float
         under- or over-fitting measure
 
     Notes
     -----
-    Solving this as a system of equations that's linear wrt Rk, where Ax~=b
-    and we are trying to minimize r = ||Ax - b||**2. Fitting to the real or
-    imaginary parts, b = Re[Z] or Im[Z], respectively, and Ax is our model
-    fit, Z_hat. Z_hat = R_o + sum[k:1, M](R_k / (1 + j * w * tau_k). x is an
-    (M+1) x 1 matrix where the first row contains R_o and subsequent rows
-    contain R_k values. A is an N x (M+1) matrix, where N is the number of
-    data points, of independent variable values. Ex, fitting the real part of
-    data, the first column contains values of 1 / |Z|, the second column
-    contains Re[1 / (1 + j * w * tau_1)], the third contains
-    Re[1 / (1 + j * w *tau_k)] and so on. Fitting the complex values is
-    different since r = ||A'x - b'||**2 + ||A''x - b'||**2 according to Eq 14
-    of Schonleber [1], so finding the coefficients is done "manually" with
-    matrix manipulations instead of using numpy.linalg.pinv(A)
+    Since we have a system of equations, :math:`Ax ~= b`, that's linear wrt
+    :math:`R_k`, we can fit the model by calculating the pseudo-inverse of A.
+    :math:`Ax` is our model fit, :math:`\\hat{Z}`, and :math:`b` is the
+    normalized real or imaginary component of the impedance data,
+    :math:`Re(Z)/|Z|` or :math:`Im(Z)/|Z|`, respectively.
+
+    :math:`\\hat{Z} = R_0 + \\sum^M_{k=1}(R_k / |Z|(1 + j * w * \\tau_k))`.
+    :math:`x` is an (M+1) :math:`\\times` 1 matrix where the first row
+    contains :math:`R_0` and subsequent rows contain :math:`R_k` values.
+    A is an N :math:`\\times` (M+1) matrix, where N is the number of data
+    points, and M is the number of RC elements.
+
+    Examples
+    --------
+
+    Fitting the real part of data, the first column of A contains
+    values of :math:`\\frac{1}{|Z|}`, the second column contains
+    :math:`Re(1 / |Z| (1 + j * w * \\tau_1))`, the third contains
+    :math:`Re(1 / |Z| (1 + j * w * \\tau_2))` and so on. The :math:`R_k` values
+    within the x matrix are found using :code:`numpy.linalg.pinv` when
+    fit_type = 'real' or 'imag'. When fit_type = 'complex' the coefficients are
+    found "manually" using :math:`r = ||A'x - b'||^2 + ||A''x - b'||^2`
+    according to Eq 14 of Schonleber [1].
 
     [1] Schönleber, M. et al. A Method for Improving the Robustness of
     linear Kramers-Kronig Validity Tests. Electrochimica Acta 131, 20–27 (2014)
@@ -234,6 +245,9 @@ def fit_linKK(f, ts, M, Z, fit_type='real', add_cap=False):
         # of Boukamp et al.
         elements[0] = np.sum(ws * (Z.real - z_re.real)) / np.sum(ws)
     elif fit_type == 'complex':
+        # x = (A*•A)^-1
+        # y = A*•b
+        # Pseudoinsverse, A^+ = (A*•A)^-1•A* and R_k values = A^+•b
         x = np.linalg.inv(a_re.T.dot(a_re) + a_im.T.dot(a_im))
         y = a_re.T.dot(Z.real / np.abs(Z)) + a_im.T.dot(Z.imag / np.abs(Z))
         elements = x.dot(y)

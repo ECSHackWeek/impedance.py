@@ -41,6 +41,27 @@ Several example notebooks are provided in the `docs/source/examples/` directory.
 
 Several examples can be found in the `docs/source/examples/` directory (the [Fitting impedance spectra notebook](https://impedancepy.readthedocs.io/en/latest/examples/fitting_example.html) is a great place to start) and the documentation can be found at [impedancepy.readthedocs.io](https://impedancepy.readthedocs.io/en/latest/).
 
+## Citing impedance.py
+
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.02349/status.svg)](https://doi.org/10.21105/joss.02349)
+
+If you use impedance.py in published work, please consider citing https://joss.theoj.org/papers/10.21105/joss.02349 as
+
+```bash
+@article{Murbach2020,
+  doi = {10.21105/joss.02349},
+  url = {https://doi.org/10.21105/joss.02349},
+  year = {2020},
+  publisher = {The Open Journal},
+  volume = {5},
+  number = {52},
+  pages = {2349},
+  author = {Matthew D. Murbach and Brian Gerwe and Neal Dawson-Elli and Lok-kun Tsui},
+  title = {impedance.py: A Python package for electrochemical impedance analysis},
+  journal = {Journal of Open Source Software}
+}
+```
+
 ## Contributors ✨
 
 This project started at the [2018 Electrochemical Society (ECS) Hack Week in Seattle](https://www.electrochem.org/233/hack-week) and has benefited from a community of users and contributors since. Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
