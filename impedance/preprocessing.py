@@ -137,7 +137,7 @@ def readBioLogic(filename):
         Parameters
         ----------
         filename: string
-            Filename of .csv file to extract impedance data from
+            Filename of .mpt file to extract impedance data from
 
         Returns
         -------
