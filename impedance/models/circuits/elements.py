@@ -239,9 +239,7 @@ def G(p, f):
      """
     omega = 2*np.pi*np.array(f)
     R_G, t_G = p
-    return R_G/np.sqrt(1 + 1j*omega*t_G)
-  
-  
+    return R_G/np.sqrt(1 + 1j*omega*t_G)  
 @element_metadata(num_params=3, units=['Ohm', 'sec', ''])
 def Gs(p, f):
     """ defines a finite-length Gerischer Element as represented in [1]
@@ -265,9 +263,7 @@ def Gs(p, f):
 
     Z = R_G/(np.sqrt(1 + 1j*omega*t_G) *
              np.tanh(phi * np.sqrt(1 + 1j*omega*t_G)))
-    return Z
-  
-  
+    return Z  
 @element_metadata(num_params=4, units=['Ohm', '', '', '', ''])
 def Ls(p, f):
     """ defines a Ls-de Levie Pore - Finite Length
@@ -280,10 +276,11 @@ def Ls(p, f):
         gamma = \\frac{1}{\\A} + \\B \\{power{j \\ omega}\\Phi}
     where :math:`Z_0` = p[0] (Ohms) and
     :math:`\\A` = p[1] ('') , `\\B` = p[2] (''), `\\Phi` = p[3] ('')
-    
-    [1] A.Lasia, "Impedance of porous electrodes", Modern Aspects of electrochemistry, "Modellingand Numerical Simulations," 
-    vol.43, p.67-138, M.Schlesinger, Ed.,Springer, 2009, IsBN: 978-0-387-49580-4.
-    
+    [1] A.Lasia, "Impedance of porous electrodes", Modern 
+    Aspects of electrochemistry, 
+    "Modellingand Numerical Simulations," 
+    vol.43, p.67-138, M.Schlesinger, 
+    Ed.,Springer, 2009, IsBN: 978-0-387-49580-4.
     [2] R De Levie, Adv. electrochem. Elecrochem. eng., 6(1967) 329.
 
     """
