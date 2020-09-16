@@ -240,9 +240,9 @@ def G(p, f):
     omega = 2*np.pi*np.array(f)
     R_G, t_G = p
     return R_G/np.sqrt(1 + 1j*omega*t_G)
+  
+  
 @element_metadata(num_params=3, units=['Ohm', 'sec', ''])
-
-
 def Gs(p, f):
     """ defines a finite-length Gerischer Element as represented in [1]
 
