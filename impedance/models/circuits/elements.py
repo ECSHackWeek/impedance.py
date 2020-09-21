@@ -269,7 +269,7 @@ def Gs(p, f):
 
 
 @element_metadata(num_params=4, units=['Ohm', '', '', '', ''])
-def Ls(p, f):
+def Tas(p, f):
     """ defines a Ls-de Levie Pore - Finite Length
 
     Notes
