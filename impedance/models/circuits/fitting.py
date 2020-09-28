@@ -22,7 +22,8 @@ def rmse(a, b):
 
 
 def circuit_fit(frequencies, impedances, circuit, initial_guess,
-                constants, method=None, bounds=None, bootstrap=False):
+                constants, method=None, bounds=None, bootstrap=False,
+                maxfev=100000):
 
     """ Main function for fitting an equivalent circuit to data
 
@@ -51,6 +52,9 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess,
         Lower and upper bounds on parameters. Defaults to bounds on all
         parameters of 0 and np.inf, except the CPE alpha
         which has an upper bound of 1
+        
+    maxfev : int, optional
+        Max number of function evaluations for fitting
 
     Returns
     ------------
@@ -89,7 +93,7 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess,
 
     popt, pcov = curve_fit(wrapCircuit(circuit, constants), f,
                            np.hstack([Z.real, Z.imag]), p0=initial_guess,
-                           method=method, bounds=bounds, maxfev=100000,
+                           method=method, bounds=bounds, maxfev=maxfev,
                            ftol=1E-13)
 
     perror = np.sqrt(np.diag(pcov))
