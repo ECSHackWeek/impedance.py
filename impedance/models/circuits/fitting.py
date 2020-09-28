@@ -52,7 +52,7 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess,
         Lower and upper bounds on parameters. Defaults to bounds on all
         parameters of 0 and np.inf, except the CPE alpha
         which has an upper bound of 1
-        
+
     maxfev : int, optional
         Max number of function evaluations for fitting
 
