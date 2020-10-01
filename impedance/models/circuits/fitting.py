@@ -87,6 +87,11 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants,
                 lb.append(0)
         bounds = ((lb), (ub))
 
+    if 'maxfev' not in kwargs:
+        kwargs['maxfev'] = 100000
+    if 'ftol' not in kwargs:
+        kwargs['ftol'] = 1e-13
+
     popt, pcov = curve_fit(wrapCircuit(circuit, constants), f,
                            np.hstack([Z.real, Z.imag]), p0=initial_guess,
                            bounds=bounds, **kwargs)
