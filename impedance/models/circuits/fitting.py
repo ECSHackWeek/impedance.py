@@ -21,8 +21,8 @@ def rmse(a, b):
     return np.linalg.norm(a - b) / np.sqrt(n)
 
 
-def circuit_fit(frequencies, impedances, circuit, initial_guess,
-                constants, method=None, bounds=None, bootstrap=False):
+def circuit_fit(frequencies, impedances, circuit, initial_guess, constants,
+                bounds=None, bootstrap=False, **kwargs):
 
     """ Main function for fitting an equivalent circuit to data
 
@@ -44,13 +44,13 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess,
         parameters and their values to hold constant during fitting
         (e.g. {"RO": 0.1})
 
-    method : {‘lm’, ‘trf’, ‘dogbox’}, optional
-        Name of method to pass to scipy.optimize.curve_fit
-
     bounds : 2-tuple of array_like, optional
         Lower and upper bounds on parameters. Defaults to bounds on all
         parameters of 0 and np.inf, except the CPE alpha
         which has an upper bound of 1
+
+    kwargs :
+        Keyword arguments passed to scipy.optimize.curve_fit
 
     Returns
     ------------
@@ -87,10 +87,14 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess,
                 lb.append(0)
         bounds = ((lb), (ub))
 
+    if 'maxfev' not in kwargs:
+        kwargs['maxfev'] = 100000
+    if 'ftol' not in kwargs:
+        kwargs['ftol'] = 1e-13
+
     popt, pcov = curve_fit(wrapCircuit(circuit, constants), f,
                            np.hstack([Z.real, Z.imag]), p0=initial_guess,
-                           method=method, bounds=bounds, maxfev=100000,
-                           ftol=1E-13)
+                           bounds=bounds, **kwargs)
 
     perror = np.sqrt(np.diag(pcov))
 

@@ -56,7 +56,7 @@ class BaseCircuit:
         else:
             raise TypeError('Comparing object is not of the same type.')
 
-    def fit(self, frequencies, impedance, method=None, bounds=None):
+    def fit(self, frequencies, impedance, bounds=None, **kwargs):
         """ Fit the circuit model
 
         Parameters
@@ -67,13 +67,13 @@ class BaseCircuit:
         impedance: numpy array of dtype 'complex128'
             Impedance values to fit
 
-        method: {‘lm’, ‘trf’, ‘dogbox’}, optional
-            Name of method to pass to scipy.optimize.curve_fit
-
         bounds: 2-tuple of array_like, optional
             Lower and upper bounds on parameters. Defaults to bounds on all
             parameters of 0 and np.inf, except the CPE alpha
             which has an upper bound of 1
+
+        kwargs :
+            Keyword arguments passed to scipy.optimize.curve_fit
 
         Returns
         -------
@@ -103,8 +103,8 @@ class BaseCircuit:
         if self.initial_guess != []:
             parameters, conf = circuit_fit(frequencies, impedance,
                                            self.circuit, self.initial_guess,
-                                           self.constants, method=method,
-                                           bounds=bounds)
+                                           self.constants, bounds=bounds,
+                                           **kwargs)
             self.parameters_ = parameters
             if conf is not None:
                 self.conf_ = conf
