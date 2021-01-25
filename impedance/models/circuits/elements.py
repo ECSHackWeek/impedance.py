@@ -281,6 +281,28 @@ def K(p, f):
     """
     omega = 2*np.pi*np.array(f)
     return p[0]/(1 + 1j*omega*p[1])
+  
+@element_metadata(num_params=3, units=['Ohm', 'F sec^(gamma - 1)', ''])
+def TLMQ(p, f):
+    """ Simplified transmission-line model as defined in Eq. 11 of [1]
+    
+    
+    Notes
+    -----
+    .. math::
+
+        Z = \\sqrt{R_{ion}Z_{S}} \\coth \\sqrt{\\frac{R_{ion}}{Z_{S}}
+
+
+    [1] J. Landesfeind et al.,
+    Journal of The Electrochemical Society, 163 (7) A1373-A1387 (2016)
+    `doi: 10.1016/10.1149/2.1141607jes
+    <http://doi.org/10.1149/2.1141607jes>`_.
+    """
+    omega = 2*np.pi*np.array(f)
+    Rion, Qs, gamma = p
+    Zs = Qs*(1j*omega)**gamma
+    return np.sqrt(Rion/Zs)/np.tanh(np.sqrt(Rion*Zs))
 
 
 @element_metadata(num_params=4, units=['Ohm-m^2', 'Ohm-m^2', '', 'sec'])
