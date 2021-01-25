@@ -285,7 +285,7 @@ def K(p, f):
 @element_metadata(num_params=3, units=['Ohm', 'F sec^(gamma - 1)', ''])
 def TLMQ(p, f):
     """ Simplified transmission-line model as defined in Eq. 11 of [1]
-    
+
     Notes
     -----
     .. math::
