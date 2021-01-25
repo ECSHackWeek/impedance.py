@@ -286,7 +286,6 @@ def K(p, f):
 def TLMQ(p, f):
     """ Simplified transmission-line model as defined in Eq. 11 of [1]
     
-    
     Notes
     -----
     .. math::
