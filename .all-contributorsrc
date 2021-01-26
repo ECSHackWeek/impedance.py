@@ -133,6 +133,15 @@
         "bug",
         "code"
       ]
+    },
+    {
+      "login": "aokomorowski",
+      "name": "aokomorowski",
+      "avatar_url": "https://avatars.githubusercontent.com/u/43665474?v=4",
+      "profile": "https://github.com/aokomorowski",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
