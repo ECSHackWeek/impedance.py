@@ -1,3 +1,4 @@
+from impedance import __version__
 import setuptools
 
 with open("README.md", "r", encoding='utf8') as fh:
@@ -5,7 +6,7 @@ with open("README.md", "r", encoding='utf8') as fh:
 
 setuptools.setup(
     name="impedance",
-    version="1.0.0",
+    version=__version__,
     author="impedance.py developers",
     author_email="matt.murbach@gmail.com",
     description="A package for analyzing electrochemical impedance data",
