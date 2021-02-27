@@ -11,7 +11,7 @@ impedance.py
 
 Aiming to create a consistent, [scikit-learn-like API](https://arxiv.org/abs/1309.0238) for impedance analysis, impedance.py contains modules for data preprocessing, validation, model fitting, and visualization.
 
-For a little more in-depth discussion of the package background and capabilities, check out our (soon-to-be submitted) [Journal of Open Source Software paper](https://github.com/ECSHackWeek/impedance.py/blob/master/joss-paper/paper.md).
+For a little more in-depth discussion of the package background and capabilities, check out our [Journal of Open Source Software paper](https://joss.theoj.org/papers/10.21105/joss.02349).
 
 If you have a feature request or find a bug, please [file an issue](https://github.com/ECSHackWeek/impedance.py/issues) or, better yet, make the code improvements and [submit a pull request](https://help.github.com/articles/creating-a-pull-request-from-a-fork/)! The goal is to build an open-source tool that the entire impedance community can improve and use!
 
