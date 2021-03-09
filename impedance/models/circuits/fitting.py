@@ -27,12 +27,12 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants,
 
     """ Main function for fitting an equivalent circuit to data.
 
-    By default, this function uses `scipy.optimize.curve_fit 
+    By default, this function uses `scipy.optimize.curve_fit
     <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit>`
     to fit the equivalent circuit. This function generally works well for
     simple circuits. However, the final results may be sensitive to
     the initial conditions for more complex circuits. In these cases,
-    the `scipy.optimize.basinhopping 
+    the `scipy.optimize.basinhopping
     <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.basinhopping.html>`)
     global optimization algorithm can be used to attempt a better fit.
 
