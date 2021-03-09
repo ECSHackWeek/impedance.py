@@ -23,7 +23,8 @@ def rmse(a, b):
 
 
 def circuit_fit(frequencies, impedances, circuit, initial_guess, constants,
-                bounds=None, bootstrap=False, global_opt=False, **kwargs):
+                bounds=None, bootstrap=False, global_opt=False, seed=0,
+                **kwargs):
 
     """ Main function for fitting an equivalent circuit to data.
 
@@ -62,6 +63,10 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants,
     global_opt : bool, optional
         If global optimization should be used (uses the basinhopping
         algorithm). Defaults to False
+
+    seed : int, optional
+        Random seed, only used for the basinhopping algorithm.
+        Defaults to 0
 
     kwargs :
         Keyword arguments passed to scipy.optimize.curve_fit or
@@ -137,7 +142,11 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants,
         # jacobian -> covariance
         # https://stats.stackexchange.com/q/231868
         jac = results.lowest_optimization_result["jac"][np.newaxis]
-        perror = inv(np.dot(jac.T, jac)) * opt_function(popt) ** 2
+        try:
+            perror = inv(np.dot(jac.T, jac)) * opt_function(popt) ** 2
+        except np.LinAlg.LinAlgError:
+            print('Failed to compute perror')
+            perror = None
 
     return popt, perror
 
