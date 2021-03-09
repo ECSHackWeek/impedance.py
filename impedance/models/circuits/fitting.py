@@ -60,8 +60,8 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants,
         which has an upper bound of 1
 
     global_opt : bool, optional
-        If global optimization should be used (uses the shgo algorithm).
-        Defaults to False
+        If global optimization should be used (uses the basinhopping
+        algorithm). Defaults to False
 
     kwargs :
         Keyword arguments passed to scipy.optimize.curve_fit or
