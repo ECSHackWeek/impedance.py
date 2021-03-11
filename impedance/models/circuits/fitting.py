@@ -139,7 +139,7 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants,
             return rmse(wrapCircuit(circuit, constants)(frequencies, *x),
                         np.hstack([Z.real, Z.imag]))
 
-        results = basinhopping(opt_function, x0=initial_guess)
+        results = basinhopping(opt_function, x0=initial_guess, seed=seed)
         popt = results.x
 
         # jacobian -> covariance
