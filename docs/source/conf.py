@@ -16,17 +16,18 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath('../../'))
 
+from impedance import __version__  # noqa
 
 # -- Project information -----------------------------------------------------
 
 project = 'impedance.py'
-copyright = '2020, impedance.py developers'
+copyright = '2021, impedance.py developers'
 author = ''
 
 # The short X.Y version
-version = '1.0'
+version = ".".join(__version__.split('.')[:-1])
 # The full version, including alpha/beta/rc tags
-release = '1.0.0'
+release = __version__
 
 
 # -- General configuration ---------------------------------------------------
