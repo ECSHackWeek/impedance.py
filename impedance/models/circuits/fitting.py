@@ -1,7 +1,10 @@
-from .elements import circuit_elements, get_element_from_name
+import warnings
+
 import numpy as np
 from scipy.linalg import inv
 from scipy.optimize import curve_fit, basinhopping
+
+from .elements import circuit_elements, get_element_from_name
 
 ints = '0123456789'
 
@@ -145,7 +148,7 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants,
         try:
             perror = inv(np.dot(jac.T, jac)) * opt_function(popt) ** 2
         except np.linalg.LinAlgError:
-            print('Failed to compute perror')
+            warnings.warn("Failed to compute perror")
             perror = None
 
     return popt, perror
