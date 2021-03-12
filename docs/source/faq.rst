@@ -32,8 +32,8 @@ of typical equivalent circuit models.
 attempt to search the entire parameter landscape to minimize the error.
 By setting :code:`global_opt=True` in :code:`circuit_fit`, :code:`impedance.py` will use the
 `basinhopping <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.basinhopping.html>`_
-global optimization algorithm (also from the `scipy.optimize` package[1]) instead of :code:`curve_fit`,
-although the computational time may increase.
+global optimization algorithm (also from the `scipy.optimize` package[1]) instead of :code:`curve_fit`.
+Note that the computational time may increase.
 
 [1] Virtanen, P., Gommers, R., Oliphant, T.E. et al.
 SciPy 1.0: fundamental algorithms for scientific computing in Python.
