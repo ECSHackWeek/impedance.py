@@ -6,6 +6,7 @@ from .elements import circuit_elements, get_element_from_name
 import json
 import matplotlib.pyplot as plt
 import numpy as np
+import warnings
 
 
 class BaseCircuit:
@@ -151,7 +152,7 @@ class BaseCircuit:
                                      index=0)[0],
                         circuit_elements)
         else:
-            print("Simulating circuit based on initial parameters")
+            warnings.warn("Simulating circuit based on initial parameters")
             return eval(buildCircuit(self.circuit, frequencies,
                                      *self.initial_guess,
                                      constants=self.constants, eval_string='',
