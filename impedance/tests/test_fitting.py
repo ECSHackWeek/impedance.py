@@ -1,5 +1,10 @@
-from impedance.models.circuits.fitting import buildCircuit, rmse, \
-                                              extract_circuit_elements
+from impedance.preprocessing import ignoreBelowX
+from impedance.models.circuits.fitting import buildCircuit, \
+    circuit_fit, rmse, extract_circuit_elements
+from impedance.tests.test_preprocessing import frequencies \
+    as example_frequencies
+from impedance.tests.test_preprocessing import Z_correct
+
 import numpy as np
 
 # def test_residuals():
@@ -10,6 +15,34 @@ import numpy as np
 #     pass
 #
 #
+
+
+def test_circuit_fit():
+
+    # Test example circuit from "Getting Started" page
+    circuit = 'R0-p(R1,C1)-p(R2-Wo1,C2)'
+    initial_guess = [.01, .01, 100, .01, .05, 100, 1]
+    results_local = np.array([1.65e-2, 8.68e-3, 3.32e0, 5.39e-3,
+                              6.31e-2, 2.33e2, 2.20e-1])
+    results_global = np.array([1.65e-2, 8.78e-3, 3.41, 5.45e-3,
+                               1.32e-1, 1.10e3, 2.23e-1])
+
+    # Filter
+    example_frequencies_filtered, \
+        Z_correct_filtered = ignoreBelowX(example_frequencies, Z_correct)
+
+    # Test local fitting
+    assert np.isclose(circuit_fit(example_frequencies_filtered,
+                                  Z_correct_filtered, circuit,
+                                  initial_guess, constants={})[0],
+                      results_local, rtol=1e-2).all()
+
+    # Test global fitting
+    assert np.isclose(circuit_fit(example_frequencies_filtered,
+                                  Z_correct_filtered, circuit,
+                                  initial_guess, constants={},
+                                  global_opt=True)[0],
+                      results_global, rtol=1e-1).all()
 
 
 def test_buildCircuit():

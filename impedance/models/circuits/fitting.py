@@ -1,6 +1,10 @@
-from .elements import circuit_elements, get_element_from_name
+import warnings
+
 import numpy as np
-from scipy.optimize import curve_fit
+from scipy.linalg import inv
+from scipy.optimize import curve_fit, basinhopping
+
+from .elements import circuit_elements, get_element_from_name
 
 ints = '0123456789'
 
@@ -22,9 +26,19 @@ def rmse(a, b):
 
 
 def circuit_fit(frequencies, impedances, circuit, initial_guess, constants,
-                bounds=None, bootstrap=False, **kwargs):
+                bounds=None, bootstrap=False, global_opt=False, seed=0,
+                **kwargs):
 
-    """ Main function for fitting an equivalent circuit to data
+    """ Main function for fitting an equivalent circuit to data.
+
+    By default, this function uses `scipy.optimize.curve_fit
+    <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit>`
+    to fit the equivalent circuit. This function generally works well for
+    simple circuits. However, the final results may be sensitive to
+    the initial conditions for more complex circuits. In these cases,
+    the `scipy.optimize.basinhopping
+    <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.basinhopping.html>`)
+    global optimization algorithm can be used to attempt a better fit.
 
     Parameters
     -----------------
@@ -49,8 +63,17 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants,
         parameters of 0 and np.inf, except the CPE alpha
         which has an upper bound of 1
 
+    global_opt : bool, optional
+        If global optimization should be used (uses the basinhopping
+        algorithm). Defaults to False
+
+    seed : int, optional
+        Random seed, only used for the basinhopping algorithm.
+        Defaults to 0
+
     kwargs :
-        Keyword arguments passed to scipy.optimize.curve_fit
+        Keyword arguments passed to scipy.optimize.curve_fit or
+        scipy.optimize.basinhopping
 
     Returns
     ------------
@@ -66,7 +89,6 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants,
     Currently, an error of -1 is returned.
 
     """
-    f = frequencies
     Z = impedances
 
     # extract the elements from the circuit
@@ -74,29 +96,60 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants,
 
     # set upper and lower bounds on a per-element basis
     if bounds is None:
-        lb, ub = [], []
+        lower_bounds, upper_bounds = [], []
         for elem in extracted_elements:
             raw_element = get_element_from_name(elem)
             for i in range(check_and_eval(raw_element).num_params):
                 if elem in constants or elem + '_{}'.format(i) in constants:
                     continue
                 if raw_element in ['CPE', 'La'] and i == 1:
-                    ub.append(1)
+                    upper_bounds.append(1)
                 else:
-                    ub.append(np.inf)
-                lb.append(0)
-        bounds = ((lb), (ub))
+                    upper_bounds.append(np.inf)
+                lower_bounds.append(0)
+        bounds = ((lower_bounds), (upper_bounds))
 
-    if 'maxfev' not in kwargs:
-        kwargs['maxfev'] = 100000
-    if 'ftol' not in kwargs:
-        kwargs['ftol'] = 1e-13
+    if not global_opt:
+        if 'maxfev' not in kwargs:
+            kwargs['maxfev'] = 100000
+        if 'ftol' not in kwargs:
+            kwargs['ftol'] = 1e-13
 
-    popt, pcov = curve_fit(wrapCircuit(circuit, constants), f,
-                           np.hstack([Z.real, Z.imag]), p0=initial_guess,
-                           bounds=bounds, **kwargs)
+        popt, pcov = curve_fit(wrapCircuit(circuit, constants), frequencies,
+                               np.hstack([Z.real, Z.imag]),
+                               p0=initial_guess, bounds=bounds, **kwargs)
 
-    perror = np.sqrt(np.diag(pcov))
+        perror = np.sqrt(np.diag(pcov))
+
+    else:
+        def opt_function(x):
+            """ Short function for basinhopping to optimize over.
+            We want to minimize the RMSE between the fit and the data.
+
+            Parameters
+            ----------
+            x : args
+                Parameters for optimization.
+
+            Returns
+            -------
+            function
+                Returns a function (RMSE as a function of parameters).
+            """
+            return rmse(wrapCircuit(circuit, constants)(frequencies, *x),
+                        np.hstack([Z.real, Z.imag]))
+
+        results = basinhopping(opt_function, x0=initial_guess, seed=seed)
+        popt = results.x
+
+        # jacobian -> covariance
+        # https://stats.stackexchange.com/q/231868
+        jac = results.lowest_optimization_result["jac"][np.newaxis]
+        try:
+            perror = inv(np.dot(jac.T, jac)) * opt_function(popt) ** 2
+        except np.linalg.LinAlgError:
+            warnings.warn("Failed to compute perror")
+            perror = None
 
     return popt, perror
 
@@ -247,6 +300,19 @@ def buildCircuit(circuit, frequencies, *parameters,
 
 
 def extract_circuit_elements(circuit):
+    """ Extracts circuit elements from a circuit string.
+
+    Parameters
+    ----------
+    circuit : str
+        Circuit string.
+
+    Returns
+    -------
+    extracted_elements : list
+        list of extracted elements.
+
+    """
     p_string = [x for x in circuit if x not in 'p(),-']
     extracted_elements = []
     current_element = []
@@ -267,6 +333,19 @@ def extract_circuit_elements(circuit):
 
 
 def calculateCircuitLength(circuit):
+    """ Calculates the number of elements in the circuit.
+
+    Parameters
+    ----------
+    circuit : str
+        Circuit string.
+
+    Returns
+    -------
+    length : int
+        Length of circuit.
+
+    """
     length = 0
     if circuit:
         extracted_elements = extract_circuit_elements(circuit)
@@ -278,6 +357,23 @@ def calculateCircuitLength(circuit):
 
 
 def check_and_eval(element):
+    """ Checks if an element is valid, then evaluates it.
+
+    Parameters
+    ----------
+    element : str
+        Circuit element.
+
+    Raises
+    ------
+    ValueError
+        Raised if an element is not in the list of allowed elements.
+
+    Returns
+    -------
+    Evaluated element.
+
+    """
     allowed_elements = circuit_elements.keys()
     if element not in allowed_elements:
         raise ValueError(f'{element} not in ' +
