@@ -3,7 +3,7 @@ Frequently Asked Questions
 
 What method does impedance.py use for fitting equivalent circuit models?
 ------------------------------------------------------------------------
-Fitting is performed by non-linear least squares regression of
+By default, fitting is performed by non-linear least squares regression of
 the circuit model to impedance data via
 `curve_fit <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html>`_
 from the `scipy.optimize` package.[1]
@@ -23,6 +23,17 @@ problems and the Trust Region Reflective algorithm
 (:code:`method='trf'`) if bounds are provided. See `the SciPy documentation
 <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html>`_
 for more details and options.
+
+While the default method converges quickly and often yields acceptable fits,
+the results may be sensitive to the initial conditions.
+EIS fitting can be prone to this issue given the high dimensionality
+of typical equivalent circuit models.
+`Global optimization algorithms <https://en.wikipedia.org/wiki/Global_optimization>`_
+attempt to search the entire parameter landscape to minimize the error.
+By setting :code:`global_opt=True` in :code:`circuit_fit`, :code:`impedance.py` will use the
+`basinhopping <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.basinhopping.html>`_
+global optimization algorithm (also from the `scipy.optimize` package[1]) instead of :code:`curve_fit`,
+although the computational time may increase.
 
 [1] Virtanen, P., Gommers, R., Oliphant, T.E. et al.
 SciPy 1.0: fundamental algorithms for scientific computing in Python.

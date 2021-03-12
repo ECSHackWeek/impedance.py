@@ -32,12 +32,12 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants,
     """ Main function for fitting an equivalent circuit to data.
 
     By default, this function uses `scipy.optimize.curve_fit
-    <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit>`
+    <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit>_`
     to fit the equivalent circuit. This function generally works well for
     simple circuits. However, the final results may be sensitive to
     the initial conditions for more complex circuits. In these cases,
     the `scipy.optimize.basinhopping
-    <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.basinhopping.html>`)
+    <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.basinhopping.html>_`)
     global optimization algorithm can be used to attempt a better fit.
 
     Parameters
@@ -139,7 +139,8 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants,
             return rmse(wrapCircuit(circuit, constants)(frequencies, *x),
                         np.hstack([Z.real, Z.imag]))
 
-        results = basinhopping(opt_function, x0=initial_guess, seed=seed)
+        results = basinhopping(opt_function, x0=initial_guess,
+                               seed=seed, **kwargs)
         popt = results.x
 
         # jacobian -> covariance
