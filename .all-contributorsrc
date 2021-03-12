@@ -149,7 +149,9 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/29551858?v=4",
       "profile": "https://petermattia.com",
       "contributions": [
-        "code"
+        "code",
+        "test",
+        "doc"
       ]
     }
   ],
