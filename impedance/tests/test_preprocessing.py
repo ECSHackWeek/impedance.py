@@ -543,15 +543,15 @@ def test_idf_readFile_factory():
 
         if k != 'csv':  # csv file keyed with `None`
             f_name = os.path.join(directory, example_files[k])
-            instrument = INSTRUMENT_PARSERS[k]
+            format = INSTRUMENT_PARSERS[k]
             freq, imp = f_checks[k], Z_checks[k]
 
         elif k == 'csv':
             f_name = os.path.join(directory, example_files[None])
-            instrument = INSTRUMENT_PARSERS[k]
+            format = INSTRUMENT_PARSERS[k]
             freq, imp = f_checks[None], Z_checks[None]
 
-        idf = ImpedenceDataFrame.readFile(f_name, instrument)
+        idf = ImpedenceDataFrame.readFile(f_name, format)
         assert np.isclose(idf.frequencies, freq).all()
         assert np.isclose(idf.impendance, imp).all()
 
