@@ -475,17 +475,21 @@ INSTRUMENT_PARSERS = {'gamry': readGamry,
 
 
 class ImpedenceDataFrame:
-    """A lightweight `pandas.DataFrame` like object for reading and cropped impedance data
-    from instrument files either by pre-existing methods or custom implementations.
-    Processed data can then be easily saved to a csv file using the `writeCsv` method.
+    """A lightweight `pandas.DataFrame` like object for reading
+    and cropped impedance data from instrument files either by
+    pre-existing methods or custom implementations.
+    Processed data can then be easily saved to a csv file using
+    the `writeCsv` method.
 
     Notes
     -----
-    The Impedance data can be filtered by performing comparison checks on the data frame object itself and
-    then indexing with the resulting boolean array:
+    The Impedance data can be filtered by performing comparison
+    checks on the data frame object itself and then indexing with
+    the resulting boolean array:
 
     >>> frequency = np.arange(-3, 3)
-    >>> impedance = frequency.astype(complex)  #  re-cast copy to complex for demonstration
+    >>> impedance = frequency.astype(complex)
+    #  re-cast copy to complex for demonstration
 
     >>> idf = ImpedenceDataFrame(frequency, impedance)
     >>> idf_positive = idf[idf>=0]
@@ -496,8 +500,9 @@ class ImpedenceDataFrame:
     >>> idf_cropped = idf[(idf>0) & (idf<=2)]
     >>> len(idf_cropped)  # 2
 
-    By default the comparisons occur relative to the frequency data however the idf could still be indexed based
-    on the impedance data if needs be by filtering using the associated attribute:
+    By default the comparisons occur relative to the frequency data
+    however the idf could still be indexed based on the impedance data
+    if needs be by filtering using the associated attribute:
 
     >>> idf_positive = idf[idf.impendance ...]
 
@@ -526,22 +531,27 @@ class ImpedenceDataFrame:
         self.frequencies = np.asarray(frequencies).astype(float).ravel()
         self.impendance = np.asarray(impedance).astype(complex).ravel()
 
-        assert len(self.frequencies) == len(self.impendance), F'Frequency and Impedance arrays should be equal in ' \
-                                                              F'length but have shapes {self.frequencies.shape} and ' \
-                                                              F'{self.impendance.shape} respectively.'
+        if len(self.frequencies) != len(self.impendance):
+            raise ValueError(F'Frequency and Impedance should have same length'
+                             F'but have shapes {self.frequencies.shape} '
+                             F'and {self.impendance.shape} respectively.')
 
     @classmethod
     def readFile(cls, filename, instrument):
-        """Read Impedance data from file by specifying instrument type or passing custom file reader.
-        If string then `instrument` should be listed in `impedance.preprocessing.INSTRUMENT_PARSERS`.
-        If custom callable then should return a tuple containing `freqency` and `impedance`.
+        """Read Impedance data from file by specifying instrument type or
+        passing custom file reader.
+        If string then `instrument` should be listed in
+        `impedance.preprocessing.INSTRUMENT_PARSERS`.
+        If custom callable then should return a tuple containing
+        `freqency` and `impedance`.
 
         Parameters
         ----------
         filename : str
             Path to file containing impedance and frequency data.
         instrument : str OR callable
-            Which instrument file type to parse if already implemented OR custom callable to parse file instead.
+            Which instrument file type to parse if already implemented OR
+            custom callable to parse file instead.
 
         Returns
         -------
@@ -553,14 +563,16 @@ class ImpedenceDataFrame:
             parser = instrument
         else:
             raise TypeError('Passed instrument should be key in '
-                            '`impedance.preprocessing.INSTRUMENT_PARSERS` or callable.')
+                            '`impedance.preprocessing.INSTRUMENT_PARSERS`'
+                            ' or callable.')
         freq, imp = parser(filename)
         return cls(freq, imp)
 
     def writeCsv(self, path, **kwargs):
-        """Uses `np.savetxt` to write frequency and impedance data to a csv file with frequencies and
-        impedance as columns.
-        any kwarg accepted by `np.savetxt` will be accepted, otehrwise the default values below will be used:
+        """Uses `np.savetxt` to write frequency and impedance data to a csv file
+        with frequencies and impedance as columns.
+        Any kwarg accepted by `np.savetxt` will be accepted, otehrwise the
+        default values below will be used:
             * delimiter : ','
             * header: 'Frequencies,Impedance'
             * comments: ''
@@ -574,12 +586,15 @@ class ImpedenceDataFrame:
         -------
         None
         """
-        custom_kwargs = {'delimiter': ',', 'header': 'Frequencies,Impedance', 'comments': '', **kwargs}
-        data = np.vstack((self.frequencies, self.impendance)).T  # by default writes as rows hence take transpose
+        custom_kwargs = {'delimiter': ',', 'header': 'Frequencies,Impedance',
+                         'comments': '', **kwargs}
+        data = np.vstack((self.frequencies, self.impendance)).T
+        # by default writes as rows hence take transpose
         np.savetxt(path, data, **custom_kwargs)
 
     def __getitem__(self, mask):
-        """Mimics behaviour in pandas where either boolean arrays or specific indices can be used to slice Dataframes.
+        """Mimics behaviour in pandas where either boolean arrays or
+        specific indices can be used to slice Dataframes.
 
         Parameters
         ----------
@@ -593,7 +608,8 @@ class ImpedenceDataFrame:
             f, i = self.frequencies[mask], self.impendance[mask]
             return ImpedenceDataFrame(f, i)
         except IndexError:
-            raise IndexError('Data cannot be accessed with passed mask, ensure values are not out of bounds.')
+            raise IndexError('Data cannot be accessed with passed mask, '
+                             'ensure values are not out of bounds.')
 
     def __iter__(self):
         # Allows simple iteration over object with for loop
@@ -618,7 +634,8 @@ class ImpedenceDataFrame:
         return self.frequencies >= other
 
     def __str__(self):
-        data = [F' {f} | {i} ' for f, i in zip(self.frequencies, self.impendance)]
+        data = [F' {f} | {i} ' for f, i in
+                zip(self.frequencies, self.impendance)]
         return '\n'.join(data)
 
     def __repr__(self):
