@@ -537,7 +537,7 @@ class ImpedenceDataFrame:
                              F'and {self.impendance.shape} respectively.')
 
     @classmethod
-    def readFile(cls, filename, instrument):
+    def readFile(cls, filename, format):
         """Read Impedance data from file by specifying instrument type or
         passing custom file reader.
         If string then `instrument` should be listed in
@@ -549,7 +549,7 @@ class ImpedenceDataFrame:
         ----------
         filename : str
             Path to file containing impedance and frequency data.
-        instrument : str OR callable
+        format : str OR callable
             Which instrument file type to parse if already implemented OR
             custom callable to parse file instead.
 
@@ -557,10 +557,10 @@ class ImpedenceDataFrame:
         -------
         ImpedanceDataFrame instance with parsed frequency and impedance data.
         """
-        if instrument in INSTRUMENT_PARSERS:
-            parser = INSTRUMENT_PARSERS[instrument]
-        elif callable(instrument):
-            parser = instrument
+        if format in INSTRUMENT_PARSERS:
+            parser = INSTRUMENT_PARSERS[format]
+        elif callable(format):
+            parser = format
         else:
             raise TypeError('Passed instrument should be key in '
                             '`impedance.preprocessing.INSTRUMENT_PARSERS`'
@@ -571,11 +571,13 @@ class ImpedenceDataFrame:
     def writeCsv(self, path, **kwargs):
         """Uses `np.savetxt` to write frequency and impedance data to a csv file
         with frequencies and impedance as columns.
-        Any kwarg accepted by `np.savetxt` will be accepted, otehrwise the
+        Any kwarg accepted by `np.savetxt` will be accepted, otherwise the
         default values below will be used:
             * delimiter : ','
-            * header: 'Frequencies,Impedance'
             * comments: ''
+
+        Resulting file will be 3 columns of float values:
+        `frequency, impedance(real), impedance(imaginary)`.
 
         Parameters
         ----------
@@ -586,10 +588,14 @@ class ImpedenceDataFrame:
         -------
         None
         """
-        custom_kwargs = {'delimiter': ',', 'header': 'Frequencies,Impedance',
+        custom_kwargs = {'delimiter': ',',
                          'comments': '', **kwargs}
-        data = np.vstack((self.frequencies, self.impendance)).T
+        data = np.vstack((self.frequencies,
+                          np.real(self.impendance),
+                          np.imag(self.impendance))
+                         ).T
         # by default writes as rows hence take transpose
+        # 3 columns for consistenct with `readCSV`
         np.savetxt(path, data, **custom_kwargs)
 
     def __getitem__(self, mask):
