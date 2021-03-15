@@ -1,8 +1,16 @@
-from impedance.preprocessing import readFile, readGamry, ignoreBelowX
-from impedance.preprocessing import readZPlot, cropFrequencies
+from impedance.preprocessing import (
+    readFile,
+    readGamry,
+    ignoreBelowX,
+    readZPlot,
+    cropFrequencies,
+    readBioLogic,
+    ImpedenceDataFrame,
+    INSTRUMENT_PARSERS
+)
+
 import numpy as np
 import os
-from impedance.preprocessing import readBioLogic
 import pytest
 
 # store some global test data
@@ -504,3 +512,119 @@ def test_readBioLogic():
 
         f, Z = readBioLogic(os.path.join(directory,
                             'exampleDataBioLogic_MissingFreq.mpt',))
+
+
+@pytest.mark.parametrize("freq, imp",
+                         [
+                             (range(4), range(4, 8)),
+                             (np.arange(4), np.arange(4, 8))
+                         ])
+def test_idf_init_pass(freq, imp):
+    """Confirm different arrays and data types are succesfully cast."""
+    idf = ImpedenceDataFrame(freq, imp)
+    idf_f, idf_i = idf.frequencies, idf.impendance
+
+    assert isinstance(idf_f, np.ndarray) and isinstance(idf_i, np.ndarray)
+    assert (idf_f.dtype == float) and (idf_i.dtype == complex)
+    assert len(freq) == len(idf)
+
+
+def test_idf_init_fail():
+    """confirm assertion error raised for arrays of mismatched lengths."""
+    with pytest.raises(AssertionError):
+        ImpedenceDataFrame([1], [1, 2])
+
+
+def test_idf_readFile_factory():
+    """confirm factory method can be succesuflly keyword indexed to open different parsers.
+    """
+    for k in INSTRUMENT_PARSERS:
+
+        if k != 'csv':  # csv file keyed with `None`
+            f_name = os.path.join(directory, example_files[k])
+            instrument = INSTRUMENT_PARSERS[k]
+            freq, imp = f_checks[k], Z_checks[k]
+
+        elif k == 'csv':
+            f_name = os.path.join(directory, example_files[None])
+            instrument = INSTRUMENT_PARSERS[k]
+            freq, imp = f_checks[None], Z_checks[None]
+
+        idf = ImpedenceDataFrame.readFile(f_name, instrument)
+        assert np.isclose(idf.frequencies, freq).all()
+        assert np.isclose(idf.impendance, imp).all()
+
+
+def test_idf_readfile_callable_factory():
+    """confirm can pass custom callable to `readFile` factory method.
+    """
+
+    def custom_callable(fname):
+        # dummy callable to return frequencies and impedance
+        return f_checks[None], Z_checks[None]
+
+    idf = ImpedenceDataFrame.readFile('dev/null', custom_callable)
+    assert np.isclose(idf.frequencies, f_checks[None]).all()
+    assert np.isclose(idf.impendance, Z_checks[None]).all()
+
+
+@pytest.mark.parametrize("n",
+                         [
+                             5, 10
+                         ])
+def test_idf_itr(n):
+    """confirm can iterate over idf and unpack tuple."""
+    data = np.arange(n)
+    idf = ImpedenceDataFrame(data, data)
+
+    count = 0
+    for i in idf:
+        freq, imp = i
+        count += 1
+    assert count == n
+
+
+def test_idf_comparators():
+    """Confirm dunder comparisons return expected behaviours."""
+
+    def correct_bool_sum(arr, n):
+        assert arr.dtype == bool
+        assert sum(arr) == n
+
+    data = np.arange(10)
+    idf = ImpedenceDataFrame(data, data)
+
+    eq = idf == 5
+    correct_bool_sum(eq, 1)
+
+    lt = idf < 5
+    correct_bool_sum(lt, 5)
+
+    le = idf <= 5
+    correct_bool_sum(le, 6)
+
+    gt = idf > 5
+    correct_bool_sum(gt, 4)
+
+    eq = idf >= 5
+    correct_bool_sum(eq, 5)
+
+
+def test_idf_getitem():
+    """Confirm calling getitem returns a new `ImpedanceDataFrame` of expected size."""
+    data = np.arange(-3, 4)
+    idf = ImpedenceDataFrame(data, data+10)
+
+    new = idf[(idf >= 0) & (idf < 2)]
+    assert isinstance(new, ImpedenceDataFrame)
+    assert len(new) == 2
+    assert (new.frequencies.min() == 0) and (new.frequencies.max() == 1)
+    assert (new.impendance.min() == 10) and (new.impendance.max() == 11)
+
+
+def test_test_output():
+    """Mostly confirms that the output functions dont raise an error."""
+    data = np.arange(10)
+    idf = ImpedenceDataFrame(data, data)
+    assert isinstance(idf.__repr__(), str)
+    assert isinstance(idf.__str__(), str)
