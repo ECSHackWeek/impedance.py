@@ -531,12 +531,13 @@ def test_idf_init_pass(freq, imp):
 
 def test_idf_init_fail():
     """confirm assertion error raised for arrays of mismatched lengths."""
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         ImpedenceDataFrame([1], [1, 2])
 
 
 def test_idf_readFile_factory():
-    """confirm factory method can be succesuflly keyword indexed to open different parsers.
+    """confirm factory method can be succesuflly keyword indexed to
+    open different parsers.
     """
     for k in INSTRUMENT_PARSERS:
 
@@ -611,7 +612,8 @@ def test_idf_comparators():
 
 
 def test_idf_getitem():
-    """Confirm calling getitem returns a new `ImpedanceDataFrame` of expected size."""
+    """Confirm calling getitem returns a new `ImpedanceDataFrame` of
+    expected size."""
     data = np.arange(-3, 4)
     idf = ImpedenceDataFrame(data, data+10)
 
