@@ -575,7 +575,8 @@ class ImpedenceDataFrame:
         None
         """
         custom_kwargs = {'delimiter': ',', 'header': 'Frequencies,Impedance', 'comments': '', **kwargs}
-        np.savetxt(path, np.vstack((self.frequencies, self.impendance)).T, **custom_kwargs)
+        data = np.vstack((self.frequencies, self.impendance)).T  # by default writes as rows hence take transpose
+        np.savetxt(path, data, **custom_kwargs)
 
     def __getitem__(self, mask):
         """Mimics behaviour in pandas where either boolean arrays or specific indices can be used to slice Dataframes.
