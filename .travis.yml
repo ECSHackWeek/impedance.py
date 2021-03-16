@@ -17,7 +17,7 @@ install:
 # this side-steps failing build on PEP8 violations
 before_script:
    - "export DISPLAY=:99.0"
-   - flake8 impedance --exclude=*.ipynb_checkpoints
+   - flake8 impedance --exclude=*.ipynb_checkpoints,*__init__.py
 
 script:
    - pytest --cov=impedance impedance/tests
