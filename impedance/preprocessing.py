@@ -506,6 +506,13 @@ class ImpedenceDataFrame:
 
     >>> idf_positive = idf[idf.impendance ...]
 
+    The ImpedanceDataframe object can also be iterated over using a
+    conventional for loop. This will return a tuple of frequency and impedance
+    for each iteration:
+
+    >>> for entry in idf:
+    >>>     f, z = entry
+
     Attributes
     ----------
     frequencies : np.ndarray[float]
