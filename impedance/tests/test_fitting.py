@@ -37,11 +37,27 @@ def test_circuit_fit():
                                   initial_guess, constants={})[0],
                       results_local, rtol=1e-2).all()
 
-    # Test global fitting
+    # Test global fitting on multiple seeds
+    # All seeds should converge to the same value
+    # seed = 0
     assert np.isclose(circuit_fit(example_frequencies_filtered,
                                   Z_correct_filtered, circuit,
                                   initial_guess, constants={},
-                                  global_opt=True)[0],
+                                  global_opt=True, seed=0)[0],
+                      results_global, rtol=1e-1).all()
+
+    # seed = 1
+    assert np.isclose(circuit_fit(example_frequencies_filtered,
+                                  Z_correct_filtered, circuit,
+                                  initial_guess, constants={},
+                                  global_opt=True, seed=1)[0],
+                      results_global, rtol=1e-1).all()
+
+    # seed = 42
+    assert np.isclose(circuit_fit(example_frequencies_filtered,
+                                  Z_correct_filtered, circuit,
+                                  initial_guess, constants={},
+                                  global_opt=True, seed=42)[0],
                       results_global, rtol=1e-1).all()
 
 
