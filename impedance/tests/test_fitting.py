@@ -24,8 +24,8 @@ def test_circuit_fit():
     initial_guess = [.01, .01, 100, .01, .05, 100, 1]
     results_local = np.array([1.65e-2, 8.68e-3, 3.32e0, 5.39e-3,
                               6.31e-2, 2.33e2, 2.20e-1])
-    results_global = np.array([1.65e-2, 8.78e-3, 3.41, 5.45e-3,
-                               1.32e-1, 1.10e3, 2.23e-1])
+    results_global = np.array([1.65e-2, 5.34e-3, 0.22, 9.15e-3,
+                               1.31e-1, 1.10e3, 2.78])
 
     # Filter
     example_frequencies_filtered, \
@@ -37,11 +37,27 @@ def test_circuit_fit():
                                   initial_guess, constants={})[0],
                       results_local, rtol=1e-2).all()
 
-    # Test global fitting
+    # Test global fitting on multiple seeds
+    # All seeds should converge to the same value
+    # seed = 0
     assert np.isclose(circuit_fit(example_frequencies_filtered,
                                   Z_correct_filtered, circuit,
                                   initial_guess, constants={},
-                                  global_opt=True)[0],
+                                  global_opt=True, seed=0)[0],
+                      results_global, rtol=1e-1).all()
+
+    # seed = 1
+    assert np.isclose(circuit_fit(example_frequencies_filtered,
+                                  Z_correct_filtered, circuit,
+                                  initial_guess, constants={},
+                                  global_opt=True, seed=1)[0],
+                      results_global, rtol=1e-1).all()
+
+    # seed = 42
+    assert np.isclose(circuit_fit(example_frequencies_filtered,
+                                  Z_correct_filtered, circuit,
+                                  initial_guess, constants={},
+                                  global_opt=True, seed=42)[0],
                       results_global, rtol=1e-1).all()
 
 

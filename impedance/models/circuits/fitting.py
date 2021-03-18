@@ -139,8 +139,24 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants,
             return rmse(wrapCircuit(circuit, constants)(frequencies, *x),
                         np.hstack([Z.real, Z.imag]))
 
-        results = basinhopping(opt_function, x0=initial_guess,
-                               seed=seed, **kwargs)
+        class BasinhoppingBounds(object):
+            """ Adapted from the basinhopping documetation
+            https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.basinhopping.html
+            """
+
+            def __init__(self, xmax=upper_bounds, xmin=lower_bounds):
+                self.xmax = np.array(xmax)
+                self.xmin = np.array(xmin)
+
+            def __call__(self, **kwargs):
+                x = kwargs["x_new"]
+                tmax = bool(np.all(x <= self.xmax))
+                tmin = bool(np.all(x >= self.xmin))
+                return tmax and tmin
+
+        basinhopping_bounds = BasinhoppingBounds()
+        results = basinhopping(opt_function, x0=initial_guess, seed=seed,
+                               accept_test=basinhopping_bounds, **kwargs)
         popt = results.x
 
         # jacobian -> covariance
