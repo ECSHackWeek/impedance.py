@@ -78,7 +78,9 @@ def R(p, f):
         Z = R
 
     """
-    return np.array(len(f)*[p[0]])
+    R = p[0]
+    Z = np.array(len(f)*[R])
+    return Z
 
 
 @element_metadata(num_params=1, units=['F'])
@@ -91,7 +93,9 @@ def C(p, f):
 
      """
     omega = 2*np.pi*np.array(f)
-    return 1.0/(p[0]*1j*omega)
+    C = p[0]
+    Z = 1.0/(C*1j*omega)
+    return Z
 
 
 @element_metadata(num_params=1, units=['H'])
@@ -104,7 +108,9 @@ def L(p, f):
 
      """
     omega = 2*np.pi*np.array(f)
-    return p[0]*1j*omega
+    L = p[0]
+    Z = L*1j*omega
+    return Z
 
 
 @element_metadata(num_params=1, units=['Ohm sec^-1/2'])
@@ -119,8 +125,8 @@ def W(p, f):
     """
     omega = 2*np.pi*np.array(f)
     Aw = p[0]
-    Zw = Aw*(1-1j)/np.sqrt(omega)
-    return Zw
+    Z = Aw*(1-1j)/np.sqrt(omega)
+    return Z
 
 
 @element_metadata(num_params=2, units=['Ohm', 'sec'])
@@ -138,10 +144,8 @@ def Wo(p, f):
 
     """
     omega = 2*np.pi*np.array(f)
-
     Z0, tau = p[0], p[1]
     Z = Z0/(np.sqrt(1j*omega*tau)*np.tanh(np.sqrt(1j*omega*tau)))
-
     return Z  # Zw(omega)
 
 
@@ -160,10 +164,8 @@ def Ws(p, f):
 
     """
     omega = 2*np.pi*np.array(f)
-
     Z0, tau = p[0], p[1]
     Z = Z0*np.tanh(np.sqrt(1j*omega*tau))/np.sqrt(1j*omega*tau)
-
     return Z
 
 
@@ -180,8 +182,9 @@ def CPE(p, f):
     where :math:`Q` = p[0] and :math:`\\alpha` = p[1].
     """
     omega = 2*np.pi*np.array(f)
-    Q, alpha = p
-    return 1.0/(Q*(1j*omega)**alpha)
+    Q, alpha = p[0], p[1]
+    Z = 1.0/(Q*(1j*omega)**alpha)
+    return Z
 
 
 @element_metadata(num_params=2, units=['H sec', ''])
@@ -200,8 +203,9 @@ def La(p, f):
     <https://www.biologic.net/documents/battery-eis-modified-inductance-element-electrochemsitry-application-note-42>`_.
     """
     omega = 2*np.pi*np.array(f)
-    L, alpha = p
-    return (L*1j*omega)**alpha
+    L, alpha = p[0], p[1]
+    Z = (L*1j*omega)**alpha
+    return Z
 
 
 @element_metadata(num_params=2, units=['Ohm', 'sec'])
@@ -238,9 +242,9 @@ def G(p, f):
     <https://doi.org/10.1016/0013-4686(93)85083-B>`_.
      """
     omega = 2*np.pi*np.array(f)
-    R_G, t_G = p
-    return R_G/np.sqrt(1 + 1j*omega*t_G)
-
+    R_G, t_G = p[0], p[1]
+    Z = R_G/np.sqrt(1 + 1j*omega*t_G)
+    return Z
 
 @element_metadata(num_params=3, units=['Ohm', 'sec', ''])
 def Gs(p, f):
@@ -261,8 +265,7 @@ def Gs(p, f):
     <https://doi.org/10.1016/j.ssi.2008.04.024>`_.
      """
     omega = 2*np.pi*np.array(f)
-    R_G, t_G, phi = p
-
+    R_G, t_G, phi = p[0], p[1], p[2]
     Z = R_G/(np.sqrt(1 + 1j*omega*t_G) *
              np.tanh(phi * np.sqrt(1 + 1j*omega*t_G)))
     return Z
@@ -280,7 +283,9 @@ def K(p, f):
 
     """
     omega = 2*np.pi*np.array(f)
-    return p[0]/(1 + 1j*omega*p[1])
+    R, tau_k = p[0], p[1]
+    Z = R/(1 + 1j*omega*tau_k)
+    return Z
 
 
 @element_metadata(num_params=3, units=['Ohm', 'F sec^(gamma - 1)', ''])
@@ -300,9 +305,10 @@ def TLMQ(p, f):
     <http://doi.org/10.1149/2.1141607jes>`_.
     """
     omega = 2*np.pi*np.array(f)
-    Rion, Qs, gamma = p
+    Rion, Qs, gamma = p[0], p[1], p[2]
     Zs = Qs*(1j*omega)**gamma
-    return np.sqrt(Rion/Zs)/np.tanh(np.sqrt(Rion*Zs))
+    Z = np.sqrt(Rion/Zs)/np.tanh(np.sqrt(Rion*Zs))
+    return Z
 
 
 @element_metadata(num_params=4, units=['Ohm-m^2', 'Ohm-m^2', '', 'sec'])
@@ -336,7 +342,7 @@ def T(p, f):
     """
 
     omega = 2*np.pi*np.array(f)
-    A, B, a, b = p
+    A, B, a, b = p[0], p[1], p[2], p[3]
     beta = (a + 1j*omega*b)**(1/2)
 
     sinh = []
@@ -346,7 +352,8 @@ def T(p, f):
         else:
             sinh.append(1e10)
 
-    return A/(beta*np.tanh(beta)) + B/(beta*np.array(sinh))
+    Z = A/(beta*np.tanh(beta)) + B/(beta*np.array(sinh))
+    return Z
 
 
 circuit_elements = {key: eval(key) for key in set(globals())-set(initial_state)
