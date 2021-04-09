@@ -29,7 +29,7 @@ def set_default_bounds(circuit, constants={}):
     """ This function sets default bounds for optimization.
 
     set_default_bounds sets bounds of 0 and np.inf for all parameters,
-    except the CPE alpha which has an upper bound of 1.
+    except the CPE and La alphas which have an upper bound of 1.
 
     Parameters
     -----------------
