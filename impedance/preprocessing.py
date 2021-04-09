@@ -433,8 +433,8 @@ def saveCSV(filename, frequencies, impedances):
     data = np.vstack([frequencies,
                       np.real(impedances),
                       np.imag(impedances),
-                     ]).T
-    
+                      ]).T
+
     header = 'freq,Re(Z),Im(Z)'
 
     np.savetxt(filename, data, delimiter=',',
