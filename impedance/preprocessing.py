@@ -420,7 +420,7 @@ def saveCSV(filename, frequencies, impedances, **kwargs):
     Parameters
     ----------
     filename: string
-        Filename of .csv file to extract impedance data from
+        Filename of .csv file to save impedance data to
     frequencies : np.ndarray
         Array of frequencies
     impedance : np.ndarray of complex numbers
