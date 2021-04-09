@@ -246,6 +246,7 @@ def G(p, f):
     Z = R_G/np.sqrt(1 + 1j*omega*t_G)
     return Z
 
+
 @element_metadata(num_params=3, units=['Ohm', 'sec', ''])
 def Gs(p, f):
     """ defines a finite-length Gerischer Element as represented in [1]
