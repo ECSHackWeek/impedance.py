@@ -1,8 +1,9 @@
-from impedance.preprocessing import readFile, readGamry, ignoreBelowX
-from impedance.preprocessing import readZPlot, cropFrequencies
+from impedance.preprocessing import readFile, readFile, readGamry, \
+                                    readZPlot, readBioLogic, \
+                                    ignoreBelowX, cropFrequencies, \
+                                    readCSV, saveCSV
 import numpy as np
 import os
-from impedance.preprocessing import readBioLogic
 import pytest
 
 # store some global test data
@@ -447,8 +448,8 @@ def test_readFile():
     for inst in Z_checks:
         if example_files[inst]:
             f, Z = readFile(os.path.join(directory, example_files[inst]), inst)
-            assert (np.isclose(f, f_checks[inst])).all() \
-                and (np.isclose(Z, Z_checks[inst])).all()
+            assert (np.allclose(f, f_checks[inst])) \
+                and (np.allclose(Z, Z_checks[inst]))
     # assert (f == frequencies).all() and (Z == Z_correct).all()
 
 
@@ -469,6 +470,15 @@ def test_readZPlot():
 
     assert (f == f_ZPlot).all() and (Z == Z_ZPlot).all()
     assert (f2 == f_ZPlot2).all() and (Z2 == Z_ZPlot2).all()
+
+
+def test_saveCSV():
+    for inst in Z_checks:
+        if example_files[inst]:
+            f, Z = readFile(os.path.join(directory, example_files[inst]), inst)
+            saveCSV(f'{inst}_test', f, Z)
+            f_read, Z_read = readCSV(f'{inst}_test.csv')
+            assert (np.allclose(f, f_read)) and (np.allclose(Z, Z_read))
 
 
 def test_ignoreBelowX():
