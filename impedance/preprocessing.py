@@ -414,7 +414,7 @@ def readCSV(filename):
     return f, Z
 
 
-def saveCSV(filename, frequencies, impedances):
+def saveCSV(filename, frequencies, impedances, **kwargs):
     """ saves frequencies and impedances to a csv
 
     Parameters
@@ -425,7 +425,8 @@ def saveCSV(filename, frequencies, impedances):
         Array of frequencies
     impedance : np.ndarray of complex numbers
         Array of complex impedances
-
+    kwargs :
+        Keyword arguments passed to np.savetxt
     """
     if not filename.endswith('.csv'):
         filename += '.csv'
@@ -438,7 +439,7 @@ def saveCSV(filename, frequencies, impedances):
     header = 'freq,Re(Z),Im(Z)'
 
     np.savetxt(filename, data, delimiter=',',
-               header=header)
+               header=header, **kwargs)
 
 
 def ignoreBelowX(frequencies, Z):
