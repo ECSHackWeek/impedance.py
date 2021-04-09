@@ -473,6 +473,7 @@ def test_readZPlot():
 
 
 def test_saveCSV():
+    # Read in files, save to CSV, read from CSV, and confirm allclose
     for inst in Z_checks:
         if example_files[inst]:
             f, Z = readFile(os.path.join(directory, example_files[inst]), inst)
