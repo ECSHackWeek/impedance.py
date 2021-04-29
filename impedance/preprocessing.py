@@ -391,12 +391,55 @@ def readCHInstruments(filename):
 
 
 def readCSV(filename):
+    """ function for reading plain csv files
+
+    Parameters
+    ----------
+    filename: string
+        Filename of .csv file to extract impedance data from
+
+    Returns
+    -------
+    frequencies : np.ndarray
+        Array of frequencies
+    impedance : np.ndarray of complex numbers
+        Array of complex impedances
+
+    """
     data = np.genfromtxt(filename, delimiter=',')
 
     f = data[:, 0]
     Z = data[:, 1] + 1j*data[:, 2]
 
     return f, Z
+
+
+def saveCSV(filename, frequencies, impedances, **kwargs):
+    """ saves frequencies and impedances to a csv
+
+    Parameters
+    ----------
+    filename: string
+        Filename of .csv file to save impedance data to
+    frequencies : np.ndarray
+        Array of frequencies
+    impedance : np.ndarray of complex numbers
+        Array of complex impedances
+    kwargs :
+        Keyword arguments passed to np.savetxt
+    """
+    if not filename.endswith('.csv'):
+        filename += '.csv'
+
+    data = np.vstack([frequencies,
+                      np.real(impedances),
+                      np.imag(impedances),
+                      ]).T
+
+    header = 'freq,Re(Z),Im(Z)'
+
+    np.savetxt(filename, data, delimiter=',',
+               header=header, **kwargs)
 
 
 def ignoreBelowX(frequencies, Z):
