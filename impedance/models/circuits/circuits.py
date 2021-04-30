@@ -217,12 +217,6 @@ class BaseCircuit:
             for name, unit, param, conf in zip(names, units, params, confs):
                 to_print += '  {:>5} = {:.2e}'.format(name, param)
                 to_print += '  (+/- {:.2e}) [{}]\n'.format(conf, unit)
-        elif self._is_fit() and self.conf_ is None:
-            params = self.parameters_
-            to_print += '\nFit parameters (confidence calculations failed):\n'
-            for name, unit, param in zip(names, units, params):
-                to_print += '  {:>5} = {:.2e}'.format(name, param)
-                to_print += '  [{}]\n'.format(unit)
 
         return to_print
 

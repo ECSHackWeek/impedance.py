@@ -1,9 +1,11 @@
-from impedance.models.circuits import BaseCircuit, CustomCircuit, Randles
 import json
-import matplotlib.pyplot as plt
-import numpy as np
 import os
+
+import numpy as np
+import matplotlib.pyplot as plt
 import pytest
+
+from impedance.models.circuits import BaseCircuit, CustomCircuit, Randles
 
 # get example data
 data = np.genfromtxt(os.path.join("./data/",

@@ -47,6 +47,20 @@ def test_set_default_bounds():
 
 def test_circuit_fit():
 
+    # Test trivial model (10 Ohm resistor)
+    circuit = 'R0'
+    initial_guess = [10]
+
+    results_simple = [10]
+
+    frequencies = np.array([10, 100, 1000])
+    Z_data = np.array([10, 10, 10]) # impedance is constant
+
+    assert np.allclose(circuit_fit(frequencies, Z_data, circuit,
+                                   initial_guess, constants={},
+                                   global_opt=True)[0],
+                       results_simple, rtol=1e-1)
+
     # Test example circuit from "Getting Started" page
     circuit = 'R0-p(R1,C1)-p(R2-Wo1,C2)'
     initial_guess = [.01, .01, 100, .01, .05, 100, 1]
