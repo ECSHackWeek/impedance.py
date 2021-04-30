@@ -127,17 +127,6 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
     """
     Z = impedances
 
-    # pop kwargs passed in as kwargs
-    # this is useful if a user is trying different kwargs for fitting
-    if 'kwargs' in kwargs:
-        kwargs = kwargs['kwargs']
-
-    # remove kwargs that should not be passed to optimization functions
-    if 'bounds' in kwargs:
-        bounds = kwargs.pop('bounds')
-    if 'global_opt' in kwargs:
-        global_opt = kwargs.pop('global_opt')
-
     # set upper and lower bounds on a per-element basis
     if bounds is None:
         bounds = set_default_bounds(circuit, constants=constants)
@@ -180,9 +169,9 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
             https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.basinhopping.html
             """
 
-            def __init__(self, xmax=bounds[1], xmin=bounds[0]):
-                self.xmax = np.array(xmax)
+            def __init__(self, xmin, xmax):
                 self.xmin = np.array(xmin)
+                self.xmax = np.array(xmax)
 
             def __call__(self, **kwargs):
                 x = kwargs['x_new']
@@ -190,7 +179,7 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
                 tmin = bool(np.all(x >= self.xmin))
                 return tmax and tmin
 
-        basinhopping_bounds = BasinhoppingBounds()
+        basinhopping_bounds = BasinhoppingBounds(xmin=bounds[0], xmax=bounds[1])
         results = basinhopping(opt_function, x0=initial_guess,
                                accept_test=basinhopping_bounds, **kwargs)
         popt = results.x

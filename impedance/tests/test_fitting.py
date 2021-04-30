@@ -93,11 +93,11 @@ def test_circuit_fit():
 
     # Test global fitting on multiple seeds
     # All seeds should converge to the same parameter values
-    # seed = 0
+    # seed = 0 (default)
     assert np.allclose(circuit_fit(example_frequencies_filtered,
                                    Z_correct_filtered, circuit,
                                    initial_guess, constants={},
-                                   global_opt=True, seed=0)[0],
+                                   global_opt=True)[0],
                        results_global, rtol=1e-1)
 
     # seed = 0, with predefined bounds
