@@ -211,7 +211,7 @@ class BaseCircuit:
         to_print += '\nInitial guesses:\n'
         for name, unit, param in zip(names, units, self.initial_guess):
             to_print += '  {:>5} = {:.2e} [{}]\n'.format(name, param, unit)
-        if self._is_fit() and self.conf_ is not None:
+        if self._is_fit():
             params, confs = self.parameters_, self.conf_
             to_print += '\nFit parameters:\n'
             for name, unit, param, conf in zip(names, units, params, confs):
