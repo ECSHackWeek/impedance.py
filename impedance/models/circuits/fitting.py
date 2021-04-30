@@ -179,7 +179,8 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
                 tmin = bool(np.all(x >= self.xmin))
                 return tmax and tmin
 
-        basinhopping_bounds = BasinhoppingBounds(xmin=bounds[0], xmax=bounds[1])
+        basinhopping_bounds = BasinhoppingBounds(xmin=bounds[0],
+                                                 xmax=bounds[1])
         results = basinhopping(opt_function, x0=initial_guess,
                                accept_test=basinhopping_bounds, **kwargs)
         popt = results.x
