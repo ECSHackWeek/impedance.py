@@ -54,7 +54,7 @@ def test_circuit_fit():
     results_simple = [10]
 
     frequencies = np.array([10, 100, 1000])
-    Z_data = np.array([10, 10, 10]) # impedance is constant
+    Z_data = np.array([10, 10, 10])  # impedance is constant
 
     assert np.allclose(circuit_fit(frequencies, Z_data, circuit,
                                    initial_guess, constants={},
