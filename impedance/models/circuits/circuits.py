@@ -19,12 +19,12 @@ class BaseCircuit:
         initial_guess: numpy array
             Initial guess of the circuit values
 
-        constants : dict
-            (Optional) Parameters and values to hold constant during fitting
+        constants : dict, optional
+            Parameters and values to hold constant during fitting
             (e.g. {"R0": 0.1})
 
-        name : str
-            (Optional) Name for the circuit
+        name : str, optional
+            Name for the circuit
         """
 
         # if supplied, check that initial_guess is valid and store
@@ -74,7 +74,10 @@ class BaseCircuit:
             which has an upper bound of 1
 
         kwargs :
-            Keyword arguments passed to scipy.optimize.curve_fit
+            Keyword arguments passed to
+            impedance.models.circuits.fitting.circuit_fit,
+            and subsequently to scipy.optimize.curve_fit
+            or scipy.optimize.basinhopping
 
         Returns
         -------
@@ -104,8 +107,8 @@ class BaseCircuit:
         if self.initial_guess != []:
             parameters, conf = circuit_fit(frequencies, impedance,
                                            self.circuit, self.initial_guess,
-                                           self.constants, bounds=bounds,
-                                           **kwargs)
+                                           constants=self.constants,
+                                           bounds=bounds, **kwargs)
             self.parameters_ = parameters
             if conf is not None:
                 self.conf_ = conf

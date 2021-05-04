@@ -25,9 +25,49 @@ def rmse(a, b):
     return np.linalg.norm(a - b) / np.sqrt(n)
 
 
-def circuit_fit(frequencies, impedances, circuit, initial_guess, constants,
-                bounds=None, bootstrap=False, global_opt=False, seed=0,
-                **kwargs):
+def set_default_bounds(circuit, constants={}):
+    """ This function sets default bounds for optimization.
+
+    set_default_bounds sets bounds of 0 and np.inf for all parameters,
+    except the CPE and La alphas which have an upper bound of 1.
+
+    Parameters
+    -----------------
+    circuit : string
+        String defining the equivalent circuit to be fit
+
+    constants : dictionary, optional
+        Parameters and their values to hold constant during fitting
+        (e.g. {"RO": 0.1}). Defaults to {}
+
+    Returns
+    ------------
+    bounds : 2-tuple of array_like
+        Lower and upper bounds on parameters.
+    """
+
+    # extract the elements from the circuit
+    extracted_elements = extract_circuit_elements(circuit)
+
+    # loop through bounds
+    lower_bounds, upper_bounds = [], []
+    for elem in extracted_elements:
+        raw_element = get_element_from_name(elem)
+        for i in range(check_and_eval(raw_element).num_params):
+            if elem in constants or elem + f'_{i}' in constants:
+                continue
+            if raw_element in ['CPE', 'La'] and i == 1:
+                upper_bounds.append(1)
+            else:
+                upper_bounds.append(np.inf)
+            lower_bounds.append(0)
+
+    bounds = ((lower_bounds), (upper_bounds))
+    return bounds
+
+
+def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
+                bounds=None, global_opt=False, **kwargs):
 
     """ Main function for fitting an equivalent circuit to data.
 
@@ -49,14 +89,14 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants,
         Impedances
 
     circuit : string
-        string defining the equivalent circuit to be fit
+        String defining the equivalent circuit to be fit
 
     initial_guess : list of floats
-        initial guesses for the fit parameters
+        Initial guesses for the fit parameters
 
-    constants : dictionary
-        parameters and their values to hold constant during fitting
-        (e.g. {"RO": 0.1})
+    constants : dictionary, optional
+        Parameters and their values to hold constant during fitting
+        (e.g. {"RO": 0.1}). Defaults to {}
 
     bounds : 2-tuple of array_like, optional
         Lower and upper bounds on parameters. Defaults to bounds on all
@@ -66,10 +106,6 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants,
     global_opt : bool, optional
         If global optimization should be used (uses the basinhopping
         algorithm). Defaults to False
-
-    seed : int, optional
-        Random seed, only used for the basinhopping algorithm.
-        Defaults to 0
 
     kwargs :
         Keyword arguments passed to scipy.optimize.curve_fit or
@@ -91,27 +127,13 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants,
     """
     Z = impedances
 
-    # extract the elements from the circuit
-    extracted_elements = extract_circuit_elements(circuit)
-
     # set upper and lower bounds on a per-element basis
     if bounds is None:
-        lower_bounds, upper_bounds = [], []
-        for elem in extracted_elements:
-            raw_element = get_element_from_name(elem)
-            for i in range(check_and_eval(raw_element).num_params):
-                if elem in constants or elem + '_{}'.format(i) in constants:
-                    continue
-                if raw_element in ['CPE', 'La'] and i == 1:
-                    upper_bounds.append(1)
-                else:
-                    upper_bounds.append(np.inf)
-                lower_bounds.append(0)
-        bounds = ((lower_bounds), (upper_bounds))
+        bounds = set_default_bounds(circuit, constants=constants)
 
     if not global_opt:
         if 'maxfev' not in kwargs:
-            kwargs['maxfev'] = 100000
+            kwargs['maxfev'] = 1e5
         if 'ftol' not in kwargs:
             kwargs['ftol'] = 1e-13
 
@@ -122,6 +144,9 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants,
         perror = np.sqrt(np.diag(pcov))
 
     else:
+        if 'seed' not in kwargs:
+            kwargs['seed'] = 0
+
         def opt_function(x):
             """ Short function for basinhopping to optimize over.
             We want to minimize the RMSE between the fit and the data.
@@ -144,28 +169,30 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants,
             https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.basinhopping.html
             """
 
-            def __init__(self, xmax=upper_bounds, xmin=lower_bounds):
-                self.xmax = np.array(xmax)
+            def __init__(self, xmin, xmax):
                 self.xmin = np.array(xmin)
+                self.xmax = np.array(xmax)
 
             def __call__(self, **kwargs):
-                x = kwargs["x_new"]
+                x = kwargs['x_new']
                 tmax = bool(np.all(x <= self.xmax))
                 tmin = bool(np.all(x >= self.xmin))
                 return tmax and tmin
 
-        basinhopping_bounds = BasinhoppingBounds()
-        results = basinhopping(opt_function, x0=initial_guess, seed=seed,
+        basinhopping_bounds = BasinhoppingBounds(xmin=bounds[0],
+                                                 xmax=bounds[1])
+        results = basinhopping(opt_function, x0=initial_guess,
                                accept_test=basinhopping_bounds, **kwargs)
         popt = results.x
 
         # jacobian -> covariance
         # https://stats.stackexchange.com/q/231868
-        jac = results.lowest_optimization_result["jac"][np.newaxis]
+        jac = results.lowest_optimization_result['jac'][np.newaxis]
         try:
-            perror = inv(np.dot(jac.T, jac)) * opt_function(popt) ** 2
-        except np.linalg.LinAlgError:
-            warnings.warn("Failed to compute perror")
+            pcov = inv(np.dot(jac.T, jac)) * opt_function(popt) ** 2
+            perror = np.sqrt(np.diag(pcov))
+        except (ValueError, np.linalg.LinAlgError):
+            warnings.warn('Failed to compute perror')
             perror = None
 
     return popt, perror
@@ -174,7 +201,8 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants,
 def wrapCircuit(circuit, constants):
     """ wraps function so we can pass the circuit string """
     def wrappedCircuit(frequencies, *parameters):
-        """ returns a stacked
+        """ returns a stacked array of real and imaginary impedance
+        components
 
         Parameters
         ----------
