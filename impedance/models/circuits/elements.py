@@ -272,6 +272,33 @@ def Gs(p, f):
     return Z
 
 
+@element_metadata(num_params=4, units=['Ohm', '', '', '', ''])
+def Tas(p, f):
+    """ defines a Ls-de Levie Pore - Finite Length
+
+    Notes
+    ---------
+    .. math::
+        Z = \\frac{Z_0}{\\sqrt{gamma}\\tanh{\\sart{gamma}}}
+        gamma = \\frac{1}{\\A} + \\B \\{power{j \\ omega}\\Phi}
+    where :math:`Z_0` = p[0] (Ohms) and
+    :math:`\\A` = p[1] ('') , `\\B` = p[2] (''), `\\Phi` = p[3] ('')
+    [1] A.Lasia, "Impedance of porous electrodes", Modern
+    Aspects of electrochemistry,
+    "Modellingand Numerical Simulations,"
+    vol.43, p.67-138, M.Schlesinger,
+    Ed.,Springer, 2009, IsBN: 978-0-387-49580-4.
+    [2] R De Levie, Adv. electrochem. Elecrochem. eng., 6(1967) 329.
+
+    """
+    omega = 2*np.pi*np.array(f)
+
+    Z0, A, B, Phi = p[0], p[1], p[2], p[3]
+    gamma = (1/A) + (B*np.power(1j*omega, Phi))
+    Z = Z0/(np.sqrt(gamma)*np.tanh(np.sqrt(gamma)))
+    return Z
+
+
 @element_metadata(num_params=2, units=['Ohm', 'sec'])
 def K(p, f):
     """ An RC element for use in lin-KK model
