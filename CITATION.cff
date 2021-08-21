@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you use impedance.py in published work, please consider citing https://joss.theoj.org/papers/10.21105/joss.02349 as shown below"
+preferred-citation:
+  type: article
+  doi: 10.21105/joss.02349
+  url: https://doi.org/10.21105/joss.02349
+  year: 2020
+  publisher: The Open Journal
+  volume: 5
+  number: 52
+  pages: 2349
+  authors:
+    - family-names: Murbach
+      given-names: Matthew
+      orcid: http://orcid.org/0000-0002-6583-5995
+    - family-names: Gerwe
+      given-names: Brian
+      orcid: http://orcid.org/0000-0002-1184-8483
+    - family-names: Dawson-Elli
+      given-names: Neal
+      orcid: http://orcid.org/0000-0003-4559-7309
+    - family-names: Tsui
+      given-names: Lok-kun
+      orcid: http://orcid.org/0000-0001-7381-0686
+  title: "impedance.py: A Python package for electrochemical impedance analysis"
+  journal: Journal of Open Source Software
