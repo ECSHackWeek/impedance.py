@@ -140,7 +140,7 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
         popt, pcov = curve_fit(wrapCircuit(circuit, constants), frequencies,
                                np.hstack([Z.real, Z.imag]),
                                p0=initial_guess, bounds=bounds, **kwargs)
-        
+
         # Calculate one standard deviation error estimates for fit parameters,
         # defined as the square root of the diagonal of the covariance matrix.
         # https://stackoverflow.com/a/52275674/5144795
@@ -194,7 +194,7 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
             # jacobian -> covariance
             # https://stats.stackexchange.com/q/231868
             pcov = inv(np.dot(jac.T, jac)) * opt_function(popt) ** 2
-            # covariance -> perror (one standard deviation 
+            # covariance -> perror (one standard deviation
             # error estimates for fit parameters)
             perror = np.sqrt(np.diag(pcov))
         except (ValueError, np.linalg.LinAlgError):
