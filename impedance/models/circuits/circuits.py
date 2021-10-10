@@ -57,7 +57,8 @@ class BaseCircuit:
         else:
             raise TypeError('Comparing object is not of the same type.')
 
-    def fit(self, frequencies, impedance, bounds=None, **kwargs):
+    def fit(self, frequencies, impedance, bounds=None,
+            weight_by_modulus=False, **kwargs):
         """ Fit the circuit model
 
         Parameters
@@ -72,6 +73,11 @@ class BaseCircuit:
             Lower and upper bounds on parameters. Defaults to bounds on all
             parameters of 0 and np.inf, except the CPE alpha
             which has an upper bound of 1
+
+        weight_by_modulus : bool, optional
+            Uses the modulus of each data (|Z|) as the weighting factor.
+            Standard weighting scheme when experimental variances are
+            unavailable. Only applicable when global_opt = False
 
         kwargs :
             Keyword arguments passed to
@@ -108,7 +114,9 @@ class BaseCircuit:
             parameters, conf = circuit_fit(frequencies, impedance,
                                            self.circuit, self.initial_guess,
                                            constants=self.constants,
-                                           bounds=bounds, **kwargs)
+                                           bounds=bounds,
+                                           weight_by_modulus=weight_by_modulus,
+                                           **kwargs)
             self.parameters_ = parameters
             if conf is not None:
                 self.conf_ = conf

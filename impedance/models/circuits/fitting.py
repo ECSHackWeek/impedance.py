@@ -67,7 +67,8 @@ def set_default_bounds(circuit, constants={}):
 
 
 def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
-                bounds=None, global_opt=False, **kwargs):
+                bounds=None, weight_by_modulus=False, global_opt=False,
+                **kwargs):
 
     """ Main function for fitting an equivalent circuit to data.
 
@@ -103,6 +104,11 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
         parameters of 0 and np.inf, except the CPE alpha
         which has an upper bound of 1
 
+    weight_by_modulus : bool, optional
+        Uses the modulus of each data (|Z|) as the weighting factor.
+        Standard weighting scheme when experimental variances are unavailable.
+        Only applicable when global_opt = False
+
     global_opt : bool, optional
         If global optimization should be used (uses the basinhopping
         algorithm). Defaults to False
@@ -136,6 +142,11 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
             kwargs['maxfev'] = 1e5
         if 'ftol' not in kwargs:
             kwargs['ftol'] = 1e-13
+
+        # weighting scheme for fitting
+        if weight_by_modulus:
+            abs_Z = np.abs(Z)
+            kwargs['sigma'] = np.hstack([abs_Z, abs_Z])
 
         popt, pcov = curve_fit(wrapCircuit(circuit, constants), frequencies,
                                np.hstack([Z.real, Z.imag]),
