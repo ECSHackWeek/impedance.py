@@ -90,6 +90,7 @@ This project started at the [2018 Electrochemical Society (ECS) Hack Week in Sea
   </tr>
   <tr>
     <td align="center"><a href="https://petermattia.com"><img src="https://avatars.githubusercontent.com/u/29551858?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Peter Attia</b></sub></a><br /><a href="https://github.com/ECSHackWeek/impedance.py/commits?author=petermattia" title="Code">💻</a> <a href="https://github.com/ECSHackWeek/impedance.py/commits?author=petermattia" title="Tests">⚠️</a> <a href="https://github.com/ECSHackWeek/impedance.py/commits?author=petermattia" title="Documentation">📖</a></td>
+    <td align="center"><a href="http://sdkang.org"><img src="https://avatars.githubusercontent.com/u/55116501?v=4?s=100" width="100px;" alt=""/><br /><sub><b>sdkang</b></sub></a><br /><a href="https://github.com/ECSHackWeek/impedance.py/commits?author=stephendkang" title="Tests">⚠️</a> <a href="https://github.com/ECSHackWeek/impedance.py/commits?author=stephendkang" title="Code">💻</a></td>
   </tr>
 </table>
 
