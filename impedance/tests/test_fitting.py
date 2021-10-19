@@ -105,6 +105,13 @@ def test_circuit_fit():
                                    constants={})[0],
                        results_local_weighted, rtol=1e-2)
 
+    # Test if using weight_by_modulus=True produces the same results
+    assert np.allclose(circuit_fit(example_frequencies_filtered,
+                                   Z_correct_filtered, circuit,
+                                   initial_guess, weight_by_modulus=True,
+                                   constants={})[0],
+                       results_local_weighted, rtol=1e-2)
+
     # Test global fitting on multiple seeds
     # All seeds should converge to the same parameter values
     # seed = 0 (default)
