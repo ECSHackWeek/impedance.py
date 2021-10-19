@@ -153,6 +153,16 @@
         "test",
         "doc"
       ]
+    },
+    {
+      "login": "stephendkang",
+      "name": "sdkang",
+      "avatar_url": "https://avatars.githubusercontent.com/u/55116501?v=4",
+      "profile": "http://sdkang.org",
+      "contributions": [
+        "test",
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
