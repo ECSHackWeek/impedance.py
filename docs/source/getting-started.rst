@@ -112,13 +112,13 @@ Step 2: Import your data
 
 This example will assume the following dataset is located in your current working directory (feel free to replace it with your data): :download:`exampleData.csv <_static/exampleData.csv>`
 
-For this dataset, importing the data looks something like:
+For this dataset which simply contains impedance data in three columns (frequency, Z_real, Z_imag), importing the data looks something like:
 
 .. code-block:: python
 
   from impedance import preprocessing
 
-  # Load data from the example EIS result
+  # Load data from the example EIS data
   frequencies, Z = preprocessing.readCSV('./exampleData.csv')
 
   # keep only the impedance data in the first quandrant
