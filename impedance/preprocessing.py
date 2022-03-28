@@ -396,7 +396,8 @@ def readCSV(filename):
     Parameters
     ----------
     filename: string
-        Filename of .csv file to extract impedance data from
+        Filename of .csv file to extract impedance data from where
+        the file has three columns (frequency, Z_real, Z_imag)
 
     Returns
     -------
