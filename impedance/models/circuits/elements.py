@@ -1,18 +1,7 @@
 import numpy as np
 
-initial_state = globals().copy()
-non_element_functions = ['element_metadata',
-                         'initial_state',
-                         'non_element_functions',
-                         'typeChecker',
-                         'circuit_elements']
-# populated at the end of the file -
-# this maps ex. 'R' to the function R to always give us a list of
-# active elements in any context
-circuit_elements = {}
 
-
-def element_metadata(num_params, units):
+def element(num_params, units):
     """ decorator to store metadata for a circuit element
 
         Parameters
@@ -22,6 +11,7 @@ def element_metadata(num_params, units):
         units : list of str
             list of units for the element parameters
     """
+
     def decorator(func):
         def wrapper(p, f):
             typeChecker(p, f, func.__name__, num_params)
@@ -32,7 +22,14 @@ def element_metadata(num_params, units):
         wrapper.__name__ = func.__name__
         wrapper.__doc__ = func.__doc__
 
+        global circuit_elements
+        if func.__name__ not in circuit_elements:
+            circuit_elements[func.__name__] = wrapper
+
         return wrapper
+
+    # add this circuit to the global list of circuit elements if not already in there
+
     return decorator
 
 
@@ -61,13 +58,20 @@ def p(parallel):
         Z = \\frac{1}{\\frac{1}{Z_1} + \\frac{1}{Z_2} + ... + \\frac{1}{Z_n}}
 
      """
-    z = len(parallel[0])*[0 + 0*1j]
+    z = len(parallel[0]) * [0 + 0 * 1j]
     for elem in parallel:
         z += 1/elem
     return 1/z
 
 
-@element_metadata(num_params=1, units=['Ohm'])
+# manually add parallel and series operators to circuit elements dict w/o metadata
+# populated by the element decorator -
+# this maps ex. 'R' to the function R to always give us a list of
+# active elements in any context
+circuit_elements = {"s": s, "p": p}
+
+
+@element(num_params=1, units=["Ohm"])
 def R(p, f):
     """ defines a resistor
 
@@ -83,7 +87,7 @@ def R(p, f):
     return Z
 
 
-@element_metadata(num_params=1, units=['F'])
+@element(num_params=1, units=["F"])
 def C(p, f):
     """ defines a capacitor
 
@@ -98,7 +102,7 @@ def C(p, f):
     return Z
 
 
-@element_metadata(num_params=1, units=['H'])
+@element(num_params=1, units=["H"])
 def L(p, f):
     """ defines an inductor
 
@@ -113,7 +117,7 @@ def L(p, f):
     return Z
 
 
-@element_metadata(num_params=1, units=['Ohm sec^-1/2'])
+@element(num_params=1, units=["Ohm sec^-1/2"])
 def W(p, f):
     """ defines a semi-infinite Warburg element
 
@@ -129,7 +133,7 @@ def W(p, f):
     return Z
 
 
-@element_metadata(num_params=2, units=['Ohm', 'sec'])
+@element(num_params=2, units=["Ohm", "sec"])
 def Wo(p, f):
     """ defines an open (finite-space) Warburg element
 
@@ -149,7 +153,7 @@ def Wo(p, f):
     return Z  # Zw(omega)
 
 
-@element_metadata(num_params=2, units=['Ohm', 'sec'])
+@element(num_params=2, units=["Ohm", "sec"])
 def Ws(p, f):
     """ defines a short (finite-length) Warburg element
 
@@ -169,7 +173,7 @@ def Ws(p, f):
     return Z
 
 
-@element_metadata(num_params=2, units=['Ohm^-1 sec^a', ''])
+@element(num_params=2, units=["Ohm^-1 sec^a", ""])
 def CPE(p, f):
     """ defines a constant phase element
 
@@ -187,7 +191,7 @@ def CPE(p, f):
     return Z
 
 
-@element_metadata(num_params=2, units=['H sec', ''])
+@element(num_params=2, units=["H sec", ""])
 def La(p, f):
     """ defines a modified inductance element as represented in [1]
 
@@ -208,7 +212,7 @@ def La(p, f):
     return Z
 
 
-@element_metadata(num_params=2, units=['Ohm', 'sec'])
+@element(num_params=2, units=["Ohm", "sec"])
 def G(p, f):
     """ defines a Gerischer Element as represented in [1]
 
@@ -247,7 +251,7 @@ def G(p, f):
     return Z
 
 
-@element_metadata(num_params=3, units=['Ohm', 'sec', ''])
+@element(num_params=3, units=["Ohm", "sec", ""])
 def Gs(p, f):
     """ defines a finite-length Gerischer Element as represented in [1]
 
@@ -272,7 +276,7 @@ def Gs(p, f):
     return Z
 
 
-@element_metadata(num_params=2, units=['Ohm', 'sec'])
+@element(num_params=2, units=["Ohm", "sec"])
 def K(p, f):
     """ An RC element for use in lin-KK model
 
@@ -283,13 +287,13 @@ def K(p, f):
         Z = \\frac{R}{1 + j \\omega \\tau_k}
 
     """
-    omega = 2*np.pi*np.array(f)
+    omega = 2 * np.pi * np.array(f)
     R, tau_k = p[0], p[1]
-    Z = R/(1 + 1j*omega*tau_k)
+    Z = R / (1 + 1j * omega * tau_k)
     return Z
 
 
-@element_metadata(num_params=3, units=['Ohm', 'F sec^(gamma - 1)', ''])
+@element(num_params=3, units=["Ohm", "F sec^(gamma - 1)", ""])
 def TLMQ(p, f):
     """ Simplified transmission-line model as defined in Eq. 11 of [1]
 
@@ -312,7 +316,7 @@ def TLMQ(p, f):
     return Z
 
 
-@element_metadata(num_params=4, units=['Ohm-m^2', 'Ohm-m^2', '', 'sec'])
+@element(num_params=4, units=["Ohm-m^2", "Ohm-m^2", "", "sec"])
 def T(p, f):
     """ A macrohomogeneous porous electrode model from Paasch et al. [1]
 
@@ -355,10 +359,6 @@ def T(p, f):
 
     Z = A/(beta*np.tanh(beta)) + B/(beta*np.array(sinh))
     return Z
-
-
-circuit_elements = {key: eval(key) for key in set(globals())-set(initial_state)
-                    if key not in non_element_functions}
 
 
 def get_element_from_name(name):
