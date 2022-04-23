@@ -78,8 +78,8 @@ def test_BaseCircuit():
 
 
 def test_Randles():
-    randles = Randles(initial_guess=[.01, .005, .1, .01, 200])
-    randlesCPE = Randles(initial_guess=[.01, .05, .1, 0.9, .01, 200], CPE=True)
+    randles = Randles(initial_guess=[.01, .005, .01, 200, .1])
+    randlesCPE = Randles(initial_guess=[.01, .05, .01, 200, .1, 0.9], CPE=True)
     with pytest.raises(ValueError):
         randlesCPE = Randles([.01, 200])  # incorrect initial guess length
     randles.fit(f[np.imag(Z) < 0], Z[np.imag(Z) < 0])
@@ -87,13 +87,13 @@ def test_Randles():
 
     # compare with known fit parameters
     np.testing.assert_almost_equal(randles.parameters_,
-                                   np.array([1.86146620e-02, 1.15477171e-02,
-                                             1.33331949e+00, 6.31473571e-02,
-                                             2.22407275e+02]), decimal=2)
+                                   np.array([1.86235717e-02, 1.16804085e-02,
+                                             6.27121224e-02, 2.21232935e+02,
+                                             1.17171440e+00]), decimal=2)
 
     # compare with known impedance predictions
     assert np.isclose(randles.predict(np.array([10.0])),
-                      np.complex(0.02495749, -0.00614842))
+                      np.complex(0.0251618, -0.00601304))
 
     # check altair plotting with a fit circuit
     chart = randles.plot(f_data=f, Z_data=Z)
@@ -116,8 +116,8 @@ def test_Randles():
     randles.plot(Z_data=Z, kind='nyquist')
 
     # check equality comparisons work
-    randles1 = Randles(initial_guess=[.01, .005, .1, .0001, 200])
-    randles2 = Randles(initial_guess=[.01, .005, .1, .0001, 200])
+    randles1 = Randles(initial_guess=[.01, .005, .0001, 200, .1])
+    randles2 = Randles(initial_guess=[.01, .005, .0001, 200, .1])
     assert randles1 == randles2
 
     randles1.fit(f[np.imag(Z) < 0], Z[np.imag(Z) < 0])
