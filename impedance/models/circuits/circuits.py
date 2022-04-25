@@ -445,7 +445,7 @@ class CustomCircuit(BaseCircuit):
         of the same type easier.
 
         Example:
-            Randles circuit is given by 'R0-p(R1,C1)-Wo1'
+            Randles circuit is given by 'R0-p(R1-Wo1,C1)'
 
         """
 
