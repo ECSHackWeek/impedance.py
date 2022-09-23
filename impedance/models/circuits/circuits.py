@@ -10,10 +10,9 @@ import warnings
 
 
 class BaseCircuit:
-    """Base class for equivalent circuit models"""
-
+    """ Base class for equivalent circuit models """
     def __init__(self, initial_guess=[], constants=None, name=None):
-        """Base constructor for any equivalent circuit model
+        """ Base constructor for any equivalent circuit model
 
         Parameters
         ----------
@@ -32,7 +31,7 @@ class BaseCircuit:
         initial_guess = list(filter(None, initial_guess))
         for i in initial_guess:
             if not isinstance(i, (float, int, np.int32, np.float64)):
-                raise TypeError(f"value {i} in initial_guess is not a number")
+                raise TypeError(f'value {i} in initial_guess is not a number')
 
         # initalize class attributes
         self.initial_guess = initial_guess
@@ -56,12 +55,11 @@ class BaseCircuit:
                     matches.append(value == other.__dict__[key])
             return np.array(matches).all()
         else:
-            raise TypeError("Comparing object is not of the same type.")
+            raise TypeError('Comparing object is not of the same type.')
 
-    def fit(
-        self, frequencies, impedance, bounds=None, weight_by_modulus=False, **kwargs
-    ):
-        """Fit the circuit model
+    def fit(self, frequencies, impedance, bounds=None,
+            weight_by_modulus=False, **kwargs):
+        """ Fit the circuit model
 
         Parameters
         ----------
@@ -99,54 +97,44 @@ class BaseCircuit:
         #    impedance and frequency match in length
 
         if not isinstance(frequencies, np.ndarray):
-            raise TypeError("frequencies is not of type np.ndarray")
-        if not (
-            np.issubdtype(frequencies.dtype, np.integer)
-            or np.issubdtype(frequencies.dtype, np.floating)
-        ):
-            raise TypeError(
-                "frequencies array should have a numeric "
-                + f"dtype (currently {frequencies.dtype})"
-            )
+            raise TypeError('frequencies is not of type np.ndarray')
+        if not (np.issubdtype(frequencies.dtype, np.integer) or
+                np.issubdtype(frequencies.dtype, np.floating)):
+            raise TypeError('frequencies array should have a numeric ' +
+                            f'dtype (currently {frequencies.dtype})')
         if not isinstance(impedance, np.ndarray):
-            raise TypeError("impedance is not of type np.ndarray")
-        if impedance.dtype != complex:
-            raise TypeError(
-                "impedance array should have a complex "
-                + f"dtype (currently {impedance.dtype})"
-            )
+            raise TypeError('impedance is not of type np.ndarray')
+        if impedance.dtype != np.complex:
+            raise TypeError('impedance array should have a complex ' +
+                            f'dtype (currently {impedance.dtype})')
         if len(frequencies) != len(impedance):
-            raise TypeError("length of frequencies and impedance do not match")
+            raise TypeError('length of frequencies and impedance do not match')
 
         if self.initial_guess != []:
-            parameters, conf = circuit_fit(
-                frequencies,
-                impedance,
-                self.circuit,
-                self.initial_guess,
-                constants=self.constants,
-                bounds=bounds,
-                weight_by_modulus=weight_by_modulus,
-                **kwargs,
-            )
+            parameters, conf = circuit_fit(frequencies, impedance,
+                                           self.circuit, self.initial_guess,
+                                           constants=self.constants,
+                                           bounds=bounds,
+                                           weight_by_modulus=weight_by_modulus,
+                                           **kwargs)
             self.parameters_ = parameters
             if conf is not None:
                 self.conf_ = conf
         else:
             # TODO auto calculate initial guesses
-            raise ValueError("no initial guess supplied")
+            raise ValueError('no initial guess supplied')
 
         return self
 
     def _is_fit(self):
-        """check if model has been fit (parameters_ is not None)"""
+        """ check if model has been fit (parameters_ is not None) """
         if self.parameters_ is not None:
             return True
         else:
             return False
 
     def predict(self, frequencies, use_initial=False):
-        """Predict impedance using an equivalent circuit model
+        """ Predict impedance using an equivalent circuit model
 
         Parameters
         ----------
@@ -162,48 +150,32 @@ class BaseCircuit:
             Predicted impedance
         """
         if not isinstance(frequencies, np.ndarray):
-            raise TypeError("frequencies is not of type np.ndarray")
-        if not (
-            np.issubdtype(frequencies.dtype, np.integer)
-            or np.issubdtype(frequencies.dtype, np.floating)
-        ):
-            raise TypeError(
-                "frequencies array should have a numeric "
-                + f"dtype (currently {frequencies.dtype})"
-            )
+            raise TypeError('frequencies is not of type np.ndarray')
+        if not (np.issubdtype(frequencies.dtype, np.integer) or
+                np.issubdtype(frequencies.dtype, np.floating)):
+            raise TypeError('frequencies array should have a numeric ' +
+                            f'dtype (currently {frequencies.dtype})')
 
         if self._is_fit() and not use_initial:
-            return eval(
-                buildCircuit(
-                    self.circuit,
-                    frequencies,
-                    *self.parameters_,
-                    constants=self.constants,
-                    eval_string="",
-                    index=0,
-                )[0],
-                circuit_elements,
-            )
+            return eval(buildCircuit(self.circuit, frequencies,
+                                     *self.parameters_,
+                                     constants=self.constants, eval_string='',
+                                     index=0)[0],
+                        circuit_elements)
         else:
             warnings.warn("Simulating circuit based on initial parameters")
-            return eval(
-                buildCircuit(
-                    self.circuit,
-                    frequencies,
-                    *self.initial_guess,
-                    constants=self.constants,
-                    eval_string="",
-                    index=0,
-                )[0],
-                circuit_elements,
-            )
+            return eval(buildCircuit(self.circuit, frequencies,
+                                     *self.initial_guess,
+                                     constants=self.constants, eval_string='',
+                                     index=0)[0],
+                        circuit_elements)
 
     def get_param_names(self):
-        """Converts circuit string to names and units"""
+        """ Converts circuit string to names and units """
 
         # parse the element names from the circuit string
-        names = self.circuit.replace("p", "").replace("(", "").replace(")", "")
-        names = names.replace(",", "-").replace(" ", "").split("-")
+        names = self.circuit.replace('p', '').replace('(', '').replace(')', '')
+        names = names.replace(',', '-').replace(' ', '').split('-')
 
         full_names, all_units = [], []
         for name in names:
@@ -212,7 +184,7 @@ class BaseCircuit:
             units = check_and_eval(elem).units
             if num_params > 1:
                 for j in range(num_params):
-                    full_name = "{}_{}".format(name, j)
+                    full_name = '{}_{}'.format(name, j)
                     if full_name not in self.constants.keys():
                         full_names.append(full_name)
                         all_units.append(units[j])
@@ -224,40 +196,40 @@ class BaseCircuit:
         return full_names, all_units
 
     def __str__(self):
-        """Defines the pretty printing of the circuit"""
+        """ Defines the pretty printing of the circuit"""
 
-        to_print = "\n"
+        to_print = '\n'
         if self.name is not None:
-            to_print += "Name: {}\n".format(self.name)
-        to_print += "Circuit string: {}\n".format(self.circuit)
+            to_print += 'Name: {}\n'.format(self.name)
+        to_print += 'Circuit string: {}\n'.format(self.circuit)
         to_print += "Fit: {}\n".format(self._is_fit())
 
         if len(self.constants) > 0:
-            to_print += "\nConstants:\n"
+            to_print += '\nConstants:\n'
             for name, value in self.constants.items():
                 elem = get_element_from_name(name)
                 units = check_and_eval(elem).units
-                if "_" in name:
-                    unit = units[int(name.split("_")[-1])]
+                if '_' in name:
+                    unit = units[int(name.split('_')[-1])]
                 else:
                     unit = units[0]
-                to_print += "  {:>5} = {:.2e} [{}]\n".format(name, value, unit)
+                to_print += '  {:>5} = {:.2e} [{}]\n'.format(name, value, unit)
 
         names, units = self.get_param_names()
-        to_print += "\nInitial guesses:\n"
+        to_print += '\nInitial guesses:\n'
         for name, unit, param in zip(names, units, self.initial_guess):
-            to_print += "  {:>5} = {:.2e} [{}]\n".format(name, param, unit)
+            to_print += '  {:>5} = {:.2e} [{}]\n'.format(name, param, unit)
         if self._is_fit():
             params, confs = self.parameters_, self.conf_
-            to_print += "\nFit parameters:\n"
+            to_print += '\nFit parameters:\n'
             for name, unit, param, conf in zip(names, units, params, confs):
-                to_print += "  {:>5} = {:.2e}".format(name, param)
-                to_print += "  (+/- {:.2e}) [{}]\n".format(conf, unit)
+                to_print += '  {:>5} = {:.2e}'.format(name, param)
+                to_print += '  (+/- {:.2e}) [{}]\n'.format(conf, unit)
 
         return to_print
 
-    def plot(self, ax=None, f_data=None, Z_data=None, kind="altair", **kwargs):
-        """visualizes the model and optional data as a nyquist,
+    def plot(self, ax=None, f_data=None, Z_data=None, kind='altair', **kwargs):
+        """ visualizes the model and optional data as a nyquist,
             bode, or altair (interactive) plots
 
         Parameters
@@ -285,12 +257,12 @@ class BaseCircuit:
             axes of the created nyquist plot
         """
 
-        if kind == "nyquist":
+        if kind == 'nyquist':
             if ax is None:
                 fig, ax = plt.subplots(figsize=(5, 5))
 
             if Z_data is not None:
-                ax = plot_nyquist(ax, Z_data, ls="", marker="s", **kwargs)
+                ax = plot_nyquist(ax, Z_data, ls='', marker='s', **kwargs)
 
             if self._is_fit():
                 if f_data is not None:
@@ -299,9 +271,9 @@ class BaseCircuit:
                     f_pred = np.logspace(5, -3)
 
                 Z_fit = self.predict(f_pred)
-                ax = plot_nyquist(ax, Z_fit, ls="-", marker="", **kwargs)
+                ax = plot_nyquist(ax, Z_fit, ls='-', marker='', **kwargs)
             return ax
-        elif kind == "bode":
+        elif kind == 'bode':
             if ax is None:
                 fig, ax = plt.subplots(nrows=2, figsize=(5, 5))
 
@@ -312,20 +284,19 @@ class BaseCircuit:
 
             if Z_data is not None:
                 if f_data is None:
-                    raise ValueError(
-                        "f_data must be specified if" + " Z_data for a Bode plot"
-                    )
-                ax = plot_bode(ax, f_data, Z_data, ls="", marker="s", **kwargs)
+                    raise ValueError('f_data must be specified if' +
+                                     ' Z_data for a Bode plot')
+                ax = plot_bode(ax, f_data, Z_data, ls='', marker='s', **kwargs)
 
             if self._is_fit():
                 Z_fit = self.predict(f_pred)
-                ax = plot_bode(ax, f_pred, Z_fit, ls="-", marker="", **kwargs)
+                ax = plot_bode(ax, f_pred, Z_fit, ls='-', marker='', **kwargs)
             return ax
-        elif kind == "altair":
+        elif kind == 'altair':
             plot_dict = {}
 
             if Z_data is not None and f_data is not None:
-                plot_dict["data"] = {"f": f_data, "Z": Z_data}
+                plot_dict['data'] = {'f': f_data, 'Z': Z_data}
 
             if self._is_fit():
                 if f_data is not None:
@@ -337,19 +308,17 @@ class BaseCircuit:
                 if self.name is not None:
                     name = self.name
                 else:
-                    name = "fit"
-                plot_dict[name] = {"f": f_pred, "Z": Z_fit, "fmt": "-"}
+                    name = 'fit'
+                plot_dict[name] = {'f': f_pred, 'Z': Z_fit, 'fmt': '-'}
 
             chart = plot_altair(plot_dict, **kwargs)
             return chart
         else:
-            raise ValueError(
-                "Kind must be one of 'altair',"
-                + f"'nyquist', or 'bode' (received {kind})"
-            )
+            raise ValueError("Kind must be one of 'altair'," +
+                             f"'nyquist', or 'bode' (received {kind})")
 
     def save(self, filepath):
-        """Exports a model to JSON
+        """ Exports a model to JSON
 
         Parameters
         ----------
@@ -366,29 +335,26 @@ class BaseCircuit:
             parameters_ = list(self.parameters_)
             model_conf_ = list(self.conf_)
 
-            data_dict = {
-                "Name": model_name,
-                "Circuit String": model_string,
-                "Initial Guess": initial_guess,
-                "Constants": self.constants,
-                "Fit": True,
-                "Parameters": parameters_,
-                "Confidence": model_conf_,
-            }
+            data_dict = {"Name": model_name,
+                         "Circuit String": model_string,
+                         "Initial Guess": initial_guess,
+                         "Constants": self.constants,
+                         "Fit": True,
+                         "Parameters": parameters_,
+                         "Confidence": model_conf_,
+                         }
         else:
-            data_dict = {
-                "Name": model_name,
-                "Circuit String": model_string,
-                "Initial Guess": initial_guess,
-                "Constants": self.constants,
-                "Fit": False,
-            }
+            data_dict = {"Name": model_name,
+                         "Circuit String": model_string,
+                         "Initial Guess": initial_guess,
+                         "Constants": self.constants,
+                         "Fit": False}
 
-        with open(filepath, "w") as f:
+        with open(filepath, 'w') as f:
             json.dump(data_dict, f)
 
     def load(self, filepath, fitted_as_initial=False):
-        """Imports a model from JSON
+        """ Imports a model from JSON
 
         Parameters
         ----------
@@ -403,7 +369,7 @@ class BaseCircuit:
             fitted parameters as a completed model
         """
 
-        json_data_file = open(filepath, "r")
+        json_data_file = open(filepath, 'r')
         json_data = json.load(json_data_file)
 
         model_name = json_data["Name"]
@@ -419,17 +385,16 @@ class BaseCircuit:
 
         if json_data["Fit"]:
             if fitted_as_initial:
-                self.initial_guess = np.array(json_data["Parameters"])
+                self.initial_guess = np.array(json_data['Parameters'])
             else:
                 self.parameters_ = np.array(json_data["Parameters"])
                 self.conf_ = np.array(json_data["Confidence"])
 
 
 class Randles(BaseCircuit):
-    """A Randles circuit model class"""
-
+    """ A Randles circuit model class """
     def __init__(self, CPE=False, **kwargs):
-        """Constructor for the Randles' circuit class
+        """ Constructor for the Randles' circuit class
 
         Parameters
         ----------
@@ -442,28 +407,26 @@ class Randles(BaseCircuit):
         super().__init__(**kwargs)
 
         if CPE:
-            self.name = "Randles w/ CPE"
-            self.circuit = "R0-p(R1-Wo1,CPE1)"
+            self.name = 'Randles w/ CPE'
+            self.circuit = 'R0-p(R1-Wo1,CPE1)'
         else:
-            self.name = "Randles"
-            self.circuit = "R0-p(R1-Wo1,C1)"
+            self.name = 'Randles'
+            self.circuit = 'R0-p(R1-Wo1,C1)'
 
         circuit_len = calculateCircuitLength(self.circuit)
 
         if len(self.initial_guess) + len(self.constants) != circuit_len:
-            raise ValueError(
-                "The number of initial guesses "
-                + f"({len(self.initial_guess)}) + "
-                + "the number of constants "
-                + f"({len(self.constants)})"
-                + " must be equal to "
-                + f"the circuit length ({circuit_len})"
-            )
+            raise ValueError('The number of initial guesses ' +
+                             f'({len(self.initial_guess)}) + ' +
+                             'the number of constants ' +
+                             f'({len(self.constants)})' +
+                             ' must be equal to ' +
+                             f'the circuit length ({circuit_len})')
 
 
 class CustomCircuit(BaseCircuit):
-    def __init__(self, circuit="", **kwargs):
-        """Constructor for a customizable equivalent circuit model
+    def __init__(self, circuit='', **kwargs):
+        """ Constructor for a customizable equivalent circuit model
 
         Parameters
         ----------
@@ -492,11 +455,9 @@ class CustomCircuit(BaseCircuit):
         circuit_len = calculateCircuitLength(self.circuit)
 
         if len(self.initial_guess) + len(self.constants) != circuit_len:
-            raise ValueError(
-                "The number of initial guesses "
-                + f"({len(self.initial_guess)}) + "
-                + "the number of constants "
-                + f"({len(self.constants)})"
-                + " must be equal to "
-                + f"the circuit length ({circuit_len})"
-            )
+            raise ValueError('The number of initial guesses ' +
+                             f'({len(self.initial_guess)}) + ' +
+                             'the number of constants ' +
+                             f'({len(self.constants)})' +
+                             ' must be equal to ' +
+                             f'the circuit length ({circuit_len})')
