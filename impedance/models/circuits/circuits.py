@@ -104,7 +104,7 @@ class BaseCircuit:
                             f'dtype (currently {frequencies.dtype})')
         if not isinstance(impedance, np.ndarray):
             raise TypeError('impedance is not of type np.ndarray')
-        if impedance.dtype != np.complex:
+        if impedance.dtype != complex:
             raise TypeError('impedance array should have a complex ' +
                             f'dtype (currently {impedance.dtype})')
         if len(frequencies) != len(impedance):
