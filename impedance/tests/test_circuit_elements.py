@@ -1,7 +1,11 @@
 import string
+
 import numpy as np
 import pytest
-from impedance.models.circuits.elements import circuit_elements, s, p, element
+
+from impedance.models.circuits.elements import (OverWriteElementException,
+                                                circuit_elements, element, p,
+                                                s)
 
 
 def test_each_element():
@@ -108,3 +112,56 @@ def test_add_element():
         return Z
 
     assert "NE" in circuit_elements
+
+
+def test_add_element_overwrite_fails():
+    # checks if you can add your own custom element and then overwriting it breaks
+    @element(num_params=1, units=["Ohm"])
+    def NE2(p, f):
+        """ definitely a new circuit element no one has seen before
+
+        Notes
+        ---------
+        .. math::
+
+            Z = R
+
+        """
+        R = p[0]
+        Z = np.array(len(f) * [R])
+        return Z
+    assert "NE2" in circuit_elements
+    with pytest.raises(OverWriteElementException):
+        # try to create the same element again without overwrite
+        @element(num_params=1, units=["Ohm"])
+        def NE2(p, f):
+            """ definitely a new circuit element no one has seen before
+
+            Notes
+            ---------
+            .. math::
+
+                Z = R
+
+            """
+            R = p[0]
+            Z = np.array(len(f) * [R])
+            return Z
+
+
+def test_add_element_overwrite():
+    # checks if you can add your own custom element and then overwriting it breaks
+    @element(num_params=1, units=["Ohm"])
+    def NE3(p, f):
+        return [p*ff for ff in f]
+    assert "NE3" in circuit_elements
+    assert circuit_elements["NE3"]([1], [1]) == [[1]]
+    # try to create the same element again with overwrite
+
+    @element(num_params=1, units=["Ohm"], overwrite=True)
+    def NE3(p, f):
+        # this is gross but it demonstrates the functionality works.
+        # feel free to change to a better test
+        return [p*ff*2 for ff in f]
+    assert "NE3" in circuit_elements
+    assert circuit_elements["NE3"]([1], [1]) == [[1, 1]]

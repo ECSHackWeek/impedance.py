@@ -1,7 +1,15 @@
 import numpy as np
 
 
-def element(num_params, units):
+class ElementException(Exception):
+    ...
+
+
+class OverWriteElementException(ElementException):
+    ...
+
+
+def element(num_params, units, overwrite=False):
     """ decorator to store metadata for a circuit element
 
         Parameters
@@ -10,6 +18,8 @@ def element(num_params, units):
             number of parameters for an element
         units : list of str
             list of units for the element parameters
+        overwrite : bool (default False)
+            whether or not you're overwriting an already existing element
     """
 
     def decorator(func):
@@ -23,7 +33,9 @@ def element(num_params, units):
         wrapper.__doc__ = func.__doc__
 
         global circuit_elements
-        if func.__name__ not in circuit_elements:
+        if func.__name__ in circuit_elements and not overwrite:
+            raise OverWriteElementException(f"element {func.__name__} has already been defined. Try `overwrite=True`.")
+        else:
             circuit_elements[func.__name__] = wrapper
 
         return wrapper
