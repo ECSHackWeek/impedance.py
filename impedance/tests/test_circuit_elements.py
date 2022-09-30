@@ -96,6 +96,8 @@ def test_element_function_names():
 
 def test_add_element():
     # checks if you can add your own custom element
+    assert "NE" not in circuit_elements
+
     @element(num_params=1, units=["Ohm"])
     def NE(p, f):
         """ definitely a new circuit element no one has seen before
@@ -116,6 +118,8 @@ def test_add_element():
 
 def test_add_element_overwrite_fails():
     # checks if you can add your own custom element and then overwriting it breaks
+    assert "NE2" not in circuit_elements
+
     @element(num_params=1, units=["Ohm"])
     def NE2(p, f):
         """ definitely a new circuit element no one has seen before
@@ -151,6 +155,8 @@ def test_add_element_overwrite_fails():
 
 def test_add_element_overwrite():
     # checks if you can add your own custom element and then overwriting it breaks
+    assert "NE3" not in circuit_elements
+
     @element(num_params=1, units=["Ohm"])
     def NE3(p, f):
         return [p*ff for ff in f]
