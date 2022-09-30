@@ -33,7 +33,9 @@ def element(num_params, units, overwrite=False):
         wrapper.__doc__ = func.__doc__
 
         global circuit_elements
-        if func.__name__ in circuit_elements and not overwrite:
+        if func.__name__ in ["s", "p"]:
+            raise ElementException("cannot have elements 's' or 'p'")
+        elif func.__name__ in circuit_elements and not overwrite:
             raise OverWriteElementException(
                 f"element {func.__name__} exists, Try `overwrite=True`"
             )
@@ -76,7 +78,7 @@ def p(parallel):
     return 1 / z
 
 
-# manually add parallel and series operators to circuit elements dict w/o metadata
+# manually add parallel and series operators to circuit elements w/o metadata
 # populated by the element decorator -
 # this maps ex. 'R' to the function R to always give us a list of
 # active elements in any context
