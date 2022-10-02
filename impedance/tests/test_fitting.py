@@ -8,15 +8,6 @@ from impedance.tests.test_preprocessing import Z_correct
 
 import numpy as np
 
-# def test_residuals():
-#     pass
-#
-#
-# def test_valid():
-#     pass
-#
-#
-
 
 def test_set_default_bounds():
     # Test example circuit from "Getting Started" page

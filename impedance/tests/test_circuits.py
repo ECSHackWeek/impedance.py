@@ -17,10 +17,10 @@ Z = data[:, 1] + 1j * data[:, 2]
 
 def test_BaseCircuit():
     initial_guess = [0.01, 0.02, 50]
-    base_circuit = BaseCircuit(initial_guess)
 
     # __init__()
     # check initial_guess is loaded in correctly
+    base_circuit = BaseCircuit(initial_guess)
     assert base_circuit.initial_guess == initial_guess
 
     # improper input_guess types raise an TypeError

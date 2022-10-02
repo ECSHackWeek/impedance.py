@@ -107,8 +107,7 @@ class BaseCircuit:
             if conf is not None:
                 self.conf_ = conf
         else:
-            # TODO auto calculate initial guesses
-            raise ValueError('no initial guess supplied')
+            raise ValueError('No initial guess supplied')
 
         return self
 
@@ -239,10 +238,10 @@ class BaseCircuit:
 
         if kind == 'nyquist':
             if ax is None:
-                fig, ax = plt.subplots(figsize=(5, 5))
+                _, ax = plt.subplots(figsize=(5, 5))
 
             if Z_data is not None:
-                ax = plot_nyquist(ax, Z_data, ls='', marker='s', **kwargs)
+                ax = plot_nyquist(Z_data, ls='', marker='s', ax=ax, **kwargs)
 
             if self._is_fit():
                 if f_data is not None:
@@ -251,11 +250,11 @@ class BaseCircuit:
                     f_pred = np.logspace(5, -3)
 
                 Z_fit = self.predict(f_pred)
-                ax = plot_nyquist(ax, Z_fit, ls='-', marker='', **kwargs)
+                ax = plot_nyquist(Z_fit, ls='-', marker='', ax=ax, **kwargs)
             return ax
         elif kind == 'bode':
             if ax is None:
-                fig, ax = plt.subplots(nrows=2, figsize=(5, 5))
+                _, ax = plt.subplots(nrows=2, figsize=(5, 5))
 
             if f_data is not None:
                 f_pred = f_data
@@ -266,11 +265,13 @@ class BaseCircuit:
                 if f_data is None:
                     raise ValueError('f_data must be specified if' +
                                      ' Z_data for a Bode plot')
-                ax = plot_bode(ax, f_data, Z_data, ls='', marker='s', **kwargs)
+                ax = plot_bode(f_data, Z_data, ls='', marker='s',
+                               axes=ax, **kwargs)
 
             if self._is_fit():
                 Z_fit = self.predict(f_pred)
-                ax = plot_bode(ax, f_pred, Z_fit, ls='-', marker='', **kwargs)
+                ax = plot_bode(f_pred, Z_fit, ls='-', marker='',
+                               axes=ax, **kwargs)
             return ax
         elif kind == 'altair':
             plot_dict = {}
