@@ -194,7 +194,6 @@ def test_add_element_overwrite():
 
     @element(num_params=1, units=["Ohm"], overwrite=True)
     def NE3(p, f):
-        # this is gross but it demonstrates the functionality works.
         # feel free to change to a better test
         return [p * ff * 2 for ff in f]
 
