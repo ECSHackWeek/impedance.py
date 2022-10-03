@@ -19,7 +19,7 @@ def element(num_params, units, overwrite=False):
     units : list of str
         list of units for the element parameters
     overwrite : bool (default False)
-        whether or not you're overwriting an already existing element
+        if true, overwrites any existing element; if false, raises OverwriteError if element name already exists.
     """
 
     def decorator(func):
