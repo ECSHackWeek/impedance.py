@@ -5,7 +5,7 @@ class ElementError(Exception):
     ...
 
 
-class OverWriteElementException(ElementException):
+class OverwriteError(ElementError):
     ...
 
 
