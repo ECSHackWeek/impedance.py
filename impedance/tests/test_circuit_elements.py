@@ -162,7 +162,7 @@ def test_add_element_overwrite_fails():
         return Z
 
     assert "NE2" in circuit_elements
-    with pytest.raises(OverWriteElementException):
+    with pytest.raises(OverwriteError):
         # try to create the same element again without overwrite
         @element(num_params=1, units=["Ohm"])
         def NE2(p, f):
