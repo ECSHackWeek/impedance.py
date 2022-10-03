@@ -37,7 +37,7 @@ def element(num_params, units, overwrite=False):
             raise ElementException("cannot have elements 's' or 'p'")
         elif func.__name__ in circuit_elements and not overwrite:
             raise OverWriteElementException(
-                f"element {func.__name__} exists, Try `overwrite=True`"
+                f"element {func.__name__} already exists. If you want to overwrite the existing element, use `overwrite=True`."
             )
         else:
             circuit_elements[func.__name__] = wrapper
