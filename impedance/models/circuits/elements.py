@@ -36,7 +36,7 @@ def element(num_params, units, overwrite=False):
         if func.__name__ in ["s", "p"]:
             raise ElementError("cannot redefine elements 's' (series) or 'p' (parallel)")
         elif func.__name__ in circuit_elements and not overwrite:
-            raise OverWriteElementException(
+            raise OverwriteError(
                 f"element {func.__name__} already exists. If you want to overwrite the existing element, use `overwrite=True`."
             )
         else:
