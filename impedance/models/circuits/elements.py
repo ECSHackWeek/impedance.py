@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class ElementException(Exception):
+class ElementError(Exception):
     ...
 
 
