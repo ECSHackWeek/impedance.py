@@ -3,7 +3,7 @@ import string
 import numpy as np
 import pytest
 
-from impedance.models.circuits.elements import (OverWriteElementException,
+from impedance.models.circuits.elements import (OverwriteError,
                                                 circuit_elements, element, p,
                                                 s)
 
