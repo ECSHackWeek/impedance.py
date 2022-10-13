@@ -21,24 +21,56 @@ If you find a bug in the code or a mistake in the [documentation](https://impeda
 git clone https://github.com/<GitHubUsername>/impedance.py
 ```
 
-3.  Make your changes and commit them to your fork (for an introduction to git, checkout the [tutorial from the ECS Hack Week](https://github.com/ECSHackWeek/ECSHackWeek_Dallas/blob/master/Version_Control.pptx))
+3. Initialize a fresh virtual environment using Poetry!
+
+    This step is somewhat optional but we highly recommend to execute it to ensure that you are using the _same_ dependencies that the package is using.
+
+    3.1. Poetry is as easy as to be or not to be! Start by [install poetry](https://python-poetry.org/docs/1.1/), this can be as simply as executing:
+    ```bash
+    pip install poetry
+    ```
+    3.2. You can then initialize a new fresh environment by running:
+    ```bash
+    poetry shell
+    ```
+    This will by default use the installed python version you have configured. If you no longer wish to be a poet, you can turn off the poetry environment by running `deactivate` in the terminal.
+
+    3.3. To install the dependencies defined in `pyproject.toml` you run the following command:
+    ```bash
+    poetry install
+    ```
+
+    3.4. If you want to add/remove a package to `impedance.py`, you can do that by using the following commands:
+    ```bash
+    poetry add/remove <package>
+    ```
+    where `<package>` can be either just the package name or specific version(s) such as \
+    `"<package>==1.0.0"`. Pro tip! If the package you're adding is not directly impacting the user, you can then use the `--dev` parameter after your command to add it as a dev-dependency. \
+    Example:
+    ```bash
+    poetry add "pytest>=4.6" --dev
+    ```
+    For more information on how to be a poet, check out the [poetry docs](https://python-poetry.org/docs/basic-usage/)!
+
+4.  Make your changes and commit them to your fork (for an introduction to git, checkout the [tutorial from the ECS Hack Week](https://github.com/ECSHackWeek/ECSHackWeek_Dallas/blob/master/Version_Control.pptx))
 
 For example,
 ```bash
+git status
 git add changedfiles
 git commit
 git push
 ```
 
-4.  [Submit a Pull Request](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests) (make sure to write a good message so the reviewer can understand what you're adding!) via GitHub.
+5.  [Submit a Pull Request](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests) (make sure to write a good message so the reviewer can understand what you're adding!) via GitHub.
 
-5.  Add yourself to the list of collaborators (you can use the [all-contributors bot](https://allcontributors.org/docs/en/bot/usage))! You rock!
+6.  Add yourself to the list of collaborators (you can use the [all-contributors bot](https://allcontributors.org/docs/en/bot/usage))! You rock!
 
 ## Continuous Integration
 
 `impedance.py` uses [Travis CI](https://travis-ci.org/ECSHackWeek/impedance.py) for Continuous Integration testing. This means that every time you submit a pull request, a series of tests will be run to make sure the changes don’t accidentally introduce any bugs :bug:. *Your PR will not be accepted until it passes all of these tests.* While you can certainly wait for the results of these tests after submitting a PR, you can also run them locally to speed up the review process.
 
-We use flake8 to test for PEP 8 conformance. [PEP 8](https://www.python.org/dev/peps/pep-0008/) is a series of style guides for Python that provide suggestions for everything from variable naming to indentation. 
+We use flake8 to test for PEP 8 conformance. [PEP 8](https://www.python.org/dev/peps/pep-0008/) is a series of style guides for Python that provide suggestions for everything from variable naming to indentation.
 To run the flake8 (PEP8) code style checker:
 
 ```
