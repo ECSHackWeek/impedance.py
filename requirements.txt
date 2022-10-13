@@ -1,9 +1,4 @@
 altair>=3.0
-coveralls==3.2.0
 matplotlib>=3.0
 numpy>=1.14
-numpydoc
-nbsphinx
-pytest>=4.6
-pytest-cov
 scipy>=1.0
