@@ -23,36 +23,22 @@ def readFile(filename, instrument=None):
         Array of complex impedances
 
     """
+    SUPPORTED_TYPES = {
+        'gamry': readGamry,
+        'autolab': readAutolab,
+        'parstat': readParstat,
+        'zplot': readZPlot,
+        'versastudio': readVersaStudio,
+        'powersuite': readPowerSuite,
+        'biologic': readBioLogic,
+        'chinstruments': readCHInstruments,
+    }
 
-    supported_types = ['gamry', 'autolab', 'parstat', 'zplot', 'versastudio',
-                       'powersuite', 'biologic', 'chinstruments']
-
-    if instrument is not None:
-        assert instrument in supported_types,\
-            '{} is not a supported instrument ({})'.format(instrument,
-                                                           supported_types)
-
-    if instrument == 'gamry':
-        f, Z = readGamry(filename)
-    elif instrument == 'autolab':
-        f, Z = readAutolab(filename)
-    elif instrument == 'biologic':
-        f, Z = readBioLogic(filename)
-    elif instrument == 'parstat':
-        f, Z = readParstat(filename)
-    elif instrument == 'zplot':
-        f, Z = readZPlot(filename)
-    elif instrument == 'versastudio':
-        f, Z = readVersaStudio(filename)
-    elif instrument == 'powersuite':
-        f, Z = readPowerSuite(filename)
-    elif instrument == 'chinstruments':
-        f, Z = readCHInstruments(filename)
-    elif instrument is None:
-        f, Z = readCSV(filename)
-
-    return f, Z
-
+    if not SUPPORTED_TYPES.get(instrument):
+        print(
+            f"'{instrument}' is not a supported instrument.\n"
+            + "Will therefore try to parse using readCSV function.")
+    return SUPPORTED_TYPES.get(instrument, readCSV)(filename)
 
 def readGamry(filename):
     """ function for reading the .DTA file from Gamry
