@@ -1,0 +1,28 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.2.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-merge-conflict
+  - repo: "https://github.com/pycqa/flake8"
+    rev: 4.0.1
+    hooks:
+      - id: flake8
+        files: impedance
+  - repo: "https://github.com/pre-commit/mirrors-mypy"
+    rev: v0.942
+    hooks:
+      - id: mypy
+        args:
+          - "--install-types"
+          - "--non-interactive"
+          - "--ignore-missing-imports"
+        files: impedance
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v2.5.1
+    hooks:
+      - id: prettier
+        files: \.(md|yaml|yml)$
