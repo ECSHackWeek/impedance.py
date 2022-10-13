@@ -1,0 +1,30 @@
+name: Build impedance.py
+description: |
+    Composite workflow to re-use the build of impedance.py using poetry.
+inputs:
+  python-version:
+    description: python version used for setup-python.
+    required: false
+    default: 3.7
+
+runs:
+  using: composite
+  steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 - --version 1.1.14
+          echo "$HOME/.poetry/bin" >> $GITHUB_PATH  # add poetry to PATH.
+        shell: bash
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ inputs.python-version }}
+          cache: 'poetry'  # needs setup-python@v4, speeds up building
+
+      - name: Install impedance.py
+        run: |
+          poetry env use ${{ inputs.python-version }}
+          poetry install
+        shell: bash
