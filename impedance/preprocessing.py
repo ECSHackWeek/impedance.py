@@ -40,6 +40,7 @@ def readFile(filename, instrument=None):
             + "Will therefore try to parse using readCSV function.")
     return SUPPORTED_TYPES.get(instrument, readCSV)(filename)
 
+
 def readGamry(filename):
     """ function for reading the .DTA file from Gamry
 
