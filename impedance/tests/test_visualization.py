@@ -10,8 +10,18 @@ def test_plot_bode():
     f = [1, 10, 100]
     Z = np.array([1, 2, 3]) + 1j*np.array([2, 3, 4])
 
+    # pass axes
     _, axes = plt.subplots(nrows=2)
-    axes = plot_bode(axes, f, Z, scale=10)
+    axes = plot_bode(f, Z, scale=10, axes=axes)
+
+    xs, ys = axes[0].lines[0].get_xydata().T
+    assert (xs == f).all() and (ys == np.abs(Z)).all()
+
+    xs, ys = axes[1].lines[0].get_xydata().T
+    assert (xs == f).all() and (ys == -np.angle(Z, deg=True)).all()
+
+    # don't pass axes
+    axes = plot_bode(f, Z, scale=10)
 
     xs, ys = axes[0].lines[0].get_xydata().T
     assert (xs == f).all() and (ys == np.abs(Z)).all()
@@ -24,11 +34,15 @@ def test_plot_nyquist():
 
     Z = np.array([1, 2, 3]) + 1j*np.array([2, 3, 4])
 
+    # pass axes
     _, ax = plt.subplots()
-    ax = plot_nyquist(ax, Z, scale=10)
-
+    ax = plot_nyquist(Z, scale=10, ax=ax)
     xs, ys = ax.lines[0].get_xydata().T
+    assert (xs == Z.real).all() and (ys == -Z.imag).all()
 
+    # don't pass axes
+    ax = plot_nyquist(Z, scale=10)
+    xs, ys = ax.lines[0].get_xydata().T
     assert (xs == Z.real).all() and (ys == -Z.imag).all()
 
 
