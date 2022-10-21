@@ -17,10 +17,10 @@ Z = data[:, 1] + 1j * data[:, 2]
 
 def test_BaseCircuit():
     initial_guess = [0.01, 0.02, 50]
-    base_circuit = BaseCircuit(initial_guess)
 
     # __init__()
     # check initial_guess is loaded in correctly
+    base_circuit = BaseCircuit(initial_guess)
     assert base_circuit.initial_guess == initial_guess
 
     # improper input_guess types raise an TypeError
@@ -34,36 +34,13 @@ def test_BaseCircuit():
         r == 8
 
     # fit()
-    # improper data types in fitting raise a TypeError
     with pytest.raises(TypeError):
         r = BaseCircuit(initial_guess=[.01, .005, .1, .0001, 200])
-        r.fit([42, 4.2], [])  # frequencies not ndarray
-
-    with pytest.raises(TypeError):
-        r = BaseCircuit(initial_guess=[.01, .005, .1, .0001, 200])
-        r.fit(np.array([42 + 42j]), [])  # frequencies not numeric type
-
-    with pytest.raises(TypeError):
-        r = BaseCircuit(initial_guess=[.01, .005, .1, .0001, 200])
-        r.fit(np.array([42]), [42 + 42j])  # Z not ndarray
-
-    with pytest.raises(TypeError):
-        r = BaseCircuit(initial_guess=[.01, .005, .1, .0001, 200])
-        r.fit(np.array([42]), np.array([0.5, 0.2]))  # Z not complex
+        r.fit(np.array([42 + 42j]), [])  # frequencies are complex
 
     with pytest.raises(TypeError):
         r = BaseCircuit(initial_guess=[.01, .005, .1, .0001, 200])
         r.fit(np.array([42, 4.2]), np.array([42 + 42j]))  # mismatched lengths
-
-    # predict()
-    # improper data types in fitting raise a TypeError
-    with pytest.raises(TypeError):
-        r = BaseCircuit(initial_guess=[.01, .005, .1, .0001, 200])
-        r.predict([42, 4.2])  # frequencies not ndarray
-
-    with pytest.raises(TypeError):
-        r = BaseCircuit(initial_guess=[.01, .005, .1, .0001, 200])
-        r.predict(np.array([42 + 42j]))  # frequencies not numeric type
 
     # plot()
     # kind = {'nyquist', 'bode'} should return a plt.Axes() object
@@ -150,6 +127,10 @@ def test_CustomCircuit():
     high_f = np.array([1e9])
     assert np.isclose(np.real(custom_circuit.predict(high_f)[0]),
                       initial_guess[0])
+
+    # check complex frequencies raise TypeError
+    with pytest.raises(TypeError):
+        custom_circuit.predict([0.42, 42 + 42j])
 
     # __str()__
     initial_guess = [.01, .005, .1]

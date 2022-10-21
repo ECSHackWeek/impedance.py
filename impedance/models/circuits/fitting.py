@@ -131,7 +131,8 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
     Currently, an error of -1 is returned.
 
     """
-    Z = impedances
+    f = np.array(frequencies, dtype=float)
+    Z = np.array(impedances, dtype=complex)
 
     # set upper and lower bounds on a per-element basis
     if bounds is None:
@@ -148,7 +149,7 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
             abs_Z = np.abs(Z)
             kwargs['sigma'] = np.hstack([abs_Z, abs_Z])
 
-        popt, pcov = curve_fit(wrapCircuit(circuit, constants), frequencies,
+        popt, pcov = curve_fit(wrapCircuit(circuit, constants), f,
                                np.hstack([Z.real, Z.imag]),
                                p0=initial_guess, bounds=bounds, **kwargs)
 
@@ -175,7 +176,7 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
             function
                 Returns a function (RMSE as a function of parameters).
             """
-            return rmse(wrapCircuit(circuit, constants)(frequencies, *x),
+            return rmse(wrapCircuit(circuit, constants)(f, *x),
                         np.hstack([Z.real, Z.imag]))
 
         class BasinhoppingBounds(object):
