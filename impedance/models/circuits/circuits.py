@@ -90,23 +90,9 @@ class BaseCircuit:
         self: returns an instance of self
 
         """
+        frequencies = np.array(frequencies, dtype=float)
+        impedance = np.array(impedance, dtype=complex)
 
-        # check that inputs are valid:
-        #    frequencies: array of numbers
-        #    impedance: array of complex numbers
-        #    impedance and frequency match in length
-
-        if not isinstance(frequencies, np.ndarray):
-            raise TypeError('frequencies is not of type np.ndarray')
-        if not (np.issubdtype(frequencies.dtype, np.integer) or
-                np.issubdtype(frequencies.dtype, np.floating)):
-            raise TypeError('frequencies array should have a numeric ' +
-                            f'dtype (currently {frequencies.dtype})')
-        if not isinstance(impedance, np.ndarray):
-            raise TypeError('impedance is not of type np.ndarray')
-        if impedance.dtype != complex:
-            raise TypeError('impedance array should have a complex ' +
-                            f'dtype (currently {impedance.dtype})')
         if len(frequencies) != len(impedance):
             raise TypeError('length of frequencies and impedance do not match')
 
@@ -121,8 +107,7 @@ class BaseCircuit:
             if conf is not None:
                 self.conf_ = conf
         else:
-            # TODO auto calculate initial guesses
-            raise ValueError('no initial guess supplied')
+            raise ValueError('No initial guess supplied')
 
         return self
 
@@ -138,8 +123,7 @@ class BaseCircuit:
 
         Parameters
         ----------
-        frequencies: ndarray of numeric dtype
-
+        frequencies: array-like of numeric type
         use_initial: boolean
             If true and the model was previously fit use the initial
             parameters instead
@@ -147,14 +131,9 @@ class BaseCircuit:
         Returns
         -------
         impedance: ndarray of dtype 'complex128'
-            Predicted impedance
+            Predicted impedance at each frequency
         """
-        if not isinstance(frequencies, np.ndarray):
-            raise TypeError('frequencies is not of type np.ndarray')
-        if not (np.issubdtype(frequencies.dtype, np.integer) or
-                np.issubdtype(frequencies.dtype, np.floating)):
-            raise TypeError('frequencies array should have a numeric ' +
-                            f'dtype (currently {frequencies.dtype})')
+        frequencies = np.array(frequencies, dtype=float)
 
         if self._is_fit() and not use_initial:
             return eval(buildCircuit(self.circuit, frequencies,
@@ -259,10 +238,10 @@ class BaseCircuit:
 
         if kind == 'nyquist':
             if ax is None:
-                fig, ax = plt.subplots(figsize=(5, 5))
+                _, ax = plt.subplots(figsize=(5, 5))
 
             if Z_data is not None:
-                ax = plot_nyquist(ax, Z_data, ls='', marker='s', **kwargs)
+                ax = plot_nyquist(Z_data, ls='', marker='s', ax=ax, **kwargs)
 
             if self._is_fit():
                 if f_data is not None:
@@ -271,11 +250,11 @@ class BaseCircuit:
                     f_pred = np.logspace(5, -3)
 
                 Z_fit = self.predict(f_pred)
-                ax = plot_nyquist(ax, Z_fit, ls='-', marker='', **kwargs)
+                ax = plot_nyquist(Z_fit, ls='-', marker='', ax=ax, **kwargs)
             return ax
         elif kind == 'bode':
             if ax is None:
-                fig, ax = plt.subplots(nrows=2, figsize=(5, 5))
+                _, ax = plt.subplots(nrows=2, figsize=(5, 5))
 
             if f_data is not None:
                 f_pred = f_data
@@ -286,11 +265,13 @@ class BaseCircuit:
                 if f_data is None:
                     raise ValueError('f_data must be specified if' +
                                      ' Z_data for a Bode plot')
-                ax = plot_bode(ax, f_data, Z_data, ls='', marker='s', **kwargs)
+                ax = plot_bode(f_data, Z_data, ls='', marker='s',
+                               axes=ax, **kwargs)
 
             if self._is_fit():
                 Z_fit = self.predict(f_pred)
-                ax = plot_bode(ax, f_pred, Z_fit, ls='-', marker='', **kwargs)
+                ax = plot_bode(f_pred, Z_fit, ls='-', marker='',
+                               axes=ax, **kwargs)
             return ax
         elif kind == 'altair':
             plot_dict = {}

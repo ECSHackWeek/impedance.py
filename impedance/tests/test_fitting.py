@@ -8,15 +8,6 @@ from impedance.tests.test_preprocessing import Z_correct
 
 import numpy as np
 
-# def test_residuals():
-#     pass
-#
-#
-# def test_valid():
-#     pass
-#
-#
-
 
 def test_set_default_bounds():
     # Test example circuit from "Getting Started" page
@@ -54,9 +45,18 @@ def test_circuit_fit():
     results_simple = [10]
 
     frequencies = np.array([10, 100, 1000])
-    Z_data = np.array([10, 10, 10])  # impedance is constant
+    Z_data = np.array([10, 10, 10])  # impedance is real
 
     assert np.allclose(circuit_fit(frequencies, Z_data, circuit,
+                                   initial_guess, constants={},
+                                   global_opt=True)[0],
+                       results_simple, rtol=1e-1)
+
+    # check that list inputs work
+    frequency_list = [10, 100, 1000]
+    Z_data_list = [10, 10, 10]
+
+    assert np.allclose(circuit_fit(frequency_list, Z_data_list, circuit,
                                    initial_guess, constants={},
                                    global_opt=True)[0],
                        results_simple, rtol=1e-1)
