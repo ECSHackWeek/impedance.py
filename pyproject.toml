@@ -2,7 +2,7 @@
 name = "impedance.py"
 version = "1.4.1"
 description = "A Python package for working with electrochemical impedance data."
-authors = ["Your Name <you@example.com>"]  # TODO add your name here
+authors = ["impedance.py developers <matt.murbach@gmail.com>"]
 license = "MIT license"
 
 [tool.poetry.dependencies]
