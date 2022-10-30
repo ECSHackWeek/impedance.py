@@ -89,6 +89,7 @@ def readGamry(filename):
 
     f, Z = [], []
     for line in raw_data:
+        line = line.replace(",", ".")
         each = line.split()
         f.append(float(each[2]))
         Z.append(complex(float(each[3]), float(each[4])))
