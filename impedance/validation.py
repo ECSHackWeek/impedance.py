@@ -91,7 +91,7 @@ def linKK(f, Z, c=0.85, max_M=50, fit_type='real', add_cap=False):
     if c is not None:
         M = 0
         mu = 1
-        while mu > c and M <= max_M:
+        while mu > c and M < max_M:
             M += 1
             ts = get_tc_distribution(f, M)
             elements, mu = fit_linKK(f, ts, M, Z, fit_type, add_cap)
