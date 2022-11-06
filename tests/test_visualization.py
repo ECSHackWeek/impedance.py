@@ -3,7 +3,11 @@ import json
 import matplotlib.pyplot as plt
 import numpy as np
 
-from impedance.visualization import plot_altair, plot_bode, plot_nyquist, plot_residuals
+from impedance.visualization import (
+    plot_altair,
+    plot_bode,
+    plot_nyquist,
+    plot_residuals)
 
 
 def test_plot_bode():
