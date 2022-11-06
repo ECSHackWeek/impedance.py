@@ -2,20 +2,11 @@ from impedance.preprocessing import ignoreBelowX
 from impedance.models.circuits.fitting import buildCircuit, \
     circuit_fit, rmse, extract_circuit_elements, \
     set_default_bounds
-from impedance.tests.test_preprocessing import frequencies \
+from tests.test_preprocessing import frequencies \
     as example_frequencies
-from impedance.tests.test_preprocessing import Z_correct
+from tests.test_preprocessing import Z_correct
 
 import numpy as np
-
-# def test_residuals():
-#     pass
-#
-#
-# def test_valid():
-#     pass
-#
-#
 
 
 def test_set_default_bounds():
