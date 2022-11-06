@@ -18,7 +18,7 @@ jobs:
       - uses: ./.github/actions/build_impedance
 
       - name: Linting with flake8
-        run: poetry run flake8 . --count --show-source --exclude=*.ipynb_checkpoints
+        run: poetry run flake8 . --count --show-source
 
   tests:
     name: Run tests
