@@ -1,14 +1,15 @@
+import json
+
 import matplotlib.pyplot as plt
 import numpy as np
-from impedance.visualization import plot_altair, plot_bode, plot_nyquist
-from impedance.visualization import plot_residuals
-import json
+
+from impedance.visualization import plot_altair, plot_bode, plot_nyquist, plot_residuals
 
 
 def test_plot_bode():
 
     f = [1, 10, 100]
-    Z = np.array([1, 2, 3]) + 1j*np.array([2, 3, 4])
+    Z = np.array([1, 2, 3]) + 1j * np.array([2, 3, 4])
 
     # pass axes
     _, axes = plt.subplots(nrows=2)
@@ -32,7 +33,7 @@ def test_plot_bode():
 
 def test_plot_nyquist():
 
-    Z = np.array([1, 2, 3]) + 1j*np.array([2, 3, 4])
+    Z = np.array([1, 2, 3]) + 1j * np.array([2, 3, 4])
 
     # pass axes
     _, ax = plt.subplots()
@@ -48,13 +49,17 @@ def test_plot_nyquist():
 
 def test_plot_altair():
     frequencies = [1000.0, 1.0, 0.01]
-    Z = np.array([1, 2, 3]) + 1j*np.array([2, 3, 4])
+    Z = np.array([1, 2, 3]) + 1j * np.array([2, 3, 4])
 
-    chart = plot_altair({'data': {'f': frequencies, 'Z': Z},
-                         'fit': {'f': frequencies, 'Z': Z, 'fmt': '-'}},
-                        size=400)
+    chart = plot_altair(
+        {
+            "data": {"f": frequencies, "Z": Z},
+            "fit": {"f": frequencies, "Z": Z, "fmt": "-"},
+        },
+        size=400,
+    )
 
-    datasets = json.loads(chart.to_json())['datasets']
+    datasets = json.loads(chart.to_json())["datasets"]
     for dataset in datasets.keys():
         assert len(datasets[dataset]) == len(Z)
 
