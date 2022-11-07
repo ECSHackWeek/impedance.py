@@ -28,7 +28,7 @@ class BaseCircuit:
         """
 
         # if supplied, check that initial_guess is valid and store
-        initial_guess = list(filter(None, initial_guess))
+        initial_guess = [x for x in initial_guess if x is not None]
         for i in initial_guess:
             if not isinstance(i, (float, int, np.int32, np.float64)):
                 raise TypeError(f'value {i} in initial_guess is not a number')
