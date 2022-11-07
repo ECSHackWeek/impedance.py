@@ -6,18 +6,18 @@ authors = ["impedance.py developers <matt.murbach@gmail.com>"]
 license = "MIT license"
 
 [tool.poetry.dependencies]
-python = ">=3.7,<3.11"
+python = ">=3.7,<3.12"
 numpy = ">=1.14"
 scipy = ">=1.0"
 matplotlib = ">=3.0"
-altair = "^4.2.0"
+# altair = ">=4.2.0"
 
 [tool.poetry.dev-dependencies]
 coveralls = "3.2.0"
-numpydoc = "^1.5.0"
-nbsphinx = "^0.8.9"
+nbsphinx = ">=0.8.9"
 pytest = ">=4.6"
-pytest-cov = "^4.0.0"
+pytest-cov = ">=4.0.0"
+flake8 = ">=5.0.4"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
