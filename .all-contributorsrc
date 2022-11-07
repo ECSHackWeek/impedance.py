@@ -181,6 +181,16 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "markbouman",
+      "name": "Mark Bouman",
+      "avatar_url": "https://avatars.githubusercontent.com/u/103944120?v=4",
+      "profile": "https://github.com/markbouman",
+      "contributions": [
+        "bug",
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
@@ -188,5 +198,6 @@
   "projectOwner": "ECSHackWeek",
   "repoType": "github",
   "repoHost": "https://github.com",
-  "skipCi": true
+  "skipCi": true,
+  "commitConvention": "angular"
 }
