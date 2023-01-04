@@ -69,7 +69,7 @@ def plot_nyquist(Z, scale=1, units='Ohms', fmt='.-', ax=None, labelsize=20, tick
     return ax
 
 
-def plot_bode(f, Z, scale=1, units='Ohms', fmt='.-', axes=None, **kwargs):
+def plot_bode(f, Z, scale=1, units='Ohms', fmt='.-', axes=None, labelsize=20, ticksize=14, **kwargs):
     """ Plots impedance as a Bode plot using matplotlib
 
         Parameters
@@ -109,16 +109,16 @@ def plot_bode(f, Z, scale=1, units='Ohms', fmt='.-', axes=None, **kwargs):
 
     # Set the y-axis labels
     ax_mag.set_ylabel(r'$|Z(\omega)|$ ' +
-                      '$[{}]$'.format(units), fontsize=20)
-    ax_phs.set_ylabel(r'$-\phi_Z(\omega)$ ' + r'$[^o]$', fontsize=20)
+                      '$[{}]$'.format(units), fontsize=labelsize)
+    ax_phs.set_ylabel(r'$-\phi_Z(\omega)$ ' + r'$[^o]$', fontsize=labelsize)
 
     for ax in axes:
         # Set the frequency axes title and make log scale
-        ax.set_xlabel('f [Hz]', fontsize=20)
+        ax.set_xlabel('f [Hz]', fontsize=labelsize)
         ax.set_xscale('log')
 
         # Make the tick labels larger
-        ax.tick_params(axis='both', which='major', labelsize=14)
+        ax.tick_params(axis='both', which='major', labelsize=ticksize)
 
         # Change the number of labels on each axis to five
         ax.locator_params(axis='y', nbins=5, tight=True)
