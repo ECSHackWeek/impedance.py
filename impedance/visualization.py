@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 
-def plot_nyquist(Z, scale=1, units='Ohms', fmt='.-', ax=None, **kwargs):
+def plot_nyquist(Z, scale=1, units='Ohms', fmt='.-', ax=None, labelsize=20, ticksize=14, **kwargs):
     """ Plots impedance as a Nyquist plot using matplotlib
 
         Parameters
@@ -42,12 +42,12 @@ def plot_nyquist(Z, scale=1, units='Ohms', fmt='.-', ax=None, **kwargs):
 
     # Set the labels to -imaginary vs real
     ax.set_xlabel(r'$Z^{\prime}(\omega)$ ' +
-                  '$[{}]$'.format(units), fontsize=20)
+                  '$[{}]$'.format(units), fontsize=labelsize)
     ax.set_ylabel(r'$-Z^{\prime\prime}(\omega)$ ' +
-                  '$[{}]$'.format(units), fontsize=20)
+                  '$[{}]$'.format(units), fontsize=labelsize)
 
     # Make the tick labels larger
-    ax.tick_params(axis='both', which='major', labelsize=14)
+    ax.tick_params(axis='both', which='major', labelsize=ticksize)
 
     # Change the number of labels on each axis to five
     ax.locator_params(axis='x', nbins=5, tight=True)
