@@ -64,7 +64,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-and-push:
-    name: Build and publish package to PyPI if tagged
+    name: Build and publish package to PyPI
     runs-on: ubuntu-latest
 
     steps:
@@ -77,6 +77,7 @@ jobs:
 
       - name: Build a binary wheel and a source tarball
         run: |
+          python3 -m pip install wheel
           python3 setup.py sdist bdist_wheel
 
       - name: Publish distribution to Test PyPI
@@ -85,7 +86,7 @@ jobs:
           password: ${{ secrets.TEST_PYPI_API_TOKEN }}
           repository_url: https://test.pypi.org/legacy/
 
-      - name: Also publish distribution to PyPI if tagged
+      - name: Also publish distribution to PyPI (if tagged)
         if: startsWith(github.ref, 'refs/tags')
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
