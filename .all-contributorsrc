@@ -200,6 +200,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "pililac",
+      "name": "pililac",
+      "avatar_url": "https://avatars.githubusercontent.com/u/60116646?v=4",
+      "profile": "https://github.com/pililac",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
