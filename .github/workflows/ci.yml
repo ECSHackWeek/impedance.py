@@ -1,4 +1,4 @@
-name: CI tests
+name: Run tests and build package
 on:
   pull_request:
   push:
@@ -31,6 +31,7 @@ jobs:
 
   tests:
     name: Run tests
+    needs: linting
     runs-on: ubuntu-latest
 
     strategy:
@@ -65,6 +66,7 @@ jobs:
 
   build-and-push:
     name: Build and publish package to PyPI
+    needs: [linting, tests]
     runs-on: ubuntu-latest
 
     steps:
