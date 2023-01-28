@@ -4,7 +4,8 @@ import numpy as np
 import pandas as pd
 
 
-def plot_nyquist(Z, scale=1, units='Ohms', fmt='.-', ax=None, labelsize=20, ticksize=14, **kwargs):
+def plot_nyquist(Z, scale=1, units='Ohms', fmt='.-', ax=None, labelsize=20,
+                 ticksize=14, **kwargs):
     """ Plots impedance as a Nyquist plot using matplotlib
 
         Parameters
@@ -69,7 +70,8 @@ def plot_nyquist(Z, scale=1, units='Ohms', fmt='.-', ax=None, labelsize=20, tick
     return ax
 
 
-def plot_bode(f, Z, scale=1, units='Ohms', fmt='.-', axes=None, labelsize=20, ticksize=14, **kwargs):
+def plot_bode(f, Z, scale=1, units='Ohms', fmt='.-', axes=None, labelsize=20,
+              ticksize=14, **kwargs):
     """ Plots impedance as a Bode plot using matplotlib
 
         Parameters
