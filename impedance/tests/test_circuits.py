@@ -72,7 +72,7 @@ def test_Randles():
 
     # compare with known impedance predictions
     assert np.isclose(randles.predict(np.array([10.0])),
-                      np.complex(0.0251618, -0.00601304))
+                      complex(0.0251618, -0.00601304))
 
     # check altair plotting with a fit circuit
     chart = randles.plot(f_data=f, Z_data=Z)
