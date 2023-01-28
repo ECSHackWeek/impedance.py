@@ -191,6 +191,15 @@
         "bug",
         "code"
       ]
+    },
+    {
+      "login": "oslopanda",
+      "name": "oslopanda",
+      "avatar_url": "https://avatars.githubusercontent.com/u/33810430?v=4",
+      "profile": "https://github.com/oslopanda",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
