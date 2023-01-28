@@ -324,7 +324,7 @@ def readZPlot(filename):
 
 
 def readPowerSuite(filename):
-    """ function for reading the .txt file from Parstat
+    """ function for reading the .txt file from PowerSuite
 
     Parameters
     ----------
