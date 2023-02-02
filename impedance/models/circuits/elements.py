@@ -19,7 +19,7 @@ def element(num_params, units, overwrite=False):
     units : list of str
         list of units for the element parameters
     overwrite : bool (default False)
-        if true, overwrites any existing element; if false, 
+        if true, overwrites any existing element; if false,
         raises OverwriteError if element name already exists.
     """
 
