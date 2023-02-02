@@ -19,7 +19,8 @@ def element(num_params, units, overwrite=False):
     units : list of str
         list of units for the element parameters
     overwrite : bool (default False)
-        if true, overwrites any existing element; if false, raises OverwriteError if element name already exists.
+        if true, overwrites any existing element; if false, 
+        raises OverwriteError if element name already exists.
     """
 
     def decorator(func):
@@ -34,10 +35,13 @@ def element(num_params, units, overwrite=False):
 
         global circuit_elements
         if func.__name__ in ["s", "p"]:
-            raise ElementError("cannot redefine elements 's' (series) or 'p' (parallel)")
+            raise ElementError("cannot redefine elements 's' (series)" +
+                               "or 'p' (parallel)")
         elif func.__name__ in circuit_elements and not overwrite:
             raise OverwriteError(
-                f"element {func.__name__} already exists. If you want to overwrite the existing element, use `overwrite=True`."
+                f"element {func.__name__} already exists. " +
+                "If you want to overwrite the existing element," +
+                "use `overwrite=True`."
             )
         else:
             circuit_elements[func.__name__] = wrapper
@@ -383,7 +387,8 @@ def get_element_from_name(name):
 
 
 def typeChecker(p, f, name, length):
-    assert isinstance(p, list), "in {}, input must be of type list".format(name)
+    assert isinstance(p, list), \
+        "in {}, input must be of type list".format(name)
     for i in p:
         assert isinstance(
             i, (float, int, np.int32, np.float64)
