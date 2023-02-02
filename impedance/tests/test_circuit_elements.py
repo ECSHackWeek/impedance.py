@@ -5,7 +5,7 @@ import pytest
 
 from impedance.models.circuits.elements import (OverwriteError,
                                                 circuit_elements, element, p,
-                                                s)
+                                                s, ElementError)
 
 
 def test_each_element():
@@ -118,6 +118,13 @@ def test_element_function_names():
             assert (
                 char in letters
             ), f"{char} in {elem} is not in the allowed set of {letters}"
+
+def test_changing_base_functions_fails():
+    with pytest.raises(ElementError):
+        @element(num_params=1, units=["Ohm"])
+        def s(p, f):
+            # try redefining the series
+            return np.nan
 
 
 def test_add_element():
