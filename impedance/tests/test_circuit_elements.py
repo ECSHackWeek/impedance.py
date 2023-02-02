@@ -119,6 +119,7 @@ def test_element_function_names():
                 char in letters
             ), f"{char} in {elem} is not in the allowed set of {letters}"
 
+
 def test_changing_base_functions_fails():
     with pytest.raises(ElementError):
         @element(num_params=1, units=["Ohm"])
