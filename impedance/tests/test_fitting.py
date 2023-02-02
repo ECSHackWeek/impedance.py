@@ -202,7 +202,7 @@ def test_buildCircuit():
 
     assert buildCircuit(circuit, frequencies, *params,
                         constants={})[0].replace(' ', '') == \
-        '([R([100],[1000.0,5.0,0.01])])'
+        'R([100],[1000.0,5.0,0.01])'
 
 
 def test_RMSE():
