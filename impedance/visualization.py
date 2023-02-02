@@ -1,15 +1,15 @@
 import altair as alt
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
 
-def plot_nyquist(ax, Z, scale=1, units='Ohms', fmt='.-', **kwargs):
+def plot_nyquist(Z, scale=1, units='Ohms', fmt='.-', ax=None, labelsize=20,
+                 ticksize=14, **kwargs):
     """ Plots impedance as a Nyquist plot using matplotlib
 
         Parameters
         ----------
-        ax: matplotlib.axes.Axes
-            axes on which to plot the nyquist plot
         Z: np.array of complex numbers
             impedance data
         scale: float
@@ -18,6 +18,8 @@ def plot_nyquist(ax, Z, scale=1, units='Ohms', fmt='.-', **kwargs):
             units for :math:`Z(\\omega)`
         fmt: string
             format string passed to matplotlib (e.g. '.-' or 'o')
+        ax: matplotlib.axes.Axes (optional)
+            axes on which to plot the nyquist plot
 
         Other Parameters
         ----------------
@@ -29,6 +31,10 @@ def plot_nyquist(ax, Z, scale=1, units='Ohms', fmt='.-', **kwargs):
         -------
         ax: matplotlib.axes.Axes
     """
+    Z = np.array(Z, dtype=complex)
+
+    if ax is None:
+        _, ax = plt.subplots()
 
     ax.plot(np.real(Z), -np.imag(Z), fmt, **kwargs)
 
@@ -37,12 +43,12 @@ def plot_nyquist(ax, Z, scale=1, units='Ohms', fmt='.-', **kwargs):
 
     # Set the labels to -imaginary vs real
     ax.set_xlabel(r'$Z^{\prime}(\omega)$ ' +
-                  '$[{}]$'.format(units), fontsize=20)
+                  '$[{}]$'.format(units), fontsize=labelsize)
     ax.set_ylabel(r'$-Z^{\prime\prime}(\omega)$ ' +
-                  '$[{}]$'.format(units), fontsize=20)
+                  '$[{}]$'.format(units), fontsize=labelsize)
 
     # Make the tick labels larger
-    ax.tick_params(axis='both', which='major', labelsize=14)
+    ax.tick_params(axis='both', which='major', labelsize=ticksize)
 
     # Change the number of labels on each axis to five
     ax.locator_params(axis='x', nbins=5, tight=True)
@@ -64,13 +70,12 @@ def plot_nyquist(ax, Z, scale=1, units='Ohms', fmt='.-', **kwargs):
     return ax
 
 
-def plot_bode(axes, f, Z, scale=1, units='Ohms', fmt='.-', **kwargs):
+def plot_bode(f, Z, scale=1, units='Ohms', fmt='.-', axes=None, labelsize=20,
+              ticksize=14, **kwargs):
     """ Plots impedance as a Bode plot using matplotlib
 
         Parameters
         ----------
-        axes: list of 2 matplotlib.axes.Axes
-            axes on which to plot the bode plot
         f: np.array of floats
             frequencies
         Z: np.array of complex numbers
@@ -81,6 +86,8 @@ def plot_bode(axes, f, Z, scale=1, units='Ohms', fmt='.-', **kwargs):
             units for :math:`|Z(\\omega)|`
         fmt: string
             format string passed to matplotlib (e.g. '.-' or 'o')
+        axes: list of 2 matplotlib.axes.Axes (optional)
+            axes on which to plot the bode plot
 
         Other Parameters
         ----------------
@@ -92,6 +99,10 @@ def plot_bode(axes, f, Z, scale=1, units='Ohms', fmt='.-', **kwargs):
         -------
         ax: matplotlib.axes.Axes
     """
+    Z = np.array(Z, dtype=complex)
+
+    if axes is None:
+        _, axes = plt.subplots(nrows=2)
 
     ax_mag, ax_phs = axes
 
@@ -100,16 +111,16 @@ def plot_bode(axes, f, Z, scale=1, units='Ohms', fmt='.-', **kwargs):
 
     # Set the y-axis labels
     ax_mag.set_ylabel(r'$|Z(\omega)|$ ' +
-                      '$[{}]$'.format(units), fontsize=20)
-    ax_phs.set_ylabel(r'$-\phi_Z(\omega)$ ' + r'$[^o]$', fontsize=20)
+                      '$[{}]$'.format(units), fontsize=labelsize)
+    ax_phs.set_ylabel(r'$-\phi_Z(\omega)$ ' + r'$[^o]$', fontsize=labelsize)
 
     for ax in axes:
         # Set the frequency axes title and make log scale
-        ax.set_xlabel('f [Hz]', fontsize=20)
+        ax.set_xlabel('f [Hz]', fontsize=labelsize)
         ax.set_xscale('log')
 
         # Make the tick labels larger
-        ax.tick_params(axis='both', which='major', labelsize=14)
+        ax.tick_params(axis='both', which='major', labelsize=ticksize)
 
         # Change the number of labels on each axis to five
         ax.locator_params(axis='y', nbins=5, tight=True)

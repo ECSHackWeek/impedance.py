@@ -1,9 +1,11 @@
-name: CI tests
+name: Run tests and build package
 on:
   pull_request:
   push:
     branches:
       - main
+    tags:
+      - '*'
 
 jobs:
   linting:
@@ -11,12 +13,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@v3
 
       - name: Set up Python 3.6
-        uses: actions/setup-python@v2.2.2
+        uses: actions/setup-python@v3
         with:
-          python-version: 3.6
+          python-version: 3.7
 
       - name: Install dependencies
         run: |
@@ -31,19 +33,20 @@ jobs:
 
   tests:
     name: Run tests
+    needs: linting
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
-      max-parallel: 4
+      max-parallel: 5
       matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9]
+        python-version: [3.7, 3.8, 3.9, 3.10, 3.11]
 
     steps:
-      - uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@v3
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2.2.2
+        uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python_version }}
 
@@ -58,7 +61,31 @@ jobs:
           pytest --cov=impedance .
 
       - name: Upload coverage to coveralls
-        if: matrix.python-version == 3.6 && github.repository == 'ECSHackWeek/impedance.py'
+        if: matrix.python-version == 3.7 && github.repository == 'ECSHackWeek/impedance.py'
         run: coveralls --service=github
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-and-push:
+    name: Build and publish package to PyPI
+    needs: [linting, tests]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+
+      - name: Build a binary wheel and a source tarball
+        run: |
+          python3 -m pip install wheel
+          python3 setup.py sdist bdist_wheel
+
+      - name: Publish distribution to PyPI (if tagged)
+        if: startsWith(github.ref, 'refs/tags')
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}

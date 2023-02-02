@@ -28,7 +28,7 @@ class BaseCircuit:
         """
 
         # if supplied, check that initial_guess is valid and store
-        initial_guess = list(filter(None, initial_guess))
+        initial_guess = [x for x in initial_guess if x is not None]
         for i in initial_guess:
             if not isinstance(i, (float, int, np.int32, np.float64)):
                 raise TypeError(f'value {i} in initial_guess is not a number')
@@ -90,23 +90,9 @@ class BaseCircuit:
         self: returns an instance of self
 
         """
+        frequencies = np.array(frequencies, dtype=float)
+        impedance = np.array(impedance, dtype=complex)
 
-        # check that inputs are valid:
-        #    frequencies: array of numbers
-        #    impedance: array of complex numbers
-        #    impedance and frequency match in length
-
-        if not isinstance(frequencies, np.ndarray):
-            raise TypeError('frequencies is not of type np.ndarray')
-        if not (np.issubdtype(frequencies.dtype, np.integer) or
-                np.issubdtype(frequencies.dtype, np.floating)):
-            raise TypeError('frequencies array should have a numeric ' +
-                            f'dtype (currently {frequencies.dtype})')
-        if not isinstance(impedance, np.ndarray):
-            raise TypeError('impedance is not of type np.ndarray')
-        if impedance.dtype != np.complex:
-            raise TypeError('impedance array should have a complex ' +
-                            f'dtype (currently {impedance.dtype})')
         if len(frequencies) != len(impedance):
             raise TypeError('length of frequencies and impedance do not match')
 
@@ -121,8 +107,7 @@ class BaseCircuit:
             if conf is not None:
                 self.conf_ = conf
         else:
-            # TODO auto calculate initial guesses
-            raise ValueError('no initial guess supplied')
+            raise ValueError('No initial guess supplied')
 
         return self
 
@@ -138,8 +123,7 @@ class BaseCircuit:
 
         Parameters
         ----------
-        frequencies: ndarray of numeric dtype
-
+        frequencies: array-like of numeric type
         use_initial: boolean
             If true and the model was previously fit use the initial
             parameters instead
@@ -147,14 +131,9 @@ class BaseCircuit:
         Returns
         -------
         impedance: ndarray of dtype 'complex128'
-            Predicted impedance
+            Predicted impedance at each frequency
         """
-        if not isinstance(frequencies, np.ndarray):
-            raise TypeError('frequencies is not of type np.ndarray')
-        if not (np.issubdtype(frequencies.dtype, np.integer) or
-                np.issubdtype(frequencies.dtype, np.floating)):
-            raise TypeError('frequencies array should have a numeric ' +
-                            f'dtype (currently {frequencies.dtype})')
+        frequencies = np.array(frequencies, dtype=float)
 
         if self._is_fit() and not use_initial:
             return eval(buildCircuit(self.circuit, frequencies,
@@ -209,7 +188,7 @@ class BaseCircuit:
             for name, value in self.constants.items():
                 elem = get_element_from_name(name)
                 units = check_and_eval(elem).units
-                if '_' in name:
+                if '_' in name and len(units) > 1:
                     unit = units[int(name.split('_')[-1])]
                 else:
                     unit = units[0]
@@ -259,10 +238,10 @@ class BaseCircuit:
 
         if kind == 'nyquist':
             if ax is None:
-                fig, ax = plt.subplots(figsize=(5, 5))
+                _, ax = plt.subplots(figsize=(5, 5))
 
             if Z_data is not None:
-                ax = plot_nyquist(ax, Z_data, ls='', marker='s', **kwargs)
+                ax = plot_nyquist(Z_data, ls='', marker='s', ax=ax, **kwargs)
 
             if self._is_fit():
                 if f_data is not None:
@@ -271,11 +250,11 @@ class BaseCircuit:
                     f_pred = np.logspace(5, -3)
 
                 Z_fit = self.predict(f_pred)
-                ax = plot_nyquist(ax, Z_fit, ls='-', marker='', **kwargs)
+                ax = plot_nyquist(Z_fit, ls='-', marker='', ax=ax, **kwargs)
             return ax
         elif kind == 'bode':
             if ax is None:
-                fig, ax = plt.subplots(nrows=2, figsize=(5, 5))
+                _, ax = plt.subplots(nrows=2, figsize=(5, 5))
 
             if f_data is not None:
                 f_pred = f_data
@@ -286,11 +265,13 @@ class BaseCircuit:
                 if f_data is None:
                     raise ValueError('f_data must be specified if' +
                                      ' Z_data for a Bode plot')
-                ax = plot_bode(ax, f_data, Z_data, ls='', marker='s', **kwargs)
+                ax = plot_bode(f_data, Z_data, ls='', marker='s',
+                               axes=ax, **kwargs)
 
             if self._is_fit():
                 Z_fit = self.predict(f_pred)
-                ax = plot_bode(ax, f_pred, Z_fit, ls='-', marker='', **kwargs)
+                ax = plot_bode(f_pred, Z_fit, ls='-', marker='',
+                               axes=ax, **kwargs)
             return ax
         elif kind == 'altair':
             plot_dict = {}
@@ -408,10 +389,10 @@ class Randles(BaseCircuit):
 
         if CPE:
             self.name = 'Randles w/ CPE'
-            self.circuit = 'R0-p(R1,CPE1)-Wo1'
+            self.circuit = 'R0-p(R1-Wo1,CPE1)'
         else:
             self.name = 'Randles'
-            self.circuit = 'R0-p(R1,C1)-Wo1'
+            self.circuit = 'R0-p(R1-Wo1,C1)'
 
         circuit_len = calculateCircuitLength(self.circuit)
 
@@ -445,7 +426,7 @@ class CustomCircuit(BaseCircuit):
         of the same type easier.
 
         Example:
-            Randles circuit is given by 'R0-p(R1,C1)-Wo1'
+            Randles circuit is given by 'R0-p(R1-Wo1,C1)'
 
         """
 

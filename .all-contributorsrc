@@ -163,6 +163,61 @@
         "test",
         "code"
       ]
+    },
+    {
+      "login": "lucasfdvx",
+      "name": "lucasfdvx",
+      "avatar_url": "https://avatars.githubusercontent.com/u/85888904?v=4",
+      "profile": "https://github.com/lucasfdvx",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "SaftMacki",
+      "name": "Marcus Karlstad",
+      "avatar_url": "https://avatars.githubusercontent.com/u/90030271?v=4",
+      "profile": "https://github.com/SaftMacki",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "markbouman",
+      "name": "Mark Bouman",
+      "avatar_url": "https://avatars.githubusercontent.com/u/103944120?v=4",
+      "profile": "https://github.com/markbouman",
+      "contributions": [
+        "bug",
+        "code"
+      ]
+    },
+    {
+      "login": "oslopanda",
+      "name": "oslopanda",
+      "avatar_url": "https://avatars.githubusercontent.com/u/33810430?v=4",
+      "profile": "https://github.com/oslopanda",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "pililac",
+      "name": "pililac",
+      "avatar_url": "https://avatars.githubusercontent.com/u/60116646?v=4",
+      "profile": "https://github.com/pililac",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "kevinsmia1939",
+      "name": "Kavin Teenakul",
+      "avatar_url": "https://avatars.githubusercontent.com/u/11407922?v=4",
+      "profile": "https://github.com/kevinsmia1939",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
@@ -170,5 +225,6 @@
   "projectOwner": "ECSHackWeek",
   "repoType": "github",
   "repoHost": "https://github.com",
-  "skipCi": true
+  "skipCi": true,
+  "commitConvention": "angular"
 }
