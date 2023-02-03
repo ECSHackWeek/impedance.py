@@ -431,7 +431,7 @@ class CustomCircuit(BaseCircuit):
         """
 
         super().__init__(**kwargs)
-        self.circuit = circuit
+        self.circuit = circuit.replace(" ", "")
 
         circuit_len = calculateCircuitLength(self.circuit)
 
