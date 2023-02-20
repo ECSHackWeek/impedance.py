@@ -322,8 +322,7 @@ def buildCircuit(circuit, frequencies, *parameters,
     elif parallel is not None and len(parallel) > 1:
         eval_string += "p(["
         split = parallel
-    elif series == parallel:
-        eval_string += "(["
+    elif series == parallel:  # only single element
         split = series
 
     for i, elem in enumerate(split):
@@ -355,7 +354,8 @@ def buildCircuit(circuit, frequencies, *parameters,
             eval_string += new
 
         if i == len(split) - 1:
-            eval_string += '])'
+            if len(split) > 1:  # do not add closing brackets if single element
+                eval_string += '])'
         else:
             eval_string += ','
 

@@ -186,6 +186,14 @@ def test_CustomCircuit():
     with pytest.raises(ValueError):
         custom_circuit = CustomCircuit('R0-NotAnElement', initial_guess=[1, 2])
 
+    # test single element circuit
+    initial_guess = [1]
+    custom_string = 'R0'
+    custom_circuit = CustomCircuit(initial_guess=initial_guess,
+                                   circuit=custom_string)
+    custom_circuit.fit([1, 2, 3], [4, 4, 4])
+    assert custom_circuit.parameters_[0] == 4
+
     # space in circuit string
     circuit = circuit = 'R0-p(R1, C1)'
     initial_guess = [1, 2, 3]
