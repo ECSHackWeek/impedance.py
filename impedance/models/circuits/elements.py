@@ -321,7 +321,7 @@ def TLMQ(p, f):
     -----
     .. math::
 
-        Z = \\sqrt{R_{ion}Z_{S}} \\coth \\sqrt{\\frac{R_{ion}}{Z_{S}}
+        Z = \\sqrt{R_{ion}Z_{S}} \\coth \\sqrt{\\frac{R_{ion}}{Z_{S}}}
 
 
     [1] J. Landesfeind et al.,
