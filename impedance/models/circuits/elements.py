@@ -331,8 +331,8 @@ def TLMQ(p, f):
     """
     omega = 2 * np.pi * np.array(f)
     Rion, Qs, gamma = p[0], p[1], p[2]
-    Zs = Qs * (1j * omega) ** gamma
-    Z = np.sqrt(Rion / Zs) / np.tanh(np.sqrt(Rion * Zs))
+    Zs = Qs * (1j * omega) ** -gamma
+    Z = np.sqrt(Rion * Zs) / np.tanh(np.sqrt(Rion / Zs))
     return Z
 
 
