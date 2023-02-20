@@ -344,7 +344,8 @@ def T(p, f):
     -----
     .. math::
 
-        Z = A\\frac{\\coth{\\beta}}{\\beta} + B\\frac{1}{\\beta\\sinh{\\beta}} + \\frac{B}{2}
+        Z = A\\frac{\\coth{\\beta}}{\\beta} + B\\frac{1}{\\beta\\sinh{\\beta}}
+        + \\frac{B}{2}
 
     where
 
