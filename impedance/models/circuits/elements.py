@@ -344,7 +344,7 @@ def T(p, f):
     -----
     .. math::
 
-        Z = A\\frac{\\coth{\\beta}}{\\beta} + B\\frac{1}{\\beta\\sinh{\\beta}}
+        Z = A\\frac{\\coth{\\beta}}{\\beta} + B\\frac{1}{\\beta\\sinh{\\beta}} + \\frac{B}{2}
 
     where
 
@@ -377,7 +377,7 @@ def T(p, f):
         else:
             sinh.append(1e10)
 
-    Z = A / (beta * np.tanh(beta)) + B / (beta * np.array(sinh))
+    Z = A / (beta * np.tanh(beta)) + B / (beta * np.array(sinh)) + B / 2
     return Z
 
 
