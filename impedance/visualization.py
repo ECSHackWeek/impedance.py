@@ -55,7 +55,7 @@ def plot_nyquist(Z, scale=1, units='Ohms', fmt='.-', ax=None, labelsize=20,
     ax.locator_params(axis='y', nbins=5, tight=True)
 
     # Add a light grid
-    ax.grid(b=True, which='major', axis='both', alpha=.5)
+    ax.grid(visible=True, which='major', axis='both', alpha=.5)
 
     # Change axis units to 10**log10(scale) and resize the offset text
     limits = -np.log10(scale)
@@ -126,7 +126,7 @@ def plot_bode(f, Z, scale=1, units='Ohms', fmt='.-', axes=None, labelsize=20,
         ax.locator_params(axis='y', nbins=5, tight=True)
 
         # Add a light grid
-        ax.grid(b=True, which='major', axis='both', alpha=.5)
+        ax.grid(visible=True, which='major', axis='both', alpha=.5)
 
     # Change axis units to 10**log10(scale) and resize the offset text
     limits = -np.log10(scale)
@@ -323,7 +323,7 @@ def plot_residuals(ax, f, res_real, res_imag, fmt='.-', y_limits=(-5, 5),
     ax.locator_params(axis='y', nbins=4, tight=True)
 
     # Add a light grid
-    ax.grid(b=True, which='major', axis='both', alpha=.5)
+    ax.grid(visible=True, which='major', axis='both', alpha=.5)
     ax.legend(fontsize=14)
 
     ax.set_ylim(y_limits)

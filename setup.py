@@ -15,7 +15,7 @@ setuptools.setup(
     url="https://impedancepy.readthedocs.io/en/latest/",
     packages=setuptools.find_packages(),
     python_requires="~=3.7",
-    install_requires=['altair>=3.0', 'matplotlib>=3.0',
+    install_requires=['altair>=3.0', 'matplotlib>=3.5',
                       'numpy>=1.14', 'scipy>=1.0'],
     classifiers=(
         "Programming Language :: Python :: 3",
