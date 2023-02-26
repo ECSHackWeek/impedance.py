@@ -205,8 +205,8 @@ To easily visualize the fit, the :code:`plot_nyquist()` function can be handy.
   from impedance.visualization import plot_nyquist
 
   fig, ax = plt.subplots()
-  plot_nyquist(ax, Z, fmt='o')
-  plot_nyquist(ax, Z_fit, fmt='-')
+  plot_nyquist(Z, fmt='o', scale=10, ax=ax)
+  plot_nyquist(Z_fit, fmt='-', scale=10, ax=ax)
 
   plt.legend(['Data', 'Fit'])
   plt.show()
