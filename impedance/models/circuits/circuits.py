@@ -188,7 +188,7 @@ class BaseCircuit:
             for name, value in self.constants.items():
                 elem = get_element_from_name(name)
                 units = check_and_eval(elem).units
-                if '_' in name:
+                if '_' in name and len(units) > 1:
                     unit = units[int(name.split('_')[-1])]
                 else:
                     unit = units[0]
@@ -431,7 +431,7 @@ class CustomCircuit(BaseCircuit):
         """
 
         super().__init__(**kwargs)
-        self.circuit = circuit
+        self.circuit = circuit.replace(" ", "")
 
         circuit_len = calculateCircuitLength(self.circuit)
 
