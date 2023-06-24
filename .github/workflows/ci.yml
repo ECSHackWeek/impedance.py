@@ -15,10 +15,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up Python 3.6
+      - name: Set up Python 3.7
         uses: actions/setup-python@v3
         with:
-          python-version: 3.7
+          python-version: "3.7"
 
       - name: Install dependencies
         run: |
@@ -40,7 +40,7 @@ jobs:
       fail-fast: false
       max-parallel: 5
       matrix:
-        python-version: [3.7, 3.8, 3.9, 3.10, 3.11]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
 
     steps:
       - uses: actions/checkout@v3
@@ -61,7 +61,7 @@ jobs:
           pytest --cov=impedance .
 
       - name: Upload coverage to coveralls
-        if: matrix.python-version == 3.7 && github.repository == 'ECSHackWeek/impedance.py'
+        if: matrix.python-version == 3.10 && github.repository == 'ECSHackWeek/impedance.py'
         run: coveralls --service=github
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
