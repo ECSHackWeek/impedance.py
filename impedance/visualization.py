@@ -168,7 +168,7 @@ def plot_altair(data_dict, size=400, background='#FFFFFF'):
         df = pd.DataFrame({'f': f, 'z_real': Z.real, 'z_imag': Z.imag,
                            'kind': kind, 'fmt': fmt})
 
-        Z_df = Z_df.append(df)
+        Z_df = pd.concat([Z_df, df], ignore_index=True)
 
     range_x = max(Z_df['z_real']) - min(Z_df['z_real'])
     range_y = max(-Z_df['z_imag']) - min(-Z_df['z_imag'])
