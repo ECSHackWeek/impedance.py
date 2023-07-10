@@ -99,7 +99,8 @@ This project started at the [2018 Electrochemical Society (ECS) Hack Week in Sea
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/pililac"><img src="https://avatars.githubusercontent.com/u/60116646?v=4?s=100" width="100px;" alt="pililac"/><br /><sub><b>pililac</b></sub></a><br /><a href="https://github.com/ECSHackWeek/impedance.py/issues?q=author%3Apililac" title="Bug reports">🐛</a></td>
     </tr>
     <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/kevinsmia1939"><img src="https://avatars.githubusercontent.com/u/11407922?v=4?s=100" width="100px;" alt="Kavin Teenakul"/><br /><sub><b>Kavin Teenakul</b></sub></a><br /><a href="https://github.com/ECSHackWeek/impedance.py/commits?author=kevinsmia1939" title="Code">💻</a> <a href="https://github.com/ECSHackWeek/impedance.py/commits?author=kevinsmia1939" title="Documentation">📖</a>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/kevinsmia1939"><img src="https://avatars.githubusercontent.com/u/11407922?v=4?s=100" width="100px;" alt="Kavin Teenakul"/><br /><sub><b>Kavin Teenakul</b></sub></a><br /><a href="https://github.com/ECSHackWeek/impedance.py/commits?author=kevinsmia1939" title="Code">💻</a> <a href="https://github.com/ECSHackWeek/impedance.py/commits?author=kevinsmia1939" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/etrevis"><img src="https://avatars.githubusercontent.com/u/16451399?v=4?s=100" width="100px;" alt="Enrico"/><br /><sub><b>Enrico</b></sub></a><br /><a href="https://github.com/ECSHackWeek/impedance.py/commits?author=etrevis" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

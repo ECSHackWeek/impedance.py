@@ -219,6 +219,15 @@
         "code",
         "doc"
       ]
+    },
+    {
+      "login": "etrevis",
+      "name": "Enrico",
+      "avatar_url": "https://avatars.githubusercontent.com/u/16451399?v=4",
+      "profile": "https://github.com/etrevis",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
@@ -227,5 +236,6 @@
   "repoType": "github",
   "repoHost": "https://github.com",
   "skipCi": true,
-  "commitConvention": "angular"
+  "commitConvention": "angular",
+  "commitType": "docs"
 }
