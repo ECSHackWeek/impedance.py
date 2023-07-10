@@ -315,7 +315,7 @@ def K(p, f):
 
 @element(num_params=3, units=['Ohm', 'sec', ''])
 def Zarc(p, f):
-    """ An RQ element rewritted with resistance and
+    """ An RQ element rewritten with resistance and
     and time constant as paramenters. Equivalent to a
     Cole-Cole relaxation in dielectrics.
 
