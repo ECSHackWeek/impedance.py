@@ -6,7 +6,7 @@ authors = ["impedance.py developers <matt.murbach@gmail.com>"]
 license = "MIT license"
 
 [tool.poetry.dependencies]
-python = ">=3.7,<3.11"
+python = "^3.8"
 numpy = ">=1.14"
 scipy = ">=1.0"
 matplotlib = ">=3.0"
