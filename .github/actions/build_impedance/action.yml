@@ -40,8 +40,8 @@ runs:
       shell: bash
       run: |
         poetry env use ${{ inputs.python-version }}
-        if [ "${{ poetry-install-group }}" != "" ]; then
-          poetry install --with ${{ poetry-install-group }};
+        if [ "${{ inputs.poetry-install-group }}" != "" ]; then
+          poetry install --with ${{ inputs.poetry-install-group }};
         else
           poetry install;
         fi
