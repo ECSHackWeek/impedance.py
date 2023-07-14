@@ -3,9 +3,14 @@ import string
 import numpy as np
 import pytest
 
-from impedance.models.circuits.elements import (OverwriteError,
-                                                circuit_elements, element, p,
-                                                s, ElementError)
+from impedance.models.circuits.elements import (
+    ElementError,
+    OverwriteError,
+    circuit_elements,
+    element,
+    p,
+    s,
+)
 
 
 def test_each_element():
@@ -69,9 +74,9 @@ def test_each_element():
             (6.332569967499333e-08 - 7.957742115295703e-05j),
         ],
         "Zarc": [
-            (0.08900974-0.00486384j),
-            (0.04818879-0.01198904j),
-            (0.00969182-0.00436265j),
+            (0.08900974 - 0.00486384j),
+            (0.04818879 - 0.01198904j),
+            (0.00969182 - 0.00436265j),
         ],
     }
     input_vals = [0.1, 0.2, 0.3, 0.4]
@@ -127,6 +132,7 @@ def test_element_function_names():
 
 def test_changing_base_functions_fails():
     with pytest.raises(ElementError):
+
         @element(num_params=1, units=["Ohm"])
         def s(p, f):
             # try redefining the series
@@ -179,7 +185,7 @@ def test_add_element_overwrite_fails():
     with pytest.raises(OverwriteError):
         # try to create the same element again without overwrite
         @element(num_params=1, units=["Ohm"])  # noqa: F811
-        def NE2(p, f):
+        def NE2(p, f):  # noqa: F811
             """definitely a new circuit element no one has seen before
 
             Notes
@@ -208,7 +214,7 @@ def test_add_element_overwrite():
     # try to create the same element again with overwrite
 
     @element(num_params=1, units=["Ohm"], overwrite=True)  # noqa: F811
-    def NE3(p, f):
+    def NE3(p, f):  # noqa: F811
         # feel free to change to a better test
         return [p * ff * 2 for ff in f]
 
