@@ -1,30 +1,47 @@
 name: Build impedance.py
 description: |
-    Composite workflow to re-use the build of impedance.py using poetry.
+  Composite workflow to re-use the build of impedance.py using poetry.
+
 inputs:
-  python-version:
-    description: python version used for setup-python.
+  poetry-version:
+    description: "The version of poetry to install."
+    default: "1.5.1"
+    type: string
     required: false
-    default: 3.7
+  python-version:
+    description: "The version of Python to use for setup-python."
+    default: "3.10"
+    type: string
+    required: false
+  install-only-core-dependencies:
+    description: "Whether to only install core dependencies."
+    default: false
+    type: boolean
+    required: false
 
 runs:
   using: composite
   steps:
-      - uses: actions/checkout@v3
+    - name: Install Poetry
+      shell: bash
+      run: |
+        if [ "${{ inputs.poetry-version }}" != "" ]; then
+          pipx install poetry==${{ inputs.poetry-version }}
+        else
+          pipx install poetry
+        fi
 
-      - name: Install Poetry
-        run: |
-          curl -sSL https://install.python-poetry.org | python3 - --version 1.1.14
-          echo "$HOME/.poetry/bin" >> $GITHUB_PATH  # add poetry to PATH.
-        shell: bash
+    - uses: actions/setup-python@v4
+      with:
+        python-version: ${{ inputs.python-version }}
+        cache: 'poetry'
 
-      - uses: actions/setup-python@v4
-        with:
-          python-version: ${{ inputs.python-version }}
-          cache: 'poetry'  # needs setup-python@v4, speeds up building
-
-      - name: Install impedance.py
-        run: |
-          poetry env use ${{ inputs.python-version }}
-          poetry install
-        shell: bash
+    - name: Install impedance.py
+      shell: bash
+      run: |
+        poetry env use ${{ inputs.python-version }}
+        if [ "${{ inputs.install-only-core-dependencies }}" = true ]; then
+          poetry install --only main;
+        else
+          poetry install;
+        fi
