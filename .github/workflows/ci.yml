@@ -56,11 +56,9 @@ jobs:
       - uses: actions/checkout@v3
 
       - uses: ./.github/actions/build_impedance
-        with:
-          poetry-install-group: release
 
       - name: Build a binary wheel and a source tarball
-        run: poetry run python3 setup.py sdist bdist_wheel
+        run: poetry build --verbose
 
       - name: Publish distribution to PyPI (if tagged)
         if: startsWith(github.ref, 'refs/tags')

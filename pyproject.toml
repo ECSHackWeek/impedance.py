@@ -5,6 +5,25 @@ description = "A Python package for working with electrochemical impedance data.
 authors = ["impedance.py developers <matt.murbach@gmail.com>"]
 license = "MIT license"
 
+readme = "README.md"
+exclude = ["*.so", "*.pyc", "*~", "#*", ".git*", ".coverage*", "DS_Store", "__pycache__"]
+include = ["README.md", "CODE_OF_CONDUCT.md", "CONTRIBUTING.md", "LICENSE", "CITATION.cff"]
+packages = [{include = "impedance" }]
+
+repository = "https://github.com/ECSHackWeek/impedance.py"
+documentation = "https://impedancepy.readthedocs.io/en/latest/"
+
+classifiers = [
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+
 [tool.poetry.dependencies]
 python = "^3.8.1"
 numpy = ">=1.14"
@@ -20,10 +39,6 @@ pytest = ">=4.6"
 pytest-cov = "^4.0.0"
 pylama = "^8.4.1"
 flake8 = "^6.0.0"
-
-
-[tool.poetry.group.release.dependencies]
-wheel = "^0.40.0"
 
 [tool.pylama.pycodestyle]
 max_line_length = 80
