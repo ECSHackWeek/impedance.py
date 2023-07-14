@@ -1,1 +1,1 @@
-__version__ = "1.7.1"
+from impedance._version import __version__
