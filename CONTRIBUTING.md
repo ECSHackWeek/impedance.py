@@ -48,7 +48,7 @@ git clone https://github.com/<GitHubUsername>/impedance.py
     `"<package>==1.0.0"`. Pro tip! If the package you're adding is not directly impacting the user, you can then use the `--dev` parameter after your command to add it as a dev-dependency. \
     Example:
     ```bash
-    poetry add "pytest>=4.6" --dev
+    poetry add "pytest>=4.6" --group dev
     ```
     For more information on how to be a poet, check out the [poetry docs](https://python-poetry.org/docs/basic-usage/)!
 
