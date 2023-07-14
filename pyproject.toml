@@ -20,6 +20,10 @@ pytest = ">=4.6"
 pytest-cov = "^4.0.0"
 pylama = "^8.4.1"
 
+
+[tool.poetry.group.release.dependencies]
+wheel = "^0.40.0"
+
 [tool.pylama.pycodestyle]
 max_line_length = 80
 

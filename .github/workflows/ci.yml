@@ -53,17 +53,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v3
 
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v3
+      - uses: ./.github/actions/build_impedance
         with:
-          python-version: "3.10"
+          poetry-install-group: release
 
       - name: Build a binary wheel and a source tarball
-        run: |
-          python3 -m pip install wheel
-          python3 setup.py sdist bdist_wheel
+        run: poetry run python3 setup.py sdist bdist_wheel
 
       - name: Publish distribution to PyPI (if tagged)
         if: startsWith(github.ref, 'refs/tags')

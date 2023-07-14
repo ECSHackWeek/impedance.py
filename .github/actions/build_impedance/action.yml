@@ -13,10 +13,10 @@ inputs:
     default: "3.10"
     type: string
     required: false
-  install-only-core-dependencies:
-    description: "Whether to only install core dependencies."
-    default: false
-    type: boolean
+  poetry-install-group:
+    description: "To install a specific poetry group."
+    default: ""
+    type: string
     required: false
 
 runs:
@@ -40,8 +40,8 @@ runs:
       shell: bash
       run: |
         poetry env use ${{ inputs.python-version }}
-        if [ "${{ inputs.install-only-core-dependencies }}" = true ]; then
-          poetry install --only main;
+        if [ "${{ poetry-install-group }}" != "" ]; then
+          poetry install --with ${{ poetry-install-group }};
         else
           poetry install;
         fi
