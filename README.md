@@ -35,7 +35,7 @@ impedance.py requires:
 -   SciPy (>=1.0)
 -   NumPy (>=1.14)
 -   Matplotlib (>=3.0)
--   Altair (>=3.0)
+-   Altair (>=4.2)
 
 Several example notebooks are provided in the `docs/source/examples/` directory. Opening these will require Jupyter notebook or Jupyter lab.
 
