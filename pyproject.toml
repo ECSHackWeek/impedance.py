@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "impedance.py"
+name = "impedance"
 version = "1.7.1"
 description = "A Python package for working with electrochemical impedance data."
 authors = ["impedance.py developers <matt.murbach@gmail.com>"]
