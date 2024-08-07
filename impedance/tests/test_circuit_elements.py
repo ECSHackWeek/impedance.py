@@ -1,4 +1,5 @@
 import string
+import warnings
 
 import numpy as np
 import pytest
@@ -92,9 +93,9 @@ def test_each_element():
             f(["hi"], ["yes", "hello"])
 
     # Test no overflow in T at high frequencies
-    with pytest.warns(None) as record:
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
         circuit_elements["T"]([1, 2, 50, 100], [10000])
-    assert not record
 
 
 def test_s():
