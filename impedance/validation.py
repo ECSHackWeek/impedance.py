@@ -264,15 +264,15 @@ def fit_linKK(f, ts, M, Z, fit_type='real', add_cap=False):
 
 
 def eval_linKK(elements, ts, f):
-    """ Builds a circuit of RC elements to be used in LinKK """
-    circuit_string = 's([R({},{}),'.format([elements[0]], f.tolist())
+    """Builds a circuit of RC elements to be used in LinKK"""
+    circuit_string = f"s([R({[elements[0]]},{f.tolist()}),"
 
-    for (Rk, tk) in zip(elements[1:], ts):
-        circuit_string += f'K({[Rk, tk]},{f.tolist()}),'
+    for Rk, tk in zip(elements[1:], ts):
+        circuit_string += f"K({[Rk, tk]},{f.tolist()}),"
 
-    circuit_string += 'L({},{}),'.format([elements[-1]], f.tolist())
+    circuit_string += f"L({[elements[-1]]},{f.tolist()}),"
     if elements.size == (ts.size + 3):
-        circuit_string += 'C({},{}),'.format([1/elements[-2]], f.tolist())
+        circuit_string += f"C({[1 / elements[-2]]},{f.tolist()}),"
 
     circuit_string = circuit_string.strip(',')
     circuit_string += '])'
