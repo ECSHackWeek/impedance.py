@@ -44,6 +44,7 @@ class BaseCircuit:
         # initialize fit parameters and confidence intervals
         self.parameters_ = None
         self.conf_ = None
+        self.pcov_ = None
 
     def __eq__(self, other):
         if self.__class__ == other.__class__:
@@ -97,15 +98,21 @@ class BaseCircuit:
             raise TypeError('length of frequencies and impedance do not match')
 
         if self.initial_guess != []:
-            parameters, conf = circuit_fit(frequencies, impedance,
+            parameters, pcov = circuit_fit(frequencies, impedance,
                                            self.circuit, self.initial_guess,
                                            constants=self.constants,
                                            bounds=bounds,
                                            weight_by_modulus=weight_by_modulus,
                                            **kwargs)
             self.parameters_ = parameters
-            if conf is not None:
-                self.conf_ = conf
+            if pcov is not None:
+                self.pcov_ = pcov
+
+                # Calculate one standard deviation error estimates for fit
+                # parameters, defined as the square root of the diagonal of the
+                # covariance matrix.
+                # https://stackoverflow.com/a/52275674/5144795
+                self.conf_ = np.sqrt(np.diag(pcov))
         else:
             raise ValueError('No initial guess supplied')
 
@@ -323,6 +330,7 @@ class BaseCircuit:
                          "Fit": True,
                          "Parameters": parameters_,
                          "Confidence": model_conf_,
+                         "Covariance": self.pcov_.tolist(),
                          }
         else:
             data_dict = {"Name": model_name,
@@ -370,6 +378,7 @@ class BaseCircuit:
             else:
                 self.parameters_ = np.array(json_data["Parameters"])
                 self.conf_ = np.array(json_data["Confidence"])
+                self.pcov_ = np.array(json_data["Covariance"])
 
 
 class Randles(BaseCircuit):
