@@ -45,6 +45,12 @@ def element(num_params, units, overwrite=False):
             )
         else:
             circuit_elements[func.__name__] = wrapper
+        # Adding numpy to circuit_elements for proper evaluation with
+        # numpy>=2.0.0 because the scalar representation was changed.
+        # "Scalars are now printed as np.float64(3.0) rather than just 3.0."
+        # https://numpy.org/doc/2.0/release/2.0.0-notes.html
+        # #representation-of-numpy-scalars-changed
+        circuit_elements["np"] = np
 
         return wrapper
 

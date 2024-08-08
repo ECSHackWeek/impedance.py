@@ -78,7 +78,7 @@ def test_each_element():
     input_vals = [0.1, 0.2, 0.3, 0.4]
     for key, f in circuit_elements.items():
         # don't test the outputs of series and parallel functions
-        if key not in ["s", "p"]:
+        if key not in ["s", "p", "np"]:
             num_inputs = f.num_params
             val = f(input_vals[:num_inputs], freqs)
             assert np.isclose(val, correct_vals[key]).all()
