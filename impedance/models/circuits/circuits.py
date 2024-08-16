@@ -133,7 +133,10 @@ class BaseCircuit:
         impedance: ndarray of dtype 'complex128'
             Predicted impedance at each frequency
         """
-        frequencies = np.array(frequencies, dtype=float)
+        frequencies = (
+            np.array([frequencies], dtype=float) if isinstance(frequencies, float)
+            else np.array(frequencies, dtype=float)
+        )
 
         if self._is_fit() and not use_initial:
             return eval(buildCircuit(self.circuit, frequencies,
