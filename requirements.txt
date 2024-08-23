@@ -1,7 +1,8 @@
 altair>=3.0
 coveralls==3.2.0
 matplotlib>=3.5
-numpy>=1.14
+numpy>=1.22.4
+pandas
 pytest>=4.6
 pytest-cov
 scipy>=1.0
