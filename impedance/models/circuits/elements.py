@@ -45,12 +45,6 @@ def element(num_params, units, overwrite=False):
             )
         else:
             circuit_elements[func.__name__] = wrapper
-        # Adding numpy to circuit_elements for proper evaluation with
-        # numpy>=2.0.0 because the scalar representation was changed.
-        # "Scalars are now printed as np.float64(3.0) rather than just 3.0."
-        # https://numpy.org/doc/2.0/release/2.0.0-notes.html
-        # #representation-of-numpy-scalars-changed
-        circuit_elements["np"] = np
 
         return wrapper
 
@@ -412,17 +406,20 @@ def get_element_from_name(name):
 
 
 def typeChecker(p, f, name, length):
-    assert isinstance(p, list), \
-        "in {}, input must be of type list".format(name)
-    for i in p:
-        assert isinstance(
-            i, (float, int, np.int32, np.float64)
-        ), "in {}, value {} in {} is not a number".format(name, i, p)
-    for i in f:
-        assert isinstance(
-            i, (float, int, np.int32, np.float64)
-        ), "in {}, value {} in {} is not a number".format(name, i, f)
-    assert len(p) == length, "in {}, input list must be length {}".format(
-        name, length
-    )
-    return
+    if not np.all(np.isreal(p)):
+        raise TypeError(f"In {name} all of the parameters are not real ({p})")
+    if not np.all(np.isreal(f)):
+        raise TypeError(f"In {name} all of the frequencies are not ({f})")
+    if len(p) != length:
+        raise TypeError(f"In {name} length of parameters is not {length} ")
+
+def get_element_parameter_names_and_units_from_name(name):
+    elem = get_element_from_name(name)
+    n_params = circuit_elements[elem].num_params
+    return [
+        format_parameter_name(name, j, n_params)
+        for j in range(n_params)
+    ], circuit_elements[elem].units
+
+def format_parameter_name(name, j, n_params):
+    return f"{name}_{j}" if n_params > 1 else f"{name}"
