@@ -1,6 +1,8 @@
 altair>=3.0
 coveralls==3.2.0
 matplotlib>=3.5
+networkx>=2.6.3
+numdifftools>=0.9.41
 numpy>=1.14
 pytest>=4.6
 pytest-cov

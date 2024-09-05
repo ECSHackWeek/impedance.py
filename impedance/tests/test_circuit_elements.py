@@ -83,14 +83,20 @@ def test_each_element():
             val = f(input_vals[:num_inputs], freqs)
             assert np.isclose(val, correct_vals[key]).all()
 
-        # check for typing:
-        with pytest.raises(AssertionError):
-            f = circuit_elements["R"]
-            f(1, 2)
+    # check for typing:
+    f = circuit_elements["R"]
+    with pytest.raises(TypeError):
+        f(1, 2)
 
-        # test for handling more wrong inputs
-        with pytest.raises(AssertionError):
-            f(["hi"], ["yes", "hello"])
+    # test for handling more wrong inputs
+    with pytest.raises(TypeError):
+        f(["hi"], ["yes", "hello"])
+    with pytest.raises(TypeError):
+        f([0.1, 0.2], [1])
+    with pytest.raises(TypeError):
+        f([1 + 1j], [1])
+    with pytest.raises(TypeError):
+        f([0.1], [1 + 1j])
 
     # Test no overflow in T at high frequencies
     with warnings.catch_warnings():
