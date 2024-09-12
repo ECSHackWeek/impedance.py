@@ -8,7 +8,9 @@ from impedance.models.circuits.fitting import (
     CircuitGraph,
     BoundsCheck,
 )
-from impedance.tests.test_preprocessing import frequencies as example_frequencies
+from impedance.tests.test_preprocessing import (
+    frequencies as example_frequencies,
+)
 from impedance.tests.test_preprocessing import Z_correct
 
 import numpy as np
@@ -54,7 +56,12 @@ def test_circuit_fit():
 
     assert np.allclose(
         circuit_fit(
-            frequencies, Z_data, circuit, initial_guess, constants={}, global_opt=True
+            frequencies,
+            Z_data,
+            circuit,
+            initial_guess,
+            constants={},
+            global_opt=True,
         )[0],
         results_simple,
         rtol=1e-1,
@@ -221,7 +228,7 @@ def test_circuit_fit():
             "options": {
                 "scale": initial_guess,
                 "maxfun": 10_000,
-            }
+            },
         },
     )[0]
     assert sum_sq_error(popt) < 5e-5

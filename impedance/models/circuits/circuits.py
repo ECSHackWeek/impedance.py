@@ -20,7 +20,9 @@ import warnings
 class BaseCircuit:
     """Base class for equivalent circuit models"""
 
-    def __init__(self, circuit="", initial_guess=None, constants=None, name=None):
+    def __init__(
+        self, circuit="", initial_guess=None, constants=None, name=None
+    ):
         """Base constructor for any equivalent circuit model
 
         Parameters
@@ -44,7 +46,9 @@ class BaseCircuit:
         # if supplied, check that initial_guess is valid and store
         initial_guess = [x for x in initial_guess if x is not None]
         if not np.all(np.isfinite(initial_guess)):
-            raise TypeError(f"initial_guess must be numeric or None ({initial_guess})")
+            raise TypeError(
+                f"initial_guess must be numeric or None ({initial_guess})"
+            )
 
         # initalize class attributes
         self.initial_guess = initial_guess
@@ -86,7 +90,12 @@ class BaseCircuit:
             raise TypeError("Comparing object is not of the same type.")
 
     def fit(
-        self, frequencies, impedance, bounds=None, weight_by_modulus=False, **kwargs
+        self,
+        frequencies,
+        impedance,
+        bounds=None,
+        weight_by_modulus=False,
+        **kwargs,
     ):
         """Fit the circuit model
 
@@ -184,10 +193,16 @@ class BaseCircuit:
 
         full_names, all_units = [], []
         for name in names:
-            p_names, p_units = get_element_parameter_names_and_units_from_name(name)
+            p_names, p_units = get_element_parameter_names_and_units_from_name(
+                name
+            )
             full_names.extend([n for n in p_names if n not in self.constants])
             all_units.extend(
-                [u for u, n in zip(p_units, p_names) if n not in self.constants]
+                [
+                    u
+                    for u, n in zip(p_units, p_names)
+                    if n not in self.constants
+                ]
             )
 
         return full_names, all_units
@@ -283,13 +298,18 @@ class BaseCircuit:
             if Z_data is not None:
                 if f_data is None:
                     raise ValueError(
-                        "f_data must be specified if" + " Z_data for a Bode plot"
+                        "f_data must be specified if"
+                        + " Z_data for a Bode plot"
                     )
-                ax = plot_bode(f_data, Z_data, ls="", marker="s", axes=ax, **kwargs)
+                ax = plot_bode(
+                    f_data, Z_data, ls="", marker="s", axes=ax, **kwargs
+                )
 
             if self._is_fit():
                 Z_fit = self.predict(f_pred)
-                ax = plot_bode(f_pred, Z_fit, ls="-", marker="", axes=ax, **kwargs)
+                ax = plot_bode(
+                    f_pred, Z_fit, ls="-", marker="", axes=ax, **kwargs
+                )
             return ax
         elif kind == "altair":
             plot_dict = {}

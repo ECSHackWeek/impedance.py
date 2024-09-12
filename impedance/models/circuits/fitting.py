@@ -4,9 +4,19 @@ import re
 import numpy as np
 import numdifftools as nd
 from scipy.linalg import inv, norm
-from scipy.optimize import curve_fit, dual_annealing, minimize, basinhopping, Bounds
+from scipy.optimize import (
+    curve_fit,
+    dual_annealing,
+    minimize,
+    basinhopping,
+    Bounds,
+)
 
-from .elements import circuit_elements, get_element_from_name, format_parameter_name
+from .elements import (
+    circuit_elements,
+    get_element_from_name,
+    format_parameter_name,
+)
 
 ints = "0123456789"
 _LBFGSB_OPTIONS = {
@@ -78,7 +88,9 @@ def objective_function(graph, f, Z, weight_by_modulus=False):
         function
             Returns a function
         """
-        return sum_square_error(graph(f, *x), np.stack([Z.real, Z.imag]), weights)
+        return sum_square_error(
+            graph(f, *x), np.stack([Z.real, Z.imag]), weights
+        )
 
     return cost_function
 
@@ -218,7 +230,9 @@ def circuit_fit(
         bounds = set_default_bounds(circuit, constants=constants)
 
     cg = CircuitGraph(circuit, constants)
-    sumsq_errors = objective_function(cg, f, Z, weight_by_modulus=weight_by_modulus)
+    sumsq_errors = objective_function(
+        cg, f, Z, weight_by_modulus=weight_by_modulus
+    )
     if not global_opt:
         if opt_method == "minimize":
             if "options" not in kwargs:
@@ -291,7 +305,9 @@ def circuit_fit(
             )
 
             popt = results.x
-            pcov = results.get("lowest_optimization_result", {}).get("hess_inv", None)
+            pcov = results.get("lowest_optimization_result", {}).get(
+                "hess_inv", None
+            )
             try:
                 pcov = pcov.todense()
             except AttributeError:
@@ -442,7 +458,9 @@ class CircuitGraph:
         pindex = 0
         for node in self.execution_order:
             Zfunc = self.graph.nodes[node]["Z"]
-            plist = [node_results[pred] for pred in self.graph.predecessors(node)]
+            plist = [
+                node_results[pred] for pred in self.graph.predecessors(node)
+            ]
             if len(plist) < 1:
                 n_params = Zfunc.num_params
                 for j in range(n_params):
