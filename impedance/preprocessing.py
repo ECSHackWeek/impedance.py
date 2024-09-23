@@ -28,7 +28,7 @@ def readFile(filename, instrument=None):
                        'powersuite', 'biologic', 'chinstruments']
 
     if instrument is not None:
-        assert instrument in supported_types,\
+        assert instrument in supported_types, \
             '{} is not a supported instrument ({})'.format(instrument,
                                                            supported_types)
 
