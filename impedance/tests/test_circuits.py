@@ -22,6 +22,7 @@ def test_BaseCircuit():
     # check initial_guess is loaded in correctly
     base_circuit = BaseCircuit(initial_guess)
     assert base_circuit.initial_guess == initial_guess
+    assert base_circuit.parameters is None
 
     # improper input_guess types raise an TypeError
     with pytest.raises(TypeError):
@@ -69,6 +70,8 @@ def test_Randles():
                                    np.array([1.86235717e-02, 1.16804085e-02,
                                              6.27121224e-02, 2.21232935e+02,
                                              1.17171440e+00]), decimal=2)
+    np.testing.assert_array_equal(randles.parameters, randles.parameters_)
+
 
     # compare with known impedance predictions
     assert np.isclose(randles.predict(np.array([10.0])),
@@ -193,6 +196,10 @@ def test_CustomCircuit():
                                    circuit=custom_string)
     custom_circuit.fit([1, 2, 3], [4, 4, 4])
     assert custom_circuit.parameters_[0] == 4
+    np.testing.assert_array_equal(
+        custom_circuit.parameters,
+        custom_circuit.parameters_
+    )
 
     # space in circuit string
     circuit = circuit = 'R0-p(R1, C1)'
