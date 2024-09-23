@@ -179,8 +179,8 @@ def test_add_element_overwrite_fails():
     assert "NE2" in circuit_elements
     with pytest.raises(OverwriteError):
         # try to create the same element again without overwrite
-        @element(num_params=1, units=["Ohm"])  # noqa: F811
-        def NE2(p, f):
+        @element(num_params=1, units=["Ohm"])
+        def NE2(p, f):  # noqa: F811
             """definitely a new circuit element no one has seen before
 
             Notes
@@ -208,8 +208,8 @@ def test_add_element_overwrite():
     assert circuit_elements["NE3"]([1], [1]) == [[1]]
     # try to create the same element again with overwrite
 
-    @element(num_params=1, units=["Ohm"], overwrite=True)  # noqa: F811
-    def NE3(p, f):
+    @element(num_params=1, units=["Ohm"], overwrite=True)
+    def NE3(p, f):  # noqa: F811
         # feel free to change to a better test
         return [p * ff * 2 for ff in f]
 
