@@ -134,7 +134,8 @@ class BaseCircuit:
             Predicted impedance at each frequency
         """
         frequencies = (
-            np.array([frequencies], dtype=float) if isinstance(frequencies, float)
+            np.array([frequencies], dtype=float)
+            if isinstance(frequencies, float)
             else np.array(frequencies, dtype=float)
         )
 
