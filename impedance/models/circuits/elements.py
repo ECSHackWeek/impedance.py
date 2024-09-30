@@ -196,6 +196,30 @@ def Ws(p, f):
     Z = Z0 * np.tanh(np.sqrt(1j * omega * tau)) / np.sqrt(1j * omega * tau)
     return Z
 
+@element(num_params=3, units=["Ohm", "sec",""])
+def Ws(p, f):
+    """defines a modified  open (finite-space) Warburg element, for use in the 
+    non-ideal cases where the open Warburg element is not suitable as presented in [1]
+
+    Notes
+    ---------
+    .. math::
+        Z = \\frac{Z_0}{{ j \\omega \\tau }^{\\frac{\\alpha}{2}}}
+        \\tanh{{j \\omega \\tau }^{\\frac{\\alpha}{2}}
+
+    where :math:`Z_0` = p[0] (Ohms) and
+    :math:`\\tau` = p[1] (sec) = :math:`\\frac{L^2}{D}` and
+    :math:`\\alpha` = p[2]
+
+    [1] `EC-Lab Application Note 51, BioLogic Instruments (2014)
+    <https://biologic.net/wp-content/uploads/2019/08/dc-characterizations_supercapacitor-an51.pdf>`_.
+
+    """
+    omega = 2 * np.pi * np.array(f)
+    Z0, tau, alpha = p[0], p[1], p[2]
+    Z = Z0 * np.coth((1j * omega * tau)**(alpha/2)) / (1j * omega * tau)**(alpha/2)
+    return Z
+
 
 @element(num_params=2, units=["Ohm^-1 sec^a", ""])
 def CPE(p, f):
