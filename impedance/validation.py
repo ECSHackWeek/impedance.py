@@ -276,6 +276,7 @@ def eval_linKK(elements, ts, f):
 
     circuit_string = circuit_string.strip(',')
     circuit_string += '])'
+    circuit_string = circuit_string.replace("np.", "__import__('numpy').")
 
     return eval(circuit_string, circuit_elements)
 
