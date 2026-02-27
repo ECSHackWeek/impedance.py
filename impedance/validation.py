@@ -68,7 +68,7 @@ def linKK(f, Z, c=0.85, max_M=50, fit_type='real', add_cap=False):
 
     .. math::
 
-        \\mu = 1 - \\frac{\\sum_{R_k \\ge 0} |R_k|}{\\sum_{R_k < 0} |R_k|}
+        \\mu = 1 - \\frac{\\sum_{R_k < 0} |R_k|}{\\sum_{R_k \\ge 0} |R_k|}
 
     The argument :code:`c` defines the cutoff value for :math:`\\mu`. The
     algorithm starts at :code:`M = 3` and iterates up to :code:`max_M` until a
