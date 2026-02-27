@@ -238,6 +238,15 @@
         "code",
         "bug"
       ]
+    },
+    {
+      "login": "Uladzimir-dev",
+      "name": "Uladzimir Matys",
+      "avatar_url": "https://avatars.githubusercontent.com/u/68189726?v=4",
+      "profile": "https://github.com/Uladzimir-dev",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
