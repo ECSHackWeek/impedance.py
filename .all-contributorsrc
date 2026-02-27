@@ -256,6 +256,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "YaroslavBerko",
+      "name": "YaroslavBerko",
+      "avatar_url": "https://avatars.githubusercontent.com/u/38190821?v=4",
+      "profile": "https://github.com/YaroslavBerko",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
