@@ -100,11 +100,11 @@ class BaseCircuit:
             raise ValueError('No initial guess supplied')
 
         parameters, conf = circuit_fit(frequencies, impedance,
-                                        self.circuit, self.initial_guess,
-                                        constants=self.constants,
-                                        bounds=bounds,
-                                        weight_by_modulus=weight_by_modulus,
-                                        **kwargs)
+                                       self.circuit, self.initial_guess,
+                                       constants=self.constants,
+                                       bounds=bounds,
+                                       weight_by_modulus=weight_by_modulus,
+                                       **kwargs)
         self.parameters_ = parameters
         if conf is not None:
             self.conf_ = conf
@@ -138,9 +138,9 @@ class BaseCircuit:
             parameters_for_fit = self.initial_guess
 
         return eval(buildCircuit(self.circuit, frequencies,
-                            *parameters_for_fit,
-                            constants=self.constants, eval_string='',
-                            index=0)[0],
+                                 *parameters_for_fit,
+                                 constants=self.constants, eval_string='',
+                                 index=0)[0],
                     circuit_elements)
 
     def get_param_names(self):
@@ -291,10 +291,10 @@ class BaseCircuit:
         initial_guess = self.initial_guess
 
         data_dict = {"Name": model_name,
-                        "Circuit String": model_string,
-                        "Initial Guess": initial_guess,
-                        "Constants": self.constants,
-                        "Fit": False}
+                     "Circuit String": model_string,
+                     "Initial Guess": initial_guess,
+                     "Constants": self.constants,
+                     "Fit": False}
 
         if self._is_fit():
             data_dict["Fit"] = True

@@ -33,7 +33,7 @@ def element(num_params, units, overwrite=False):
         wrapper.__name__ = func.__name__
         wrapper.__doc__ = func.__doc__
 
-        global circuit_elements
+        # global circuit_elements
         if func.__name__ in ["s", "p"]:
             raise ElementError("cannot redefine elements 's' (series)" +
                                "or 'p' (parallel)")
