@@ -180,7 +180,7 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
                         np.hstack([Z.real, Z.imag]))
 
         class BasinhoppingBounds(object):
-            """ Adapted from the basinhopping documetation
+            """ Adapted from the basinhopping documentation
             https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.basinhopping.html
             """
 
@@ -293,24 +293,28 @@ def buildCircuit(circuit, frequencies, *parameters,
         result = []
         skipped = []
         for i, sub_str in enumerate(split):
-            if i not in skipped:
-                if '(' not in sub_str and ')' not in sub_str:
-                    result.append(sub_str)
-                else:
-                    open_parens, closed_parens = count_parens(sub_str)
-                    if open_parens == closed_parens:
-                        result.append(sub_str)
-                    else:
-                        uneven = True
-                        while i < len(split) - 1 and uneven:
-                            sub_str += special + split[i+1]
+            if i in skipped:
+                continue
 
-                            open_parens, closed_parens = count_parens(sub_str)
-                            uneven = open_parens != closed_parens
+            if '(' not in sub_str and ')' not in sub_str:
+                result.append(sub_str)
+                continue
 
-                            i += 1
-                            skipped.append(i)
-                        result.append(sub_str)
+            open_parens, closed_parens = count_parens(sub_str)
+            if open_parens == closed_parens:
+                result.append(sub_str)
+                continue
+
+            uneven = True
+            while i < len(split) - 1 and uneven:
+                sub_str += special + split[i+1]
+
+                open_parens, closed_parens = count_parens(sub_str)
+                uneven = open_parens != closed_parens
+
+                i += 1
+                skipped.append(i)
+            result.append(sub_str)
         return result
 
     parallel = parse_circuit(circuit, parallel=True)
@@ -338,10 +342,9 @@ def buildCircuit(circuit, frequencies, *parameters,
             elem_number = check_and_eval(raw_elem).num_params
             param_list = []
             for j in range(elem_number):
+                current_elem = elem
                 if elem_number > 1:
-                    current_elem = elem + '_{}'.format(j)
-                else:
-                    current_elem = elem
+                    current_elem += '_{}'.format(j)
 
                 if current_elem in constants.keys():
                     param_list.append(constants[current_elem])
@@ -352,12 +355,11 @@ def buildCircuit(circuit, frequencies, *parameters,
             param_string += str(param_list)
             new = raw_elem + '(' + param_string + ',' + str(frequencies) + ')'
             eval_string += new
-
-        if i == len(split) - 1:
-            if len(split) > 1:  # do not add closing brackets if single element
-                eval_string += '])'
-        else:
+        if i < len(split) - 1:
             eval_string += ','
+
+    if len(split) > 1:  # do not add closing brackets if single element
+        eval_string += '])'
 
     return eval_string, index
 
@@ -383,14 +385,12 @@ def extract_circuit_elements(circuit):
     for i, char in enumerate(p_string):
         if char not in ints:
             current_element.append(char)
-        else:
-            # min to prevent looking ahead past end of list
-            if p_string[min(i+1, length-1)] not in ints:
-                current_element.append(char)
-                extracted_elements.append(''.join(current_element))
-                current_element = []
-            else:
-                current_element.append(char)
+            continue
+        current_element.append(char)
+        # min to prevent looking ahead past end of list
+        if p_string[min(i+1, length-1)] not in ints:
+            extracted_elements.append(''.join(current_element))
+            current_element = []
     extracted_elements.append(''.join(current_element))
     return extracted_elements
 
@@ -410,12 +410,13 @@ def calculateCircuitLength(circuit):
 
     """
     length = 0
-    if circuit:
-        extracted_elements = extract_circuit_elements(circuit)
-        for elem in extracted_elements:
-            raw_element = get_element_from_name(elem)
-            num_params = check_and_eval(raw_element).num_params
-            length += num_params
+    if not circuit:
+        return length
+    extracted_elements = extract_circuit_elements(circuit)
+    for elem in extracted_elements:
+        raw_element = get_element_from_name(elem)
+        num_params = check_and_eval(raw_element).num_params
+        length += num_params
     return length
 
 
