@@ -235,6 +235,7 @@ def wrapCircuit(circuit, constants):
 
         """
 
+        circuit_elements["frequencies"] = frequencies
         x = eval(buildCircuit(circuit, frequencies, *parameters,
                               constants=constants, eval_string='',
                               index=0)[0],
@@ -350,7 +351,7 @@ def buildCircuit(circuit, frequencies, *parameters,
                     index += 1
 
             param_string += str(param_list)
-            new = raw_elem + '(' + param_string + ',' + str(frequencies) + ')'
+            new = raw_elem + '(' + param_string + ', frequencies)'
             eval_string += new
 
         if i == len(split) - 1:

@@ -135,6 +135,7 @@ class BaseCircuit:
         """
         frequencies = np.array(frequencies, dtype=float)
 
+        circuit_elements["frequencies"] = frequencies
         if self._is_fit() and not use_initial:
             return eval(buildCircuit(self.circuit, frequencies,
                                      *self.parameters_,

@@ -92,7 +92,7 @@ def p(parallel):
 # populated by the element decorator -
 # this maps ex. 'R' to the function R to always give us a list of
 # active elements in any context
-circuit_elements = {"s": s, "p": p}
+circuit_elements = {"s": s, "p": p, "frequencies": np.array([1.])}
 
 
 @element(num_params=1, units=["Ohm"])
