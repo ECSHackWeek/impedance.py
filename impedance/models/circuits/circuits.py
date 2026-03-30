@@ -96,27 +96,24 @@ class BaseCircuit:
         if len(frequencies) != len(impedance):
             raise TypeError('length of frequencies and impedance do not match')
 
-        if self.initial_guess != []:
-            parameters, conf = circuit_fit(frequencies, impedance,
-                                           self.circuit, self.initial_guess,
-                                           constants=self.constants,
-                                           bounds=bounds,
-                                           weight_by_modulus=weight_by_modulus,
-                                           **kwargs)
-            self.parameters_ = parameters
-            if conf is not None:
-                self.conf_ = conf
-        else:
+        if self.initial_guess == []:
             raise ValueError('No initial guess supplied')
+
+        parameters, conf = circuit_fit(frequencies, impedance,
+                                        self.circuit, self.initial_guess,
+                                        constants=self.constants,
+                                        bounds=bounds,
+                                        weight_by_modulus=weight_by_modulus,
+                                        **kwargs)
+        self.parameters_ = parameters
+        if conf is not None:
+            self.conf_ = conf
 
         return self
 
     def _is_fit(self):
         """ check if model has been fit (parameters_ is not None) """
-        if self.parameters_ is not None:
-            return True
-        else:
-            return False
+        return (self.parameters_ is not None)
 
     def predict(self, frequencies, use_initial=False):
         """ Predict impedance using an equivalent circuit model
@@ -135,19 +132,16 @@ class BaseCircuit:
         """
         frequencies = np.array(frequencies, dtype=float)
 
-        if self._is_fit() and not use_initial:
-            return eval(buildCircuit(self.circuit, frequencies,
-                                     *self.parameters_,
-                                     constants=self.constants, eval_string='',
-                                     index=0)[0],
-                        circuit_elements)
-        else:
+        parameters_for_fit = self.parameters_
+        if not self._is_fit() or use_initial:
             warnings.warn("Simulating circuit based on initial parameters")
-            return eval(buildCircuit(self.circuit, frequencies,
-                                     *self.initial_guess,
-                                     constants=self.constants, eval_string='',
-                                     index=0)[0],
-                        circuit_elements)
+            parameters_for_fit = self.initial_guess
+
+        return eval(buildCircuit(self.circuit, frequencies,
+                            *parameters_for_fit,
+                            constants=self.constants, eval_string='',
+                            index=0)[0],
+                    circuit_elements)
 
     def get_param_names(self):
         """ Converts circuit string to names and units """
@@ -236,6 +230,8 @@ class BaseCircuit:
             axes of the created nyquist plot
         """
 
+        f_pred = f_data if f_data is not None else np.logspace(5, -3)
+        Z_fit = self.predict(f_pred) if self._is_fit() else None
         if kind == 'nyquist':
             if ax is None:
                 _, ax = plt.subplots(figsize=(5, 5))
@@ -244,22 +240,11 @@ class BaseCircuit:
                 ax = plot_nyquist(Z_data, ls='', marker='s', ax=ax, **kwargs)
 
             if self._is_fit():
-                if f_data is not None:
-                    f_pred = f_data
-                else:
-                    f_pred = np.logspace(5, -3)
-
-                Z_fit = self.predict(f_pred)
                 ax = plot_nyquist(Z_fit, ls='-', marker='', ax=ax, **kwargs)
             return ax
         elif kind == 'bode':
             if ax is None:
                 _, ax = plt.subplots(nrows=2, figsize=(5, 5))
-
-            if f_data is not None:
-                f_pred = f_data
-            else:
-                f_pred = np.logspace(5, -3)
 
             if Z_data is not None:
                 if f_data is None:
@@ -269,7 +254,6 @@ class BaseCircuit:
                                axes=ax, **kwargs)
 
             if self._is_fit():
-                Z_fit = self.predict(f_pred)
                 ax = plot_bode(f_pred, Z_fit, ls='-', marker='',
                                axes=ax, **kwargs)
             return ax
@@ -280,12 +264,6 @@ class BaseCircuit:
                 plot_dict['data'] = {'f': f_data, 'Z': Z_data}
 
             if self._is_fit():
-                if f_data is not None:
-                    f_pred = f_data
-                else:
-                    f_pred = np.logspace(5, -3)
-
-                Z_fit = self.predict(f_pred)
                 if self.name is not None:
                     name = self.name
                 else:
@@ -312,24 +290,20 @@ class BaseCircuit:
 
         initial_guess = self.initial_guess
 
+        data_dict = {"Name": model_name,
+                        "Circuit String": model_string,
+                        "Initial Guess": initial_guess,
+                        "Constants": self.constants,
+                        "Fit": False}
+
         if self._is_fit():
+            data_dict["Fit"] = True
             parameters_ = list(self.parameters_)
             model_conf_ = list(self.conf_)
-
-            data_dict = {"Name": model_name,
-                         "Circuit String": model_string,
-                         "Initial Guess": initial_guess,
-                         "Constants": self.constants,
-                         "Fit": True,
-                         "Parameters": parameters_,
-                         "Confidence": model_conf_,
-                         }
-        else:
-            data_dict = {"Name": model_name,
-                         "Circuit String": model_string,
-                         "Initial Guess": initial_guess,
-                         "Constants": self.constants,
-                         "Fit": False}
+            data_dict.update({
+                "Parameters": parameters_,
+                "Confidence": model_conf_
+            })
 
         with open(filepath, 'w') as f:
             json.dump(data_dict, f)
@@ -364,12 +338,13 @@ class BaseCircuit:
         self.constants = model_constants
         self.name = model_name
 
-        if json_data["Fit"]:
-            if fitted_as_initial:
-                self.initial_guess = np.array(json_data['Parameters'])
-            else:
-                self.parameters_ = np.array(json_data["Parameters"])
-                self.conf_ = np.array(json_data["Confidence"])
+        if not json_data["Fit"]:
+            return
+        if fitted_as_initial:
+            self.initial_guess = np.array(json_data['Parameters'])
+        else:
+            self.parameters_ = np.array(json_data["Parameters"])
+            self.conf_ = np.array(json_data["Confidence"])
 
 
 class Randles(BaseCircuit):
