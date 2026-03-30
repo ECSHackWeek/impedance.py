@@ -238,6 +238,33 @@
         "code",
         "bug"
       ]
+    },
+    {
+      "login": "Mehdisoley",
+      "name": "Mehdisoley",
+      "avatar_url": "https://avatars.githubusercontent.com/u/124178590?v=4",
+      "profile": "https://github.com/Mehdisoley",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "Uladzimir-dev",
+      "name": "Uladzimir Matys",
+      "avatar_url": "https://avatars.githubusercontent.com/u/68189726?v=4",
+      "profile": "https://github.com/Uladzimir-dev",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "YaroslavBerko",
+      "name": "YaroslavBerko",
+      "avatar_url": "https://avatars.githubusercontent.com/u/38190821?v=4",
+      "profile": "https://github.com/YaroslavBerko",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
