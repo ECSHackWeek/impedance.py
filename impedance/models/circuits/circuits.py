@@ -135,20 +135,27 @@ class BaseCircuit:
         """
         frequencies = np.array(frequencies, dtype=float)
 
-        arg_dict = {**circuit_elements, "frequencies": frequencies}
+        arg_dict = {
+            **circuit_elements,
+            "frequencies": frequencies,
+            "constants": self.constants
+        }
         if self._is_fit() and not use_initial:
-            return eval(buildCircuit(self.circuit, frequencies,
+            arg_dict.update({"parameters": self.parameters_})
+            eval_str, index = buildCircuit(self.circuit, frequencies,
                                      *self.parameters_,
                                      constants=self.constants, eval_string='',
-                                     index=0)[0],
-                        arg_dict)
+                                     index=0)
+            return eval(eval_str, arg_dict)
         else:
             warnings.warn("Simulating circuit based on initial parameters")
-            return eval(buildCircuit(self.circuit, frequencies,
+            arg_dict.update({"parameters": self.initial_guess})
+            eval_str, index = buildCircuit(self.circuit, frequencies,
                                      *self.initial_guess,
                                      constants=self.constants, eval_string='',
-                                     index=0)[0],
-                        arg_dict)
+                                     index=0)
+
+            return eval(eval_str, arg_dict)
 
     def get_param_names(self):
         """ Converts circuit string to names and units """
