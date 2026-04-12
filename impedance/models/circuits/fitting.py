@@ -235,10 +235,11 @@ def wrapCircuit(circuit, constants):
 
         """
 
+        arg_dict = {**circuit_elements, "frequencies": frequencies}
         x = eval(buildCircuit(circuit, frequencies, *parameters,
                               constants=constants, eval_string='',
                               index=0)[0],
-                 circuit_elements)
+                 arg_dict)
         y_real = np.real(x)
         y_imag = np.imag(x)
 
@@ -350,7 +351,7 @@ def buildCircuit(circuit, frequencies, *parameters,
                     index += 1
 
             param_string += str(param_list)
-            new = raw_elem + '(' + param_string + ',' + str(frequencies) + ')'
+            new = raw_elem + '(' + param_string + ',frequencies)'
             eval_string += new
 
         if i == len(split) - 1:
@@ -442,4 +443,6 @@ def check_and_eval(element):
         raise ValueError(f'{element} not in ' +
                          f'allowed elements ({allowed_elements})')
     else:
-        return eval(element, circuit_elements)
+        dummy_frequency_array = np.array([1.])
+        arg_dict = {**circuit_elements, "frequencies": dummy_frequency_array}
+        return eval(element, arg_dict)
