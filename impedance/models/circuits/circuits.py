@@ -371,6 +371,11 @@ class BaseCircuit:
                 self.parameters_ = np.array(json_data["Parameters"])
                 self.conf_ = np.array(json_data["Confidence"])
 
+    @property
+    def parameters(self):
+        """Returns the model parameters."""
+        return self.parameters_
+
 
 class Randles(BaseCircuit):
     """ A Randles circuit model class """
