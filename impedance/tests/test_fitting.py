@@ -72,8 +72,10 @@ def test_circuit_fit():
                               6.31e-2, 2.33e2, 2.20e-1])
     results_local_bounds = results_local.copy()
     results_local_bounds[5] = 2.38e2
-    results_local_weighted = np.array([1.64e-2, 9.06e-3, 3.06,
-                                       5.29e-3, 1.45e-1, 1.32e3, 2.02e-1])
+    results_local_weighted_m = np.array([1.64e-2, 9.06e-3, 3.06,
+                                        5.29e-3, 1.45e-1, 1.32e3, 2.02e-1])
+    results_local_weighted_p = np.array([1.687e-2, 8.763e-3, 3.613, 5.194e-3,
+                                        1.225e-1, 9.510e+2, 2.891e-1])
 
     results_global = np.array([1.65e-2, 5.34e-3, 0.22, 9.15e-3,
                                1.31e-1, 1.10e3, 2.78])
@@ -103,14 +105,31 @@ def test_circuit_fit():
                                    Z_correct_filtered, circuit,
                                    initial_guess, sigma=sigma,
                                    constants={})[0],
-                       results_local_weighted, rtol=1e-2)
+                       results_local_weighted_m, rtol=1e-2)
 
     # Test if using weight_by_modulus=True produces the same results
     assert np.allclose(circuit_fit(example_frequencies_filtered,
                                    Z_correct_filtered, circuit,
                                    initial_guess, weight_by_modulus=True,
                                    constants={})[0],
-                       results_local_weighted, rtol=1e-2)
+                       results_local_weighted_m, rtol=1e-2)
+
+    # Test local fitting with predefined weights
+    # Use Z components as weights
+    sigma = np.hstack((np.real(Z_correct_filtered),
+                       np.imag(Z_correct_filtered)))
+    assert np.allclose(circuit_fit(example_frequencies_filtered,
+                                   Z_correct_filtered, circuit,
+                                   initial_guess, sigma=sigma,
+                                   constants={})[0],
+                       results_local_weighted_p, rtol=1e-2)
+
+    # Test if using weight_proportionally=True produces the same results
+    assert np.allclose(circuit_fit(example_frequencies_filtered,
+                                   Z_correct_filtered, circuit,
+                                   initial_guess, weight_proportionally=True,
+                                   constants={})[0],
+                       results_local_weighted_p, rtol=1e-2)
 
     # Test global fitting on multiple seeds
     # All seeds should converge to the same parameter values
