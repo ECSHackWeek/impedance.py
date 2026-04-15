@@ -281,7 +281,7 @@ def eval_linKK(elements, ts, f):
     circuit_string = circuit_string.strip(',')
     circuit_string += '])'
 
-    return eval(circuit_string, circuit_elements)
+    return eval(circuit_string, {**circuit_elements, 'np': np})
 
 
 def residuals_linKK(elements, ts, Z, f, residuals='real'):
