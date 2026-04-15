@@ -225,7 +225,7 @@ def La(p, f):
     """
     omega = 2 * np.pi * np.array(f)
     L, alpha = p[0], p[1]
-    Z = (L * 1j * omega) ** alpha
+    Z = L * (1j * omega) ** alpha
     return Z
 
 
