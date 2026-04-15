@@ -324,6 +324,8 @@ def buildCircuit(circuit, frequencies, *parameters,
         split = parallel
     elif series == parallel:  # only single element
         split = series
+    else:
+        split = parallel
 
     for i, elem in enumerate(split):
         if ',' in elem or '-' in elem:
