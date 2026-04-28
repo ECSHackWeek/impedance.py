@@ -143,6 +143,15 @@ def test_circuit_fit():
                                    global_opt=True, seed=42)[0],
                        results_global, rtol=1e-1)
 
+import re
+def subsitute_values(buildCircuit_text, frequencies, parameters):
+    parameters=[float(p) for p in parameters]
+    frequencies=[float(p) for p in frequencies]
+    new_ckt_txt = buildCircuit_text.replace('frequencies',str(frequencies))
+    param_idx=re.findall(r'parameters\[(\d+)\]', new_ckt_txt)
+    for i in param_idx:
+        new_ckt_txt = new_ckt_txt.replace(f"parameters[{i}]",str(parameters[int(i)]))
+    return new_ckt_txt
 
 def test_buildCircuit():
 
@@ -151,8 +160,8 @@ def test_buildCircuit():
     params = [.1, .01, 1, 1000, 15, .9]
     frequencies = [1000.0, 5.0, 0.01]
 
-    assert buildCircuit(circuit, frequencies, *params,
-                        constants={})[0].replace(' ', '') == \
+    assert subsitute_values(buildCircuit(circuit,constants={})[0], frequencies, 
+                            params).replace(' ', '') == \
         's([R([0.1],[1000.0,5.0,0.01]),' + \
         'p([s([R([0.01],[1000.0,5.0,0.01]),' + \
         'Wo([1.0,1000.0],[1000.0,5.0,0.01])]),' + \
@@ -163,8 +172,8 @@ def test_buildCircuit():
     params = [.1, .01, .2, .3]
     frequencies = [1000.0, 5.0, 0.01]
 
-    assert buildCircuit(circuit, frequencies, *params,
-                        constants={})[0].replace(' ', '') == \
+    assert subsitute_values(buildCircuit(circuit,constants={})[0], frequencies, 
+                            params).replace(' ', '') == \
         's([R([0.1],[1000.0,5.0,0.01]),' + \
         'p([C([0.01],[1000.0,5.0,0.01]),' + \
         'R([0.2],[1000.0,5.0,0.01]),' + \
@@ -175,21 +184,21 @@ def test_buildCircuit():
     params = [1, 2, 3, 4, 5]
     frequencies = [1000.0, 5.0, 0.01]
 
-    assert buildCircuit(circuit, frequencies, *params,
-                        constants={})[0].replace(' ', '') == \
-        's([R([1],[1000.0,5.0,0.01]),' + \
-        'p([s([p([R([2],[1000.0,5.0,0.01]),' + \
-        'C([3],[1000.0,5.0,0.01])]),' + \
-        'R([4],[1000.0,5.0,0.01])]),' + \
-        'C([5],[1000.0,5.0,0.01])])])'
+    assert subsitute_values(buildCircuit(circuit,constants={})[0], frequencies, 
+                            params).replace(' ', '') == \
+        's([R([1.0],[1000.0,5.0,0.01]),' + \
+        'p([s([p([R([2.0],[1000.0,5.0,0.01]),' + \
+        'C([3.0],[1000.0,5.0,0.01])]),' + \
+        'R([4.0],[1000.0,5.0,0.01])]),' + \
+        'C([5.0],[1000.0,5.0,0.01])])])'
 
     # Test parallel elements at beginning and end
     circuit = 'p(C1,R1)-p(C2,R2)'
     params = [.1, .01, .2, .3]
     frequencies = [1000.0, 5.0, 0.01]
 
-    assert buildCircuit(circuit, frequencies, *params,
-                        constants={})[0].replace(' ', '') == \
+    assert subsitute_values(buildCircuit(circuit,constants={})[0], frequencies, 
+                            params).replace(' ', '') == \
         's([p([C([0.1],[1000.0,5.0,0.01]),' + \
         'R([0.01],[1000.0,5.0,0.01])]),' + \
         'p([C([0.2],[1000.0,5.0,0.01]),' + \
@@ -200,9 +209,9 @@ def test_buildCircuit():
     params = [100]
     frequencies = [1000.0, 5.0, 0.01]
 
-    assert buildCircuit(circuit, frequencies, *params,
-                        constants={})[0].replace(' ', '') == \
-        'R([100],[1000.0,5.0,0.01])'
+    assert subsitute_values(buildCircuit(circuit,constants={})[0], frequencies, 
+                            params).replace(' ', '') == \
+        'R([100.0],[1000.0,5.0,0.01])'
 
 
 def test_RMSE():
@@ -220,3 +229,9 @@ def test_element_extraction():
     circuit = 'R0-p(RR0,C1)-p(R1,C2032478)-W1'
     extracted_elements = extract_circuit_elements(circuit)
     assert extracted_elements == ['R0', 'RR0', 'C1', 'R1', 'C2032478', 'W1']
+
+# test_circuit_fit()
+# test_newbuildCircuit()
+# test_buildCircuit()
+# print("Passed")
+compare_newbuildCircuit()

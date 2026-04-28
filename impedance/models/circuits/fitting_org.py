@@ -218,10 +218,6 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
 
 def wrapCircuit(circuit, constants):
     """ wraps function so we can pass the circuit string """
-    buildCircuit_text=buildCircuit(circuit, constants=constants, 
-                        eval_string='', index=0)[0]
-    builtCircuit = eval('lambda frequencies,parameters : ' +  buildCircuit_text, circuit_elements)
-
     def wrappedCircuit(frequencies, *parameters):
         """ returns a stacked array of real and imaginary impedance
         components
@@ -239,14 +235,19 @@ def wrapCircuit(circuit, constants):
 
         """
 
-        x = builtCircuit(frequencies,parameters)
+        x = eval(buildCircuit(circuit, frequencies, *parameters,
+                              constants=constants, eval_string='',
+                              index=0)[0],
+                 circuit_elements)
         y_real = np.real(x)
         y_imag = np.imag(x)
 
         return np.hstack([y_real, y_imag])
     return wrappedCircuit
 
-def buildCircuit(circuit, constants=None, eval_string='', index=0):
+
+def buildCircuit(circuit, frequencies, *parameters,
+                 constants=None, eval_string='', index=0):
     """ recursive function that transforms a circuit, parameters, and
     frequencies into a string that can be evaluated
 
@@ -261,15 +262,12 @@ def buildCircuit(circuit, constants=None, eval_string='', index=0):
     -------
     eval_string: str
         Python expression for calculating the resulting fit
-        This would a string that can be used to construct a lamda function. 
-        For example if circuit=R1,CPE1 with CPE1_1 = const1, eval_string = 
-        "p(R(frequencies,[parameters[0]), CPE(frequencies,[p[1],const1]))"; 
-        We can then construct lambda frequencies,parameters : <eval_string>
-
     index: int
         Tracks parameter index through recursive calling of the function
     """
 
+    parameters = np.array(parameters).tolist()
+    frequencies = np.array(frequencies).tolist()
     circuit = circuit.replace(' ', '')
 
     def parse_circuit(circuit, parallel=False, series=False):
@@ -329,11 +327,12 @@ def buildCircuit(circuit, constants=None, eval_string='', index=0):
 
     for i, elem in enumerate(split):
         if ',' in elem or '-' in elem:
-            eval_string, index = buildCircuit(elem, constants=constants,
+            eval_string, index = buildCircuit(elem, frequencies,
+                                              *parameters,
+                                              constants=constants,
                                               eval_string=eval_string,
                                               index=index)
         else:
-            #Return a string that can be used to construct a lamda function lambda f,p : R(f,[p[0],const1,p[1]...])
             param_string = ""
             raw_elem = get_element_from_name(elem)
             elem_number = check_and_eval(raw_elem).num_params
@@ -345,13 +344,13 @@ def buildCircuit(circuit, constants=None, eval_string='', index=0):
                     current_elem = elem
 
                 if current_elem in constants.keys():
-                    param_list.append(str(constants[current_elem]))
+                    param_list.append(constants[current_elem])
                 else:
-                    param_list.append(f'parameters[{index}]')
+                    param_list.append(parameters[index])
                     index += 1
 
-            param_string = "[" + ','.join(param_list) + "]"
-            new = raw_elem + '(' + param_string + ', frequencies)'
+            param_string += str(param_list)
+            new = raw_elem + '(' + param_string + ',' + str(frequencies) + ')'
             eval_string += new
 
         if i == len(split) - 1:
