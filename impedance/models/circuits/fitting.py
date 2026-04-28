@@ -137,7 +137,7 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
     # set upper and lower bounds on a per-element basis
     if bounds is None:
         bounds = set_default_bounds(circuit, constants=constants)
-
+    wrapedCircuit=wrapCircuit(circuit, constants)
     if not global_opt:
         if 'maxfev' not in kwargs:
             kwargs['maxfev'] = 1e5
@@ -149,7 +149,7 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
             abs_Z = np.abs(Z)
             kwargs['sigma'] = np.hstack([abs_Z, abs_Z])
 
-        popt, pcov = curve_fit(wrapCircuit(circuit, constants), f,
+        popt, pcov = curve_fit(wrapedCircuit, f,
                                np.hstack([Z.real, Z.imag]),
                                p0=initial_guess, bounds=bounds, **kwargs)
 
@@ -176,7 +176,7 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
             function
                 Returns a function (RMSE as a function of parameters).
             """
-            return rmse(wrapCircuit(circuit, constants)(f, *x),
+            return rmse(wrapedCircuit(f, *x),
                         np.hstack([Z.real, Z.imag]))
 
         class BasinhoppingBounds(object):
