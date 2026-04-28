@@ -230,8 +230,3 @@ def test_element_extraction():
     extracted_elements = extract_circuit_elements(circuit)
     assert extracted_elements == ['R0', 'RR0', 'C1', 'R1', 'C2032478', 'W1']
 
-# test_circuit_fit()
-# test_newbuildCircuit()
-# test_buildCircuit()
-# print("Passed")
-compare_newbuildCircuit()
