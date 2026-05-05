@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import pytest
 
 from impedance.models.circuits import BaseCircuit, CustomCircuit, Randles
+from impedance.models.circuits.fitting import rmse
 
 # get example data
 data = np.genfromtxt(os.path.join("./data/",
@@ -198,3 +199,29 @@ def test_CustomCircuit():
     circuit = circuit = 'R0-p(R1, C1)'
     initial_guess = [1, 2, 3]
     circuit = CustomCircuit(circuit, initial_guess=initial_guess)
+
+from .test_fitting import test_data
+def test_CustomCircuitwAlgorithm():
+    data = test_data()
+    optimizations={'algorithm':'pygad'}
+    for d in data :
+        if len(d) == 7:
+            circuit, initial_guess, scale, results, bounds, frequencies, Z = d
+            constants={}
+        elif len(d) == 8:
+            circuit, initial_guess, constants, scale, results, bounds, frequencies, Z = d
+        else: raise Exception(f"Unexpected data length: {len(d)}")
+        custom_circuit = CustomCircuit(initial_guess=initial_guess,
+                                   circuit=circuit,constants=constants)
+        custom_circuit.fit(frequencies, Z, bounds=bounds, optimizations=optimizations.copy(), scale=scale)
+        assert custom_circuit._is_fit()
+        param = custom_circuit.parameters_
+        Z_fit = custom_circuit.predict(frequencies=frequencies)
+        err = rmse(Z,Z_fit)
+        if not np.allclose(results,param, rtol=1e-1):
+            print(f'Failed {circuit}: {results} != {param}; RMSE={err}')
+        else:
+            print(f'Passed {circuit}')        
+        custom_circuit.plot(f_data=frequencies, Z_data=Z, kind="nyquist")
+        plt.show()
+ 

@@ -8,6 +8,7 @@ from .elements import circuit_elements, get_element_from_name
 
 ints = '0123456789'
 
+from warnings import warn
 
 def rmse(a, b):
     """
@@ -66,9 +67,30 @@ def set_default_bounds(circuit, constants={}):
     return bounds
 
 
+def scale_bounds(bounds,n_guess,scale):
+    b0 = np.atleast_1d(bounds[0])
+    b1 = np.atleast_1d(bounds[1])
+    if len(b0) == 1:
+        b0 = np.repeat(b0[0], n_guess)
+    if len(b1) == 1:
+        b1 = np.repeat(b1[0], n_guess)
+    bounds = (b0, b1)
+    if scale is None:
+        scale = np.ones(n_guess)
+    else:
+        scale = np.array(scale, dtype=float)
+    scaled_low = np.array(bounds[0], dtype=float) / scale
+    scaled_high = np.array(bounds[1], dtype=float) / scale
+    return scaled_low,scaled_high
+
+def is_scalarval(var,val):
+    if isinstance(var,(list,np.ndarray)): return False
+    if var != val: return False
+    return True
+
 def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
                 bounds=None, weight_by_modulus=False, global_opt=False,
-                **kwargs):
+                optimizations=[], scale=None, **kwargs):
 
     """ Main function for fitting an equivalent circuit to data.
 
@@ -113,9 +135,24 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
         If global optimization should be used (uses the basinhopping
         algorithm). Defaults to False
 
+    optimizations : dict or list of dicts, optional
+        If global_opt is True, gets set to "basinhopping"
+        Else 
+            If optimizations is not passed, curve_fit is used.
+            If dict(s), it must algorithm + algorithm options
+                "algorithm" is mandatory. eg : {"algorithm" : 'scipy_minimize', 'method' : ...} or {"algorithm" : 'pygad', 'gene_space' : ...} 
+            List could be a list of dics (in the above format). This is used for sequential optimizations, particularly useful for GA.
+
+    scale : list, optional
+        Used to denote "scale" of prameters to improve convergence.
+        Consider a p(R,C) or R-C circuit. Suppose C-s is in μF while, 
+        R-s might be in ~0.1 ohms; we can pass [0.1,1e-6].
+        Internally the parameters are divided by scale during optimization.
+
     kwargs :
         Keyword arguments passed to scipy.optimize.curve_fit or
         scipy.optimize.basinhopping
+        One can also pass a callable soft_constraint that adds a penalty for arbitary constraints. 
 
     Returns
     ------------
@@ -131,6 +168,7 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
     Currently, an error of -1 is returned.
 
     """
+    kwargs_org = kwargs
     f = np.array(frequencies, dtype=float)
     Z = np.array(impedances, dtype=complex)
 
@@ -138,7 +176,55 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
     if bounds is None:
         bounds = set_default_bounds(circuit, constants=constants)
     wrapedCircuit=wrapCircuit(circuit, constants)
-    if not global_opt:
+
+    if global_opt:
+        warn('global_opt has been deprecated. Use optimizations={"algorithm" : "basinhopping"}' \
+        ' OR optimizations="basinhopping"', DeprecationWarning, 2)
+        opt={"algorithm" : 'basinhopping'}
+        optimizations=[]
+    elif optimizations == []:
+        opt={"algorithm" : 'curve_fit'}
+    elif isinstance(optimizations,(list)) :
+        opt=optimizations.pop(0) 
+    else :
+        opt=optimizations
+        optimizations=[]
+        
+    if not isinstance(opt,dict) : opt={"algorithm" : opt}
+
+    target_Z = np.hstack([Z.real, Z.imag])
+    sigma = kwargs.pop('sigma', 1)
+
+    soft_constraint = kwargs.pop('soft_constraint', lambda p : 0)
+
+    if opt["algorithm"] in ('scipy_minimize','pygad') or callable(opt["algorithm"]):
+        if scale is None : 
+            scale = 1
+            warnings.warn("'scale' is recommeded for scipy_minimize...")
+        scaled_low, scaled_high = scale_bounds(bounds,len(initial_guess),scale)
+        def obj_fn(p_scaled):
+            p_unscaled = p_scaled * scale
+            try:
+                pred_Z = wrapedCircuit(f, *p_unscaled)
+                error =  np.sum(((pred_Z - target_Z) / sigma)**2) + soft_constraint(p_unscaled)
+            except Exception:
+                return np.inf
+            return error
+        pbar = None
+        show_progress = opt.pop('show_progress', 
+                    kwargs.get('show_progress', True))
+        if show_progress:
+            if opt["algorithm"] ==  'pygad':
+                maxiter = opt.get('num_generations', 1000)
+            else:
+                maxiter = kwargs.get('options', {}).get('maxiter', None)
+            try:
+                from tqdm.auto import tqdm
+                pbar = tqdm(total=maxiter, desc="circuit fit")
+            except ImportError:
+                warn('tqdm not found, progress cannot be plotted !!!')
+    
+    if opt["algorithm"] == 'curve_fit':
         if 'maxfev' not in kwargs:
             kwargs['maxfev'] = 1e5
         if 'ftol' not in kwargs:
@@ -150,7 +236,7 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
             kwargs['sigma'] = np.hstack([abs_Z, abs_Z])
 
         popt, pcov = curve_fit(wrapedCircuit, f,
-                               np.hstack([Z.real, Z.imag]),
+                               target_Z,
                                p0=initial_guess, bounds=bounds, **kwargs)
 
         # Calculate one standard deviation error estimates for fit parameters,
@@ -158,7 +244,7 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
         # https://stackoverflow.com/a/52275674/5144795
         perror = np.sqrt(np.diag(pcov))
 
-    else:
+    elif opt["algorithm"] == 'basinhopping':
         if 'seed' not in kwargs:
             kwargs['seed'] = 0
 
@@ -213,8 +299,140 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
             warnings.warn('Failed to compute perror')
             perror = None
 
-    return popt, perror
+    elif opt["algorithm"] == 'scipy_minimize':
+        method = opt.pop('method', 'L-BFGS-B')
+        print(f"Running {opt['algorithm']} with {method}...")
 
+        from scipy.optimize import minimize
+        user_callback = kwargs.pop('callback', None)
+        def combined_callback(xk, *args, **kwds):
+            if pbar is not None:
+                pbar.update(1)
+            if user_callback is not None:
+                user_callback(xk, *args, **kwds)
+
+        min_bounds_scaled = list(zip(scaled_low, scaled_high))
+        res = minimize(obj_fn, initial_guess, bounds=min_bounds_scaled, callback=combined_callback, **kwargs)
+        if pbar is not None:
+            pbar.close()
+        popt = res.x * scale
+        if hasattr(res, 'hess_inv'):
+            pcov = res.hess_inv
+            if hasattr(pcov, "todense"): pcov = pcov.todense()
+            pcov = pcov * np.outer(scale, scale)
+        else:
+            pcov = np.zeros((len(popt), len(popt)))
+        perror = np.sqrt(np.diag(pcov))
+
+    elif opt["algorithm"] == 'pygad':
+        print(f"Running {opt['algorithm']}...")
+        import pygad
+
+        def fitness_func(ga_instance, solution, solution_idx):
+            return 1./obj_fn(solution)
+
+        gene_space = opt.pop('gene_space', None)
+        if gene_space is None and scaled_low is not None:
+            gene_space = [{'low': low, 'high': high} for low, high in zip(scaled_low, scaled_high)]
+
+        num_generations = opt.pop('num_generations', 1000)
+        num_parents_mating = opt.pop('num_parents_mating', 4)
+        sol_per_pop = opt.pop('sol_per_pop', 20)
+        num_genes=len(initial_guess)
+        
+        initial_population = opt.pop('initial_population', None)
+        if initial_population is None:
+            if scaled_low is None:
+                raise ValueError("Bounds must be provided for PyGAD optimization to generate the initial population.")
+            
+            if np.any(np.isinf(scaled_low)) or np.any(np.isinf(scaled_high)):
+                raise ValueError("Bounds must be finite for PyGAD optimization to generate the initial population.")
+                
+            initial_population = np.empty((sol_per_pop, num_genes))
+            initial_population[0] = np.array(initial_guess) / scale
+            
+            for i in range(1, sol_per_pop):
+                initial_population[i] = np.random.uniform(scaled_low, scaled_high)
+                
+            initial_population = np.clip(initial_population, scaled_low, scaled_high)
+        else:
+            initial_population = np.array(initial_population) / scale
+
+        plot_pygad = opt.pop('plot', False)
+        user_on_generation = opt.pop('on_generation', None)
+            
+        def on_generation(ga_instance):
+            if pbar is not None:
+                pbar.update(1)
+            if user_on_generation:
+                user_on_generation(ga_instance)
+
+        ga_instance = pygad.GA(num_generations=num_generations,
+                                num_parents_mating=num_parents_mating,
+                                fitness_func=fitness_func,
+                                initial_population=initial_population,
+                                sol_per_pop=sol_per_pop,
+                                num_genes=num_genes,
+                                gene_space=gene_space,
+                                on_generation=on_generation,
+                                parent_selection_type=opt.pop('parent_selection_type', 'sss'), #'tournament'
+                                keep_elitism=opt.pop('keep_elitism', 1),
+                                **kwargs)
+        ga_instance.run()
+        if pbar is not None:
+            pbar.close()
+            
+        if plot_pygad:
+            ga_instance.plot_fitness()
+
+        solution, solution_fitness, solution_idx = ga_instance.best_solution()
+        popt = solution * scale
+        pcov = np.zeros((len(popt), len(popt)))        
+        perror = np.sqrt(np.diag(pcov))
+
+    elif callable(opt["algorithm"]):
+        algo=opt.pop('algorithm')
+        import inspect
+        sig = inspect.signature(algo)
+        valid_params = sig.parameters
+        
+        call_kwargs = {}
+        # Map parameters dynamically based on the callable's signature
+        if 'initial_guess' in valid_params:
+            call_kwargs['initial_guess'] = initial_guess
+        elif 'x0' in valid_params: # Standard scipy optimize param
+            call_kwargs['x0'] = initial_guess
+        else:
+            warn('Initial guess was ignored')
+        if 'bounds' in valid_params:
+            call_kwargs['bounds'] = bounds
+        else:
+            warn('bounds was ignored')
+        if 'scale' in valid_params:
+            call_kwargs['scale'] = scale
+        elif not is_scalarval(scale,1): #scale != 1 : 
+            warn('scale was ignored')
+        if 'fun' in valid_params:
+            call_kwargs['fun'] = obj_fn
+        else:
+            warn('objective function was ignored (as callable does not accept "fun" parameter)')
+            
+        accepts_kwargs = any(p.kind == inspect.Parameter.VAR_KEYWORD for p in valid_params.values())
+        for k, v in opt.items():
+            if k in valid_params or accepts_kwargs:
+                call_kwargs[k] = v
+                
+        res = algo(**call_kwargs)
+        popt = res.x if hasattr(res, 'x') else res
+        pcov = np.zeros((len(popt), len(popt)))        
+        perror = np.sqrt(np.diag(pcov))
+    else:
+        raise ValueError(f"Unknown optimization algorithm: {opt['algorithm']}")
+    if len(optimizations) > 0:
+        return circuit_fit(frequencies, impedances, circuit, initial_guess=popt, constants=constants,
+                bounds=bounds, weight_by_modulus=weight_by_modulus, global_opt=False, optimizations=optimizations, scale=scale, **kwargs_org)
+    else:
+        return popt, perror
 
 def wrapCircuit(circuit, constants):
     """ wraps function so we can pass the circuit string """

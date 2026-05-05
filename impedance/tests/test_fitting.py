@@ -143,6 +143,152 @@ def test_circuit_fit():
                                    global_opt=True, seed=42)[0],
                        results_global, rtol=1e-1)
 
+from impedance.models.circuits.elements import circuit_elements
+import matplotlib.pyplot as plt
+
+def plot_nyquist_compare(Z, Z_fit, scale=1, units='Ohms', fmt=['-',"*"], ax=None, labelsize=20,
+                 ticksize=14, **kwargs):
+    """ Plots impedance as a Nyquist plot using matplotlib
+
+        Parameters
+        ----------
+        Z: np.array of complex numbers
+            impedance data
+        scale: float
+            the scale for the axes
+        units: string
+            units for :math:`Z(\\omega)`
+        fmt: string
+            format string passed to matplotlib (e.g. '.-' or 'o')
+        ax: matplotlib.axes.Axes (optional)
+            axes on which to plot the nyquist plot
+
+        Other Parameters
+        ----------------
+        **kwargs : `matplotlib.pyplot.Line2D` properties, optional
+            Used to specify line properties like linewidth, line color,
+            marker color, and line labels.
+
+        Returns
+        -------
+        ax: matplotlib.axes.Axes
+    """
+    Z = np.array(Z, dtype=complex)
+    Z_fit = np.array(Z_fit, dtype=complex)
+
+    if ax is None:
+        _, ax = plt.subplots()
+
+    ax.plot(np.real(Z), -np.imag(Z), fmt[0], label="Origial", **kwargs)
+    ax.plot(np.real(Z_fit), -np.imag(Z_fit), fmt[1], label="Fit", **kwargs)
+    ax.legend()
+
+    # Make the axes square
+    ax.set_aspect('equal')
+
+    # Set the labels to -imaginary vs real
+    ax.set_xlabel(r'$Z^{\prime}(\omega)$ ' +
+                  '$[{}]$'.format(units), fontsize=labelsize)
+    ax.set_ylabel(r'$-Z^{\prime\prime}(\omega)$ ' +
+                  '$[{}]$'.format(units), fontsize=labelsize)
+
+    # Make the tick labels larger
+    ax.tick_params(axis='both', which='major', labelsize=ticksize)
+
+    # Change the number of labels on each axis to five
+    ax.locator_params(axis='x', nbins=5, tight=True)
+    ax.locator_params(axis='y', nbins=5, tight=True)
+
+    # Add a light grid
+    ax.grid(visible=True, which='major', axis='both', alpha=.5)
+
+    # Change axis units to 10**log10(scale) and resize the offset text
+    limits = -np.log10(scale)
+    if limits != 0:
+        ax.ticklabel_format(style='sci', axis='both',
+                            scilimits=(limits, limits))
+    y_offset = ax.yaxis.get_offset_text()
+    y_offset.set_size(18)
+    t = ax.xaxis.get_offset_text()
+    t.set_size(18)
+
+    # return ax
+    plt.show()
+
+def test_data():
+    example_frequencies_filtered, \
+        Z_correct_filtered = ignoreBelowX(example_frequencies, Z_correct)
+    data=[#circuit, initial_guess, scale, results, bounds, frequencies, Z_data]  # Test trivial model (10 Ohm resistor)
+    ('R0', [10], [10], [10], [0,100], np.array([10, 100, 1000]), np.array([10, 10, 10])),
+    # ('R0', [10], [10], [10], [0,100], [10, 100, 1000],[10, 10, 10]),
+    (
+        'R0-p(R1,C1)-p(R2-Wo1,C2)',[.01, .01, 100, .01, .05, 100, 1],np.array([1e-2,1e-2,0.1,1e-2,1e-1,1e3,1]), 
+        [1.65e-2, 5.34e-3, 0.22, 9.15e-3, 1.31e-1, 1.10e3, 2.78],[(0, 0, 0, 0, 0, 0, 0),(10, 1, 1e3, 1, 1, 1e4, 100)],
+        example_frequencies_filtered, Z_correct_filtered
+    )]
+    return data
+
+def test_circuit_fit_ga():
+    data = test_data()
+    optimizations={'algorithm':'pygad'}
+    for circuit, initial_guess, scale, results, bounds, frequencies, Z_data in data :
+        constants={}
+        buildCircuit_text=buildCircuit(circuit, constants=constants, eval_string='', index=0)[0]
+        builtCircuit = eval('lambda frequencies,parameters : ' +  buildCircuit_text, circuit_elements)
+
+        calc = circuit_fit(frequencies, Z_data, circuit,
+                                   initial_guess, constants={},
+                                   optimizations=optimizations.copy(),scale=scale,bounds=bounds)[0]
+        f = np.array(frequencies, dtype=float)
+        Z_fit = builtCircuit(f,calc)
+        err = rmse(Z_data,Z_fit)
+        if not np.allclose(results,calc, rtol=1e-1):
+            print(f'Failed {circuit}: {results} != {calc}; RMSE={err}')
+            plot_nyquist_compare(Z_data,Z_fit)
+        else:
+            print(f'Passed {circuit}')
+            
+def test_circuit_fit_callable():
+    from scipy.optimize import least_squares
+    data = test_data()
+    optimizations={'algorithm':least_squares,'method':'trf'}
+    for circuit, initial_guess, scale, results, bounds, frequencies, Z_data in data :
+        constants={}
+        buildCircuit_text=buildCircuit(circuit, constants=constants, eval_string='', index=0)[0]
+        builtCircuit = eval('lambda frequencies,parameters : ' +  buildCircuit_text, circuit_elements)
+
+        calc = circuit_fit(frequencies, Z_data, circuit,
+                                   initial_guess, constants={},
+                                   optimizations=optimizations.copy(),scale=scale,bounds=bounds)[0]
+        f = np.array(frequencies, dtype=float)
+        Z_fit = builtCircuit(f,calc)
+        err = rmse(Z_data,Z_fit)
+        if not np.allclose(results,calc, rtol=1e-1):
+            print(f'Failed {circuit}: {results} != {calc}; RMSE={err}')
+            # plot_nyquist_compare(Z_data,Z_fit)
+        else:
+            print(f'Passed {circuit}')
+
+def test_circuit_fit_seq():
+    data = test_data()
+    optimizations=[{'algorithm':'pygad'},{'algorithm':'scipy_minimize'}]
+    for circuit, initial_guess, scale, results, bounds, frequencies, Z_data in data :
+        constants={}
+        buildCircuit_text=buildCircuit(circuit, constants=constants, eval_string='', index=0)[0]
+        builtCircuit = eval('lambda frequencies,parameters : ' +  buildCircuit_text, circuit_elements)
+
+        calc = circuit_fit(frequencies, Z_data, circuit,
+                                   initial_guess, constants={},
+                                   optimizations=optimizations.copy(),scale=scale,bounds=bounds)[0]
+        f = np.array(frequencies, dtype=float)
+        Z_fit = builtCircuit(f,calc)
+        err = rmse(Z_data,Z_fit)
+        if not np.allclose(results,calc, rtol=1e-1):
+            print(f'Failed {circuit}: {results} != {calc}; RMSE={err}')
+            plot_nyquist_compare(Z_data,Z_fit)
+        else:
+            print(f'Passed {circuit}')
+
 import re
 def subsitute_values(buildCircuit_text, frequencies, parameters):
     parameters=[float(p) for p in parameters]
