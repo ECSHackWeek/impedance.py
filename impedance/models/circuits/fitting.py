@@ -1,4 +1,19 @@
 import warnings
+import os
+
+#module:impedance/models/circuits/
+def _custom_formatwarning(msg, category, filename, lineno, line=None):
+    norm_path = os.path.normpath(filename)
+    path_parts = norm_path.split(os.sep)
+    if 'impedance' in path_parts:
+        display_name = ".".join(path_parts[path_parts.index('impedance'):])
+        if display_name.endswith('.py'):
+            display_name = display_name[:-3]
+    else:
+        display_name = os.path.basename(filename)
+    return f"{display_name}:{lineno}: {category.__name__}: {msg}\n"
+
+warnings.formatwarning = _custom_formatwarning
 
 import numpy as np
 from scipy.linalg import inv
@@ -68,19 +83,40 @@ def set_default_bounds(circuit, constants={}):
 
 
 def scale_bounds(bounds,n_guess,scale):
-    b0 = np.atleast_1d(bounds[0])
-    b1 = np.atleast_1d(bounds[1])
-    if len(b0) == 1:
-        b0 = np.repeat(b0[0], n_guess)
-    if len(b1) == 1:
-        b1 = np.repeat(b1[0], n_guess)
-    bounds = (b0, b1)
+    #We should either accept [(0,0.1),(0,100),(0,0.01),(0,10),(0,1)] or [(0,0,...),[0.1,100,...]] or [0, [0.1,100,...]]; This should also work when n_guess=2
+    is_format_1 = False
+    
+    if len(bounds) == n_guess and len(bounds) != 2:
+        is_format_1 = True
+    elif len(bounds) == 2:
+        if n_guess == 2:
+            if isinstance(bounds, list) and isinstance(bounds[0], tuple):
+                is_format_1 = True
+            else:
+                is_format_1 = False
+        else:
+            is_format_1 = False
+    else:
+        is_format_1 = True
+
+    if is_format_1:
+        b0 = np.array([b[0] for b in bounds])
+        b1 = np.array([b[1] for b in bounds])
+    else:
+        b0 = np.atleast_1d(bounds[0])
+        b1 = np.atleast_1d(bounds[1])
+        if len(b0) == 1:
+            b0 = np.repeat(b0[0], n_guess)
+        if len(b1) == 1:
+            b1 = np.repeat(b1[0], n_guess)
+
     if scale is None:
         scale = np.ones(n_guess)
     else:
         scale = np.array(scale, dtype=float)
-    scaled_low = np.array(bounds[0], dtype=float) / scale
-    scaled_high = np.array(bounds[1], dtype=float) / scale
+        
+    scaled_low = np.array(b0, dtype=float) / scale
+    scaled_high = np.array(b1, dtype=float) / scale
     return scaled_low,scaled_high
 
 def is_scalarval(var,val):
@@ -182,7 +218,7 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
         ' OR optimizations="basinhopping"', DeprecationWarning, 2)
         opt={"algorithm" : 'basinhopping'}
         optimizations=[]
-    elif optimizations == []:
+    elif optimizations == [] or optimizations == {} :
         opt={"algorithm" : 'curve_fit'}
     elif isinstance(optimizations,(list)) :
         opt=optimizations.pop(0) 
@@ -197,11 +233,17 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
 
     soft_constraint = kwargs.pop('soft_constraint', lambda p : 0)
 
-    if opt["algorithm"] in ('scipy_minimize','pygad') or callable(opt["algorithm"]):
-        if scale is None : 
-            scale = 1
-            warnings.warn("'scale' is recommeded for scipy_minimize...")
-        scaled_low, scaled_high = scale_bounds(bounds,len(initial_guess),scale)
+    algo=opt["algorithm"]
+    if algo in ('scipy_minimize','pygad','pyswarms') or callable(opt["algorithm"]):
+        needscale=True
+        if callable(algo):
+            sig = inspect.signature(algo)
+            if 'scale' not in sig.parameters: needscale=False
+        if needscale and scale is None : 
+            scale = 10 ** np.round(np.log10(np.abs(initial_guess) + np.finfo(float).eps))
+            warnings.warn(f"'scale' is recommeded for {str(algo)}. Using scale from initial_guess.")
+            
+        scaled_low, scaled_high = scale_bounds(bounds, len(initial_guess), scale)
         def obj_fn(p_scaled):
             p_unscaled = p_scaled * scale
             try:
@@ -216,11 +258,13 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
         if show_progress:
             if opt["algorithm"] ==  'pygad':
                 maxiter = opt.get('num_generations', 1000)
+            elif opt["algorithm"] == 'pyswarms':
+                maxiter = opt.get('iters', 1000)
             else:
                 maxiter = kwargs.get('options', {}).get('maxiter', None)
             try:
                 from tqdm.auto import tqdm
-                pbar = tqdm(total=maxiter, desc="circuit fit")
+                pbar = tqdm(total=maxiter, desc="Circuit fit using " + str(opt["algorithm"]))
             except ImportError:
                 warn('tqdm not found, progress cannot be plotted !!!')
     
@@ -387,6 +431,65 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
 
         solution, solution_fitness, solution_idx = ga_instance.best_solution()
         popt = solution * scale
+        pcov = np.zeros((len(popt), len(popt)))        
+        perror = np.sqrt(np.diag(pcov))
+
+    elif opt["algorithm"] == 'pyswarms':
+        print(f"Running {opt['algorithm']}...")
+        import pyswarms as ps
+
+        def fitness_func(x):
+            n_particles = x.shape[0]
+            j = [obj_fn(x[i]) for i in range(n_particles)]
+            if pbar is not None:
+                pbar.update(1)
+            return np.array(j)
+
+        if scaled_low is None:
+            raise ValueError("Bounds must be provided for pyswarms optimization.")
+            
+        if np.any(np.isinf(scaled_low)) or np.any(np.isinf(scaled_high)):
+            raise ValueError("Bounds must be finite for pyswarms optimization.")
+
+        bounds_ps = (np.array(scaled_low), np.array(scaled_high))
+        
+        options = opt.pop('options', {'c1': 0.5, 'c2': 0.3, 'w': 0.9})
+        n_particles = opt.pop('n_particles', 20)
+        iters = opt.pop('iters', 1000)
+        num_dimensions = len(initial_guess)
+        
+        initial_population = opt.pop('initial_population', None)
+        if initial_population is None:
+            initial_population = np.empty((n_particles, num_dimensions))
+            initial_population[0] = np.array(initial_guess) / scale
+            
+            for i in range(1, n_particles):
+                initial_population[i] = np.random.uniform(scaled_low, scaled_high)
+                
+            initial_population = np.clip(initial_population, scaled_low, scaled_high)
+        else:
+            initial_population = np.array(initial_population) / scale
+
+        optimizer = ps.single.GlobalBestPSO(n_particles=n_particles,
+                                            dimensions=num_dimensions,
+                                            options=options,
+                                            bounds=bounds_ps,
+                                            init_pos=initial_population)
+
+        verbose = opt.pop('verbose', pbar is None)
+        cost, pos = optimizer.optimize(fitness_func, iters=iters, verbose=verbose)
+        
+        if pbar is not None:
+            pbar.close()
+            
+        plot_pyswarms = opt.pop('plot', False)
+        if plot_pyswarms:
+            from pyswarms.utils.plotters import plot_cost_history
+            import matplotlib.pyplot as plt
+            plot_cost_history(cost_history=optimizer.cost_history)
+            plt.show()
+
+        popt = pos * scale
         pcov = np.zeros((len(popt), len(popt)))        
         perror = np.sqrt(np.diag(pcov))
 

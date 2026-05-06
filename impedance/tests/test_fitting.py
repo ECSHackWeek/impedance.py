@@ -247,7 +247,35 @@ def test_circuit_fit_ga():
             plot_nyquist_compare(Z_data,Z_fit)
         else:
             print(f'Passed {circuit}')
-            
+
+def test_circuit_fit_PSO():
+    data = test_data()
+    optimizations={'algorithm':'pyswarms'}
+    for circuit, initial_guess, scale, results, bounds, frequencies, Z_data in data :
+        constants={}
+        buildCircuit_text=buildCircuit(circuit, constants=constants, eval_string='', index=0)[0]
+        builtCircuit = eval('lambda frequencies,parameters : ' +  buildCircuit_text, circuit_elements)
+
+        calc = circuit_fit(frequencies, Z_data, circuit,
+                                   initial_guess, constants={},
+                                   optimizations=optimizations.copy(),scale=scale,bounds=bounds)[0]
+        f = np.array(frequencies, dtype=float)
+        Z_fit = builtCircuit(f,calc)
+        err = rmse(Z_data,Z_fit)
+        if not np.allclose(results,calc, rtol=1e-1):
+            print(f'Failed {circuit}: {results} != {calc}; RMSE={err}')
+            plot_nyquist_compare(Z_data,Z_fit)
+            print('Trying curve_fit from end point...')
+            calc2 = circuit_fit(frequencies, Z_data, circuit,
+                                    initial_guess=calc, constants={},
+                                    optimizations={},scale=scale,bounds=bounds)[0]
+            f = np.array(frequencies, dtype=float)
+            Z_fit2 = builtCircuit(f,calc2)
+            err2 = rmse(Z_data,Z_fit2)
+            print(f'For {circuit}: Param was {results}, PSO gave {calc} with RMSE={err}; subsequent curve_fit gave {calc2} with RMSE={err2}; ')           
+        else:
+            print(f'Passed {circuit}')
+
 def test_circuit_fit_callable():
     from scipy.optimize import least_squares
     data = test_data()
