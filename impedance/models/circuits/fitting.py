@@ -1,7 +1,8 @@
 import warnings
 import os
+import inspect
 
-#module:impedance/models/circuits/
+
 def _custom_formatwarning(msg, category, filename, lineno, line=None):
     norm_path = os.path.normpath(filename)
     path_parts = norm_path.split(os.sep)
@@ -229,12 +230,16 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
     if not isinstance(opt,dict) : opt={"algorithm" : opt}
 
     target_Z = np.hstack([Z.real, Z.imag])
-    sigma = kwargs.pop('sigma', 1)
 
     soft_constraint = kwargs.pop('soft_constraint', lambda p : 0)
 
     algo=opt["algorithm"]
     if algo in ('scipy_minimize','pygad','pyswarms') or callable(opt["algorithm"]):
+        sigma = kwargs.pop('sigma', 1)
+        # weighting scheme for fitting
+        if weight_by_modulus:
+            abs_Z = np.abs(Z)
+            kwargs['sigma'] = np.hstack([abs_Z, abs_Z])
         needscale=True
         if callable(algo):
             sig = inspect.signature(algo)
@@ -495,7 +500,6 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
 
     elif callable(opt["algorithm"]):
         algo=opt.pop('algorithm')
-        import inspect
         sig = inspect.signature(algo)
         valid_params = sig.parameters
         
