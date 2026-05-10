@@ -6,3 +6,5 @@ pandas
 pytest>=4.6
 pytest-cov
 scipy>=1.0
+pygad>=3.6.0
+pyswarms>=1.3

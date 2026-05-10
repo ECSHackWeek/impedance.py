@@ -35,6 +35,8 @@ impedance.py requires:
 -   Matplotlib (>=3.5)
 -   Altair (>=3.0)
 -   Pandas
+-   pygad>=3.6.0
+-   pyswarms>=1.3
 
 Several example notebooks are provided in the `docs/source/examples/` directory. Opening these will require Jupyter notebook or Jupyter lab.
 

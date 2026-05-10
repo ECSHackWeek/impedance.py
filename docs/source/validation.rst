@@ -1,7 +1,7 @@
 Validation
 ==========
 
-Interpreting EIS data fundamentally relies on the the system conforming to
+Interpreting EIS data fundamentally relies on the system conforming to
 conditions of causality, linearity, and stability. For an example of how
 the adherence to the Kramers-Kronig relations, see the `Validation Example Jupyter Notebook
 <examples/validation_example.ipynb>`_
