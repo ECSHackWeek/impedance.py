@@ -200,9 +200,9 @@ def test_CustomCircuit():
     initial_guess = [1, 2, 3]
     circuit = CustomCircuit(circuit, initial_guess=initial_guess)
 
-from .test_fitting import test_data
+from .test_fitting import get_data
 def test_CustomCircuitwAlgorithm():
-    data = test_data()
+    data = get_data()
     optimizations={'algorithm':'pygad'}
     for d in data :
         if len(d) == 7:
@@ -215,13 +215,13 @@ def test_CustomCircuitwAlgorithm():
                                    circuit=circuit,constants=constants)
         custom_circuit.fit(frequencies, Z, bounds=bounds, optimizations=optimizations.copy(), scale=scale)
         assert custom_circuit._is_fit()
-        param = custom_circuit.parameters_
-        Z_fit = custom_circuit.predict(frequencies=frequencies)
-        err = rmse(Z,Z_fit)
-        if not np.allclose(results,param, rtol=1e-1):
-            print(f'Failed {circuit}: {results} != {param}; RMSE={err}')
-        else:
-            print(f'Passed {circuit}')        
-        custom_circuit.plot(f_data=frequencies, Z_data=Z, kind="nyquist")
-        plt.show()
+        # param = custom_circuit.parameters_
+        # Z_fit = custom_circuit.predict(frequencies=frequencies)
+        # err = rmse(Z,Z_fit)
+        # if not np.allclose(results,param, rtol=1e-1):
+        #     print(f'Failed {circuit}: {results} != {param}; RMSE={err}')
+        # else:
+        #     print(f'Passed {circuit}')        
+        # custom_circuit.plot(f_data=frequencies, Z_data=Z, kind="nyquist")
+        # plt.show()
  

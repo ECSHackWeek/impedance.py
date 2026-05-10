@@ -212,10 +212,10 @@ def plot_nyquist_compare(Z, Z_fit, scale=1, units='Ohms', fmt=['-',"*"], ax=None
     t = ax.xaxis.get_offset_text()
     t.set_size(18)
 
-    # return ax
-    plt.show()
+    return ax
+    # plt.show()
 
-def test_data():
+def get_data():
     example_frequencies_filtered, \
         Z_correct_filtered = ignoreBelowX(example_frequencies, Z_correct)
     data=[#circuit, initial_guess, scale, results, bounds, frequencies, Z_data]  # Test trivial model (10 Ohm resistor)
@@ -228,8 +228,9 @@ def test_data():
     )]
     return data
 
+rmse_limit=1e-1
 def test_circuit_fit_ga():
-    data = test_data()
+    data = get_data()
     optimizations={'algorithm':'pygad'}
     for circuit, initial_guess, scale, results, bounds, frequencies, Z_data in data :
         constants={}
@@ -242,14 +243,10 @@ def test_circuit_fit_ga():
         f = np.array(frequencies, dtype=float)
         Z_fit = builtCircuit(f,calc)
         err = rmse(Z_data,Z_fit)
-        if not np.allclose(results,calc, rtol=1e-1):
-            print(f'Failed {circuit}: {results} != {calc}; RMSE={err}')
-            plot_nyquist_compare(Z_data,Z_fit)
-        else:
-            print(f'Passed {circuit}')
+        assert np.allclose(results,calc, rtol=1e-1) or err <= rmse_limit, f'Failed {circuit}: {results} != {calc}; RMSE={err}'
 
 def test_circuit_fit_PSO():
-    data = test_data()
+    data = get_data()
     optimizations={'algorithm':'pyswarms'}
     for circuit, initial_guess, scale, results, bounds, frequencies, Z_data in data :
         constants={}
@@ -262,23 +259,12 @@ def test_circuit_fit_PSO():
         f = np.array(frequencies, dtype=float)
         Z_fit = builtCircuit(f,calc)
         err = rmse(Z_data,Z_fit)
-        if not np.allclose(results,calc, rtol=1e-1):
-            print(f'Failed {circuit}: {results} != {calc}; RMSE={err}')
-            plot_nyquist_compare(Z_data,Z_fit)
-            print('Trying curve_fit from end point...')
-            calc2 = circuit_fit(frequencies, Z_data, circuit,
-                                    initial_guess=calc, constants={},
-                                    optimizations={},scale=scale,bounds=bounds)[0]
-            f = np.array(frequencies, dtype=float)
-            Z_fit2 = builtCircuit(f,calc2)
-            err2 = rmse(Z_data,Z_fit2)
-            print(f'For {circuit}: Param was {results}, PSO gave {calc} with RMSE={err}; subsequent curve_fit gave {calc2} with RMSE={err2}; ')           
-        else:
-            print(f'Passed {circuit}')
+        assert np.allclose(results,calc, rtol=1e-1) or err <= rmse_limit, f'Failed {circuit}: {results} != {calc}; RMSE={err}'
+
 
 def test_circuit_fit_callable():
     from scipy.optimize import least_squares
-    data = test_data()
+    data = get_data()
     optimizations={'algorithm':least_squares,'method':'trf'}
     for circuit, initial_guess, scale, results, bounds, frequencies, Z_data in data :
         constants={}
@@ -291,14 +277,10 @@ def test_circuit_fit_callable():
         f = np.array(frequencies, dtype=float)
         Z_fit = builtCircuit(f,calc)
         err = rmse(Z_data,Z_fit)
-        if not np.allclose(results,calc, rtol=1e-1):
-            print(f'Failed {circuit}: {results} != {calc}; RMSE={err}')
-            # plot_nyquist_compare(Z_data,Z_fit)
-        else:
-            print(f'Passed {circuit}')
+        assert np.allclose(results,calc, rtol=1e-1), f'Failed {circuit}: {results} != {calc}; RMSE={err}'
 
 def test_circuit_fit_seq():
-    data = test_data()
+    data = get_data()
     optimizations=[{'algorithm':'pygad'},{'algorithm':'scipy_minimize'}]
     for circuit, initial_guess, scale, results, bounds, frequencies, Z_data in data :
         constants={}
@@ -311,11 +293,7 @@ def test_circuit_fit_seq():
         f = np.array(frequencies, dtype=float)
         Z_fit = builtCircuit(f,calc)
         err = rmse(Z_data,Z_fit)
-        if not np.allclose(results,calc, rtol=1e-1):
-            print(f'Failed {circuit}: {results} != {calc}; RMSE={err}')
-            plot_nyquist_compare(Z_data,Z_fit)
-        else:
-            print(f'Passed {circuit}')
+        assert np.allclose(results,calc, rtol=1e-1) or err <= rmse_limit, f'Failed {circuit}: {results} != {calc}; RMSE={err}'
 
 import re
 def subsitute_values(buildCircuit_text, frequencies, parameters):
