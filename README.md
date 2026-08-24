@@ -29,10 +29,10 @@ See [Getting started with impedance.py](https://impedancepy.readthedocs.io/en/la
 
 impedance.py requires:
 
--   Python (>=3.7)
+-   Python (>=3.10)
 -   SciPy (>=1.0)
 -   NumPy (>=1.22.4)
--   Matplotlib (>=3.0)
+-   Matplotlib (>=3.5)
 -   Altair (>=3.0)
 -   Pandas
 
