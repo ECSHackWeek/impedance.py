@@ -40,9 +40,9 @@ def test_each_element():
             (1.6541327179718126 - 0.537460300252313j),
         ],
         "La": [
-            (0.21769191 + 0.07073239j),
-            (0.86664712 + 0.28159072j),
-            (3.45018434 + 1.12103285j),
+            (0.03450184 + 0.01121033j),
+            (0.13735431 + 0.04462912j),
+            (0.54681737 + 0.17767173j),
         ],
         "G": [
             (0.09999994078244179 - 0.00006283179105931961j),
@@ -96,6 +96,15 @@ def test_each_element():
     with warnings.catch_warnings():
         warnings.simplefilter("error")
         circuit_elements["T"]([1, 2, 50, 100], [10000])
+
+
+def test_La_linear_in_L():
+    # Z = L * (j omega)^alpha, so doubling L must double Z for any alpha
+    freqs = [0.001, 1.0, 1000]
+    La = circuit_elements["La"]
+    Z1 = La([0.1, 0.7], freqs)
+    Z2 = La([0.2, 0.7], freqs)
+    assert np.isclose(Z2, 2 * Z1).all()
 
 
 def test_s():

@@ -208,7 +208,7 @@ def CPE(p, f):
     return Z
 
 
-@element(num_params=2, units=["H sec", ""])
+@element(num_params=2, units=["H sec^(a - 1)", ""])
 def La(p, f):
     """defines a modified inductance element as represented in [1]
 
@@ -225,7 +225,7 @@ def La(p, f):
     """
     omega = 2 * np.pi * np.array(f)
     L, alpha = p[0], p[1]
-    Z = (L * 1j * omega) ** alpha
+    Z = L * (1j * omega) ** alpha
     return Z
 
 
