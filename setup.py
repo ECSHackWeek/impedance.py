@@ -14,13 +14,14 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://impedancepy.readthedocs.io/en/latest/",
     packages=setuptools.find_packages(),
-    python_requires="~=3.7",
+    python_requires="~=3.10",
     install_requires=[
         "altair>=3.0",
         "matplotlib>=3.5",
-        "numdifftools>=0.9.41",
         "networkx>=2.6.3",
-        "numpy>=1.14",
+        "numdifftools>=0.9.41",
+        "numpy>=1.22.4",
+        "pandas",
         "scipy>=1.0",
     ],
     classifiers=(

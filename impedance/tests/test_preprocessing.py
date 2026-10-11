@@ -1,4 +1,4 @@
-from impedance.preprocessing import readFile, readGamry, readZPlot,\
+from impedance.preprocessing import readFile, readGamry, readZPlot, \
                                     readBioLogic, ignoreBelowX, \
                                     cropFrequencies, readCSV, saveCSV
 import numpy as np
