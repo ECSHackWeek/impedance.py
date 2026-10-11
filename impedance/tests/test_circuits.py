@@ -16,30 +16,32 @@ Z = data[:, 1] + 1j * data[:, 2]
 
 
 def test_BaseCircuit():
-    initial_guess = [0.01, 0.02, 50]
+    initial_guess = []
 
     # __init__()
     # check initial_guess is loaded in correctly
-    base_circuit = BaseCircuit(initial_guess)
+    base_circuit = BaseCircuit(initial_guess=initial_guess)
     assert base_circuit.initial_guess == initial_guess
 
     # improper input_guess types raise an TypeError
     with pytest.raises(TypeError):
         r = BaseCircuit(initial_guess=['hi', 0.1])
+    with pytest.raises(TypeError):
+        r = BaseCircuit(initial_guess=[0.1, np.inf])
 
     # __eq__()
     # incorrect comparisons raise a TypeError
     with pytest.raises(TypeError):
-        r = BaseCircuit(initial_guess=[.01, .005, .1, .0001, 200])
+        r = BaseCircuit(initial_guess=[])
         r == 8
 
     # fit()
     with pytest.raises(TypeError):
-        r = BaseCircuit(initial_guess=[.01, .005, .1, .0001, 200])
+        r = BaseCircuit(initial_guess=[])
         r.fit(np.array([42 + 42j]), [])  # frequencies are complex
 
     with pytest.raises(TypeError):
-        r = BaseCircuit(initial_guess=[.01, .005, .1, .0001, 200])
+        r = BaseCircuit(initial_guess=[])
         r.fit(np.array([42, 4.2]), np.array([42 + 42j]))  # mismatched lengths
 
     # plot()
@@ -125,7 +127,7 @@ def test_CustomCircuit():
 
     # check predictions from initial_guesses
     high_f = np.array([1e9])
-    assert np.isclose(np.real(custom_circuit.predict(high_f)[0]),
+    assert np.isclose(np.real(custom_circuit.predict(high_f)),
                       initial_guess[0])
 
     # check complex frequencies raise TypeError
@@ -183,7 +185,7 @@ def test_CustomCircuit():
         custom_circuit.fit(f, Z)
 
     # incorrect circuit element in circuit
-    with pytest.raises(ValueError):
+    with pytest.raises(KeyError):
         custom_circuit = CustomCircuit('R0-NotAnElement', initial_guess=[1, 2])
 
     # test single element circuit

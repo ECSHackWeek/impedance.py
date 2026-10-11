@@ -1,7 +1,7 @@
 from impedance import __version__
 import setuptools
 
-with open("README.md", "r", encoding='utf8') as fh:
+with open("README.md", "r", encoding="utf8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
@@ -15,9 +15,15 @@ setuptools.setup(
     url="https://impedancepy.readthedocs.io/en/latest/",
     packages=setuptools.find_packages(),
     python_requires="~=3.10",
-    install_requires=['altair>=3.0', 'matplotlib>=3.5',
-                      'numpy>=1.22.4', 'scipy>=1.0',
-                      'pandas'],
+    install_requires=[
+        "altair>=3.0",
+        "matplotlib>=3.5",
+        "networkx>=2.6.3",
+        "numdifftools>=0.9.41",
+        "numpy>=1.22.4",
+        "pandas",
+        "scipy>=1.0",
+    ],
     classifiers=(
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

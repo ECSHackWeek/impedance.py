@@ -1,12 +1,10 @@
 import numpy as np
 
 
-class ElementError(Exception):
-    ...
+class ElementError(Exception): ...
 
 
-class OverwriteError(ElementError):
-    ...
+class OverwriteError(ElementError): ...
 
 
 def element(num_params, units, overwrite=False):
@@ -34,13 +32,14 @@ def element(num_params, units, overwrite=False):
         wrapper.__doc__ = func.__doc__
 
         if func.__name__ in ["s", "p"]:
-            raise ElementError("cannot redefine elements 's' (series)" +
-                               "or 'p' (parallel)")
+            raise ElementError(
+                "cannot redefine elements 's' (series)" + "or 'p' (parallel)"
+            )
         elif func.__name__ in circuit_elements and not overwrite:
             raise OverwriteError(
-                f"element {func.__name__} already exists. " +
-                "If you want to overwrite the existing element," +
-                "use `overwrite=True`."
+                f"element {func.__name__} already exists. "
+                + "If you want to overwrite the existing element,"
+                + "use `overwrite=True`."
             )
         else:
             circuit_elements[func.__name__] = wrapper
@@ -312,9 +311,9 @@ def K(p, f):
     return Z
 
 
-@element(num_params=3, units=['Ohm', 'sec', ''])
+@element(num_params=3, units=["Ohm", "sec", ""])
 def Zarc(p, f):
-    """ An RQ element rewritten with resistance and
+    """An RQ element rewritten with resistance and
     and time constant as paramenters. Equivalent to a
     Cole-Cole relaxation in dielectrics.
 
@@ -325,9 +324,9 @@ def Zarc(p, f):
         Z = \\frac{R}{1 + (j \\omega \\tau_k)^\\gamma }
 
     """
-    omega = 2*np.pi*np.array(f)
+    omega = 2 * np.pi * np.array(f)
     R, tau_k, gamma = p[0], p[1], p[2]
-    Z = R/(1 + ((1j*omega*tau_k)**gamma))
+    Z = R / (1 + ((1j * omega * tau_k) ** gamma))
     return Z
 
 
@@ -405,17 +404,21 @@ def get_element_from_name(name):
 
 
 def typeChecker(p, f, name, length):
-    assert isinstance(p, list), \
-        "in {}, input must be of type list".format(name)
-    for i in p:
-        assert isinstance(
-            i, (float, int, np.int32, np.float64)
-        ), "in {}, value {} in {} is not a number".format(name, i, p)
-    for i in f:
-        assert isinstance(
-            i, (float, int, np.int32, np.float64)
-        ), "in {}, value {} in {} is not a number".format(name, i, f)
-    assert len(p) == length, "in {}, input list must be length {}".format(
-        name, length
-    )
-    return
+    if not np.all(np.isreal(p)):
+        raise TypeError(f"In {name} all of the parameters are not real ({p})")
+    if not np.all(np.isreal(f)):
+        raise TypeError(f"In {name} all of the frequencies are not ({f})")
+    if len(p) != length:
+        raise TypeError(f"In {name} length of parameters is not {length} ")
+
+
+def get_element_parameter_names_and_units_from_name(name):
+    elem = get_element_from_name(name)
+    n_params = circuit_elements[elem].num_params
+    return [
+        format_parameter_name(name, j, n_params) for j in range(n_params)
+    ], circuit_elements[elem].units
+
+
+def format_parameter_name(name, j, n_params):
+    return f"{name}_{j}" if n_params > 1 else f"{name}"
