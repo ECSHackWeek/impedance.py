@@ -25,7 +25,7 @@ def readFile(filename, instrument=None):
     """
 
     supported_types = ['gamry', 'autolab', 'parstat', 'zplot', 'versastudio',
-                       'powersuite', 'biologic', 'chinstruments']
+                       'powersuite', 'biologic', 'chinstruments','ivium']
 
     if instrument is not None:
         assert instrument in supported_types, \
@@ -48,8 +48,11 @@ def readFile(filename, instrument=None):
         f, Z = readPowerSuite(filename)
     elif instrument == 'chinstruments':
         f, Z = readCHInstruments(filename)
+    elif instrument == 'ivium':
+        f, Z = readIvium(filename)
     elif instrument is None:
         f, Z = readCSV(filename)
+        
 
     return f, Z
 
@@ -388,6 +391,47 @@ def readCHInstruments(filename):
         f.append(float(each[0]))
         Z.append(complex(float(each[1]), float(each[2])))
 
+    return np.array(f), np.array(Z)
+
+def readIvium(filename):
+    """ function for reading the .idf file from Ivium
+
+    Parameters
+    ----------
+    filename: string
+        Filename of .idf file to extract impedance data from
+
+    Returns
+    -------
+    frequencies : np.ndarray
+        Array of frequencies
+    impedance : np.ndarray of complex numbers
+        Array of complex impedances
+
+    """
+
+    with open(filename, 'r', encoding='ISO-8859-2') as input_file:
+        lines = input_file.readlines()
+        
+    start_line = 0
+        
+    for i, line in enumerate(lines):
+        if 'primary_data' in line:
+            datapoints_number = int(lines[i+2])
+            start_line = i+3
+            end_line = start_line + datapoints_number
+    
+    f, Z = [], []
+    
+    if start_line != 0:
+        raw_data = lines[start_line:end_line]
+            
+        for line in raw_data:
+            each = line.split()
+            f.append(float(each[2]))
+            Z.append(complex(float(each[0]), float(each[1])))
+
+                
     return np.array(f), np.array(Z)
 
 
