@@ -390,6 +390,39 @@ def readCHInstruments(filename):
 
     return np.array(f), np.array(Z)
 
+def readKolibrik(filename):
+    """ function for dat files from Kolibrik Potentiostats
+
+    Parameters
+    ----------
+    filename: string
+        Filename of .dat file to extract impedance data
+
+    Returns
+    -------
+    frequencies : np.ndarray
+        Array of frequencies
+    impedance : np.ndarray of complex numbers
+        Array of complex impedances
+
+    """
+
+    with open(filename, 'r', encoding="utf8") as input_file:
+        lines = input_file.readlines()
+
+    for i, line in enumerate(lines):
+        if line.find('[Data]') != -1:
+            start_line = i
+
+    raw_data = lines[start_line+2:-1]
+    f, Z = [], []
+    for line in raw_data:
+        each = line.split('\t')
+        f.append(float(each[5]))
+        Z.append(complex(float(each[3]), float(each[4])))
+
+    return np.array(f), np.array(Z)
+
 
 def readCSV(filename):
     """ function for reading plain csv files
