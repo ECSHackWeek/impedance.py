@@ -96,7 +96,7 @@ class BaseCircuit:
         if len(frequencies) != len(impedance):
             raise TypeError('length of frequencies and impedance do not match')
 
-        if self.initial_guess != []:
+        if len(self.initial_guess) != 0:
             parameters, conf = circuit_fit(frequencies, impedance,
                                            self.circuit, self.initial_guess,
                                            constants=self.constants,
