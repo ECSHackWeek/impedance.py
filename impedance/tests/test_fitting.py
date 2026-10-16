@@ -143,6 +143,167 @@ def test_circuit_fit():
                                    global_opt=True, seed=42)[0],
                        results_global, rtol=1e-1)
 
+from impedance.models.circuits.elements import circuit_elements
+import matplotlib.pyplot as plt
+
+def plot_nyquist_compare(Z, Z_fit, scale=1, units='Ohms', fmt=['-',"*"], ax=None, labelsize=20,
+                 ticksize=14, **kwargs):
+    """ Plots impedance as a Nyquist plot using matplotlib
+
+        Parameters
+        ----------
+        Z: np.array of complex numbers
+            impedance data
+        scale: float
+            the scale for the axes
+        units: string
+            units for :math:`Z(\\omega)`
+        fmt: string
+            format string passed to matplotlib (e.g. '.-' or 'o')
+        ax: matplotlib.axes.Axes (optional)
+            axes on which to plot the nyquist plot
+
+        Other Parameters
+        ----------------
+        **kwargs : `matplotlib.pyplot.Line2D` properties, optional
+            Used to specify line properties like linewidth, line color,
+            marker color, and line labels.
+
+        Returns
+        -------
+        ax: matplotlib.axes.Axes
+    """
+    Z = np.array(Z, dtype=complex)
+    Z_fit = np.array(Z_fit, dtype=complex)
+
+    if ax is None:
+        _, ax = plt.subplots()
+
+    ax.plot(np.real(Z), -np.imag(Z), fmt[0], label="Origial", **kwargs)
+    ax.plot(np.real(Z_fit), -np.imag(Z_fit), fmt[1], label="Fit", **kwargs)
+    ax.legend()
+
+    # Make the axes square
+    ax.set_aspect('equal')
+
+    # Set the labels to -imaginary vs real
+    ax.set_xlabel(r'$Z^{\prime}(\omega)$ ' +
+                  '$[{}]$'.format(units), fontsize=labelsize)
+    ax.set_ylabel(r'$-Z^{\prime\prime}(\omega)$ ' +
+                  '$[{}]$'.format(units), fontsize=labelsize)
+
+    # Make the tick labels larger
+    ax.tick_params(axis='both', which='major', labelsize=ticksize)
+
+    # Change the number of labels on each axis to five
+    ax.locator_params(axis='x', nbins=5, tight=True)
+    ax.locator_params(axis='y', nbins=5, tight=True)
+
+    # Add a light grid
+    ax.grid(visible=True, which='major', axis='both', alpha=.5)
+
+    # Change axis units to 10**log10(scale) and resize the offset text
+    limits = -np.log10(scale)
+    if limits != 0:
+        ax.ticklabel_format(style='sci', axis='both',
+                            scilimits=(limits, limits))
+    y_offset = ax.yaxis.get_offset_text()
+    y_offset.set_size(18)
+    t = ax.xaxis.get_offset_text()
+    t.set_size(18)
+
+    return ax
+    # plt.show()
+
+def get_data():
+    example_frequencies_filtered, \
+        Z_correct_filtered = ignoreBelowX(example_frequencies, Z_correct)
+    data=[#circuit, initial_guess, scale, results, bounds, frequencies, Z_data]  # Test trivial model (10 Ohm resistor)
+    ('R0', [10], [10], [10], [0,100], np.array([10, 100, 1000]), np.array([10, 10, 10])),
+    # ('R0', [10], [10], [10], [0,100], [10, 100, 1000],[10, 10, 10]),
+    (
+        'R0-p(R1,C1)-p(R2-Wo1,C2)',[.01, .01, 100, .01, .05, 100, 1],np.array([1e-2,1e-2,0.1,1e-2,1e-1,1e3,1]), 
+        [1.65e-2, 5.34e-3, 0.22, 9.15e-3, 1.31e-1, 1.10e3, 2.78],[(0, 0, 0, 0, 0, 0, 0),(10, 1, 1e3, 1, 1, 1e4, 100)],
+        example_frequencies_filtered, Z_correct_filtered
+    )]
+    return data
+
+rmse_limit=1e-1
+def test_circuit_fit_ga():
+    data = get_data()
+    optimizations={'algorithm':'pygad'}
+    for circuit, initial_guess, scale, results, bounds, frequencies, Z_data in data :
+        constants={}
+        buildCircuit_text=buildCircuit(circuit, constants=constants, eval_string='', index=0)[0]
+        builtCircuit = eval('lambda frequencies,parameters : ' +  buildCircuit_text, circuit_elements)
+
+        calc = circuit_fit(frequencies, Z_data, circuit,
+                                   initial_guess, constants={},
+                                   optimizations=optimizations.copy(),scale=scale,bounds=bounds)[0]
+        f = np.array(frequencies, dtype=float)
+        Z_fit = builtCircuit(f,calc)
+        err = rmse(Z_data,Z_fit)
+        assert np.allclose(results,calc, rtol=1e-1) or err <= rmse_limit, f'Failed {circuit}: {results} != {calc}; RMSE={err}'
+
+def test_circuit_fit_PSO():
+    data = get_data()
+    optimizations={'algorithm':'pyswarms'}
+    for circuit, initial_guess, scale, results, bounds, frequencies, Z_data in data :
+        constants={}
+        buildCircuit_text=buildCircuit(circuit, constants=constants, eval_string='', index=0)[0]
+        builtCircuit = eval('lambda frequencies,parameters : ' +  buildCircuit_text, circuit_elements)
+
+        calc = circuit_fit(frequencies, Z_data, circuit,
+                                   initial_guess, constants={},
+                                   optimizations=optimizations.copy(),scale=scale,bounds=bounds)[0]
+        f = np.array(frequencies, dtype=float)
+        Z_fit = builtCircuit(f,calc)
+        err = rmse(Z_data,Z_fit)
+        assert np.allclose(results,calc, rtol=1e-1) or err <= rmse_limit, f'Failed {circuit}: {results} != {calc}; RMSE={err}'
+
+
+def test_circuit_fit_callable():
+    from scipy.optimize import least_squares
+    data = get_data()
+    optimizations={'algorithm':least_squares,'method':'trf'}
+    for circuit, initial_guess, scale, results, bounds, frequencies, Z_data in data :
+        constants={}
+        buildCircuit_text=buildCircuit(circuit, constants=constants, eval_string='', index=0)[0]
+        builtCircuit = eval('lambda frequencies,parameters : ' +  buildCircuit_text, circuit_elements)
+
+        calc = circuit_fit(frequencies, Z_data, circuit,
+                                   initial_guess, constants={},
+                                   optimizations=optimizations.copy(),scale=scale,bounds=bounds)[0]
+        f = np.array(frequencies, dtype=float)
+        Z_fit = builtCircuit(f,calc)
+        err = rmse(Z_data,Z_fit)
+        assert np.allclose(results,calc, rtol=1e-1), f'Failed {circuit}: {results} != {calc}; RMSE={err}'
+
+def test_circuit_fit_seq():
+    data = get_data()
+    optimizations=[{'algorithm':'pygad'},{'algorithm':'scipy_minimize'}]
+    for circuit, initial_guess, scale, results, bounds, frequencies, Z_data in data :
+        constants={}
+        buildCircuit_text=buildCircuit(circuit, constants=constants, eval_string='', index=0)[0]
+        builtCircuit = eval('lambda frequencies,parameters : ' +  buildCircuit_text, circuit_elements)
+
+        calc = circuit_fit(frequencies, Z_data, circuit,
+                                   initial_guess, constants={},
+                                   optimizations=optimizations.copy(),scale=scale,bounds=bounds)[0]
+        f = np.array(frequencies, dtype=float)
+        Z_fit = builtCircuit(f,calc)
+        err = rmse(Z_data,Z_fit)
+        assert np.allclose(results,calc, rtol=1e-1) or err <= rmse_limit, f'Failed {circuit}: {results} != {calc}; RMSE={err}'
+
+import re
+def subsitute_values(buildCircuit_text, frequencies, parameters):
+    parameters=[float(p) for p in parameters]
+    frequencies=[float(p) for p in frequencies]
+    new_ckt_txt = buildCircuit_text.replace('frequencies',str(frequencies))
+    param_idx=re.findall(r'parameters\[(\d+)\]', new_ckt_txt)
+    for i in param_idx:
+        new_ckt_txt = new_ckt_txt.replace(f"parameters[{i}]",str(parameters[int(i)]))
+    return new_ckt_txt
 
 def test_buildCircuit():
 
@@ -151,8 +312,8 @@ def test_buildCircuit():
     params = [.1, .01, 1, 1000, 15, .9]
     frequencies = [1000.0, 5.0, 0.01]
 
-    assert buildCircuit(circuit, frequencies, *params,
-                        constants={})[0].replace(' ', '') == \
+    assert subsitute_values(buildCircuit(circuit,constants={})[0], frequencies, 
+                            params).replace(' ', '') == \
         's([R([0.1],[1000.0,5.0,0.01]),' + \
         'p([s([R([0.01],[1000.0,5.0,0.01]),' + \
         'Wo([1.0,1000.0],[1000.0,5.0,0.01])]),' + \
@@ -163,8 +324,8 @@ def test_buildCircuit():
     params = [.1, .01, .2, .3]
     frequencies = [1000.0, 5.0, 0.01]
 
-    assert buildCircuit(circuit, frequencies, *params,
-                        constants={})[0].replace(' ', '') == \
+    assert subsitute_values(buildCircuit(circuit,constants={})[0], frequencies, 
+                            params).replace(' ', '') == \
         's([R([0.1],[1000.0,5.0,0.01]),' + \
         'p([C([0.01],[1000.0,5.0,0.01]),' + \
         'R([0.2],[1000.0,5.0,0.01]),' + \
@@ -175,21 +336,21 @@ def test_buildCircuit():
     params = [1, 2, 3, 4, 5]
     frequencies = [1000.0, 5.0, 0.01]
 
-    assert buildCircuit(circuit, frequencies, *params,
-                        constants={})[0].replace(' ', '') == \
-        's([R([1],[1000.0,5.0,0.01]),' + \
-        'p([s([p([R([2],[1000.0,5.0,0.01]),' + \
-        'C([3],[1000.0,5.0,0.01])]),' + \
-        'R([4],[1000.0,5.0,0.01])]),' + \
-        'C([5],[1000.0,5.0,0.01])])])'
+    assert subsitute_values(buildCircuit(circuit,constants={})[0], frequencies, 
+                            params).replace(' ', '') == \
+        's([R([1.0],[1000.0,5.0,0.01]),' + \
+        'p([s([p([R([2.0],[1000.0,5.0,0.01]),' + \
+        'C([3.0],[1000.0,5.0,0.01])]),' + \
+        'R([4.0],[1000.0,5.0,0.01])]),' + \
+        'C([5.0],[1000.0,5.0,0.01])])])'
 
     # Test parallel elements at beginning and end
     circuit = 'p(C1,R1)-p(C2,R2)'
     params = [.1, .01, .2, .3]
     frequencies = [1000.0, 5.0, 0.01]
 
-    assert buildCircuit(circuit, frequencies, *params,
-                        constants={})[0].replace(' ', '') == \
+    assert subsitute_values(buildCircuit(circuit,constants={})[0], frequencies, 
+                            params).replace(' ', '') == \
         's([p([C([0.1],[1000.0,5.0,0.01]),' + \
         'R([0.01],[1000.0,5.0,0.01])]),' + \
         'p([C([0.2],[1000.0,5.0,0.01]),' + \
@@ -200,9 +361,9 @@ def test_buildCircuit():
     params = [100]
     frequencies = [1000.0, 5.0, 0.01]
 
-    assert buildCircuit(circuit, frequencies, *params,
-                        constants={})[0].replace(' ', '') == \
-        'R([100],[1000.0,5.0,0.01])'
+    assert subsitute_values(buildCircuit(circuit,constants={})[0], frequencies, 
+                            params).replace(' ', '') == \
+        'R([100.0],[1000.0,5.0,0.01])'
 
 
 def test_RMSE():
@@ -220,3 +381,4 @@ def test_element_extraction():
     circuit = 'R0-p(RR0,C1)-p(R1,C2032478)-W1'
     extracted_elements = extract_circuit_elements(circuit)
     assert extracted_elements == ['R0', 'RR0', 'C1', 'R1', 'C2032478', 'W1']
+

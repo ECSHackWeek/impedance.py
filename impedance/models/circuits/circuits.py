@@ -134,20 +134,14 @@ class BaseCircuit:
             Predicted impedance at each frequency
         """
         frequencies = np.array(frequencies, dtype=float)
-
+        buildCircuit_text=buildCircuit(self.circuit, constants=self.constants, 
+                            eval_string='', index=0)[0]
+        builtCircuit = eval('lambda frequencies,parameters : ' +  buildCircuit_text, circuit_elements)
         if self._is_fit() and not use_initial:
-            return eval(buildCircuit(self.circuit, frequencies,
-                                     *self.parameters_,
-                                     constants=self.constants, eval_string='',
-                                     index=0)[0],
-                        circuit_elements)
+            return builtCircuit(frequencies,self.parameters_)
         else:
             warnings.warn("Simulating circuit based on initial parameters")
-            return eval(buildCircuit(self.circuit, frequencies,
-                                     *self.initial_guess,
-                                     constants=self.constants, eval_string='',
-                                     index=0)[0],
-                        circuit_elements)
+            return builtCircuit(frequencies,self.initial_guess)
 
     def get_param_names(self):
         """ Converts circuit string to names and units """

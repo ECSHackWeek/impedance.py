@@ -1,4 +1,20 @@
 import warnings
+import os
+import inspect
+
+
+def _custom_formatwarning(msg, category, filename, lineno, line=None):
+    norm_path = os.path.normpath(filename)
+    path_parts = norm_path.split(os.sep)
+    if 'impedance' in path_parts:
+        display_name = ".".join(path_parts[path_parts.index('impedance'):])
+        if display_name.endswith('.py'):
+            display_name = display_name[:-3]
+    else:
+        display_name = os.path.basename(filename)
+    return f"{display_name}:{lineno}: {category.__name__}: {msg}\n"
+
+warnings.formatwarning = _custom_formatwarning
 
 import numpy as np
 from scipy.linalg import inv
@@ -8,6 +24,7 @@ from .elements import circuit_elements, get_element_from_name
 
 ints = '0123456789'
 
+from warnings import warn
 
 def rmse(a, b):
     """
@@ -66,9 +83,51 @@ def set_default_bounds(circuit, constants={}):
     return bounds
 
 
+def scale_bounds(bounds,n_guess,scale):
+    #We should either accept [(0,0.1),(0,100),(0,0.01),(0,10),(0,1)] or [(0,0,...),[0.1,100,...]] or [0, [0.1,100,...]]; This should also work when n_guess=2
+    is_format_1 = False
+    
+    if len(bounds) == n_guess and len(bounds) != 2:
+        is_format_1 = True
+    elif len(bounds) == 2:
+        if n_guess == 2:
+            if isinstance(bounds, list) and isinstance(bounds[0], tuple):
+                is_format_1 = True
+            else:
+                is_format_1 = False
+        else:
+            is_format_1 = False
+    else:
+        is_format_1 = True
+
+    if is_format_1:
+        b0 = np.array([b[0] for b in bounds])
+        b1 = np.array([b[1] for b in bounds])
+    else:
+        b0 = np.atleast_1d(bounds[0])
+        b1 = np.atleast_1d(bounds[1])
+        if len(b0) == 1:
+            b0 = np.repeat(b0[0], n_guess)
+        if len(b1) == 1:
+            b1 = np.repeat(b1[0], n_guess)
+
+    if scale is None:
+        scale = np.ones(n_guess)
+    else:
+        scale = np.array(scale, dtype=float)
+        
+    scaled_low = np.array(b0, dtype=float) / scale
+    scaled_high = np.array(b1, dtype=float) / scale
+    return scaled_low,scaled_high
+
+def is_scalarval(var,val):
+    if isinstance(var,(list,np.ndarray)): return False
+    if var != val: return False
+    return True
+
 def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
                 bounds=None, weight_by_modulus=False, global_opt=False,
-                **kwargs):
+                optimizations=[], scale=None, **kwargs):
 
     """ Main function for fitting an equivalent circuit to data.
 
@@ -113,9 +172,24 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
         If global optimization should be used (uses the basinhopping
         algorithm). Defaults to False
 
+    optimizations : dict or list of dicts, optional
+        If global_opt is True, gets set to "basinhopping"
+        Else 
+            If optimizations is not passed, curve_fit is used.
+            If dict(s), it must algorithm + algorithm options
+                "algorithm" is mandatory. eg : {"algorithm" : 'scipy_minimize', 'method' : ...} or {"algorithm" : 'pygad', 'gene_space' : ...} 
+            List could be a list of dics (in the above format). This is used for sequential optimizations, particularly useful for GA.
+
+    scale : list, optional
+        Used to denote "scale" of prameters to improve convergence.
+        Consider a p(R,C) or R-C circuit. Suppose C-s is in μF while, 
+        R-s might be in ~0.1 ohms; we can pass [0.1,1e-6].
+        Internally the parameters are divided by scale during optimization.
+
     kwargs :
         Keyword arguments passed to scipy.optimize.curve_fit or
         scipy.optimize.basinhopping
+        One can also pass a callable soft_constraint that adds a penalty for arbitary constraints. 
 
     Returns
     ------------
@@ -131,14 +205,75 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
     Currently, an error of -1 is returned.
 
     """
+    kwargs_org = kwargs
     f = np.array(frequencies, dtype=float)
     Z = np.array(impedances, dtype=complex)
 
     # set upper and lower bounds on a per-element basis
     if bounds is None:
         bounds = set_default_bounds(circuit, constants=constants)
+    wrapedCircuit=wrapCircuit(circuit, constants)
 
-    if not global_opt:
+    if global_opt:
+        warn('global_opt has been deprecated. Use optimizations={"algorithm" : "basinhopping"}' \
+        ' OR optimizations="basinhopping"', DeprecationWarning, 2)
+        opt={"algorithm" : 'basinhopping'}
+        optimizations=[]
+    elif optimizations == [] or optimizations == {} :
+        opt={"algorithm" : 'curve_fit'}
+    elif isinstance(optimizations,(list)) :
+        opt=optimizations.pop(0) 
+    else :
+        opt=optimizations
+        optimizations=[]
+        
+    if not isinstance(opt,dict) : opt={"algorithm" : opt}
+
+    target_Z = np.hstack([Z.real, Z.imag])
+
+    soft_constraint = kwargs.pop('soft_constraint', lambda p : 0)
+
+    algo=opt["algorithm"]
+    if algo in ('scipy_minimize','pygad','pyswarms') or callable(opt["algorithm"]):
+        sigma = kwargs.pop('sigma', 1)
+        # weighting scheme for fitting
+        if weight_by_modulus:
+            abs_Z = np.abs(Z)
+            kwargs['sigma'] = np.hstack([abs_Z, abs_Z])
+        needscale=True
+        if callable(algo):
+            sig = inspect.signature(algo)
+            if 'scale' not in sig.parameters: needscale=False
+        if needscale and scale is None : 
+            scale = 10 ** np.round(np.log10(np.abs(initial_guess) + np.finfo(float).eps))
+            warnings.warn(f"'scale' is recommeded for {str(algo)}. Using scale from initial_guess.")
+            
+        scaled_low, scaled_high = scale_bounds(bounds, len(initial_guess), scale)
+        def obj_fn(p_scaled):
+            p_unscaled = p_scaled * scale
+            try:
+                pred_Z = wrapedCircuit(f, *p_unscaled)
+                error =  np.sum(((pred_Z - target_Z) / sigma)**2) + soft_constraint(p_unscaled)
+            except Exception:
+                return np.inf
+            return error
+        pbar = None
+        show_progress = opt.pop('show_progress', 
+                    kwargs.get('show_progress', True))
+        if show_progress:
+            if opt["algorithm"] ==  'pygad':
+                maxiter = opt.get('num_generations', 1000)
+            elif opt["algorithm"] == 'pyswarms':
+                maxiter = opt.get('iters', 1000)
+            else:
+                maxiter = kwargs.get('options', {}).get('maxiter', None)
+            try:
+                from tqdm.auto import tqdm
+                pbar = tqdm(total=maxiter, desc="Circuit fit using " + str(opt["algorithm"]))
+            except ImportError:
+                warn('tqdm not found, progress cannot be plotted !!!')
+    
+    if opt["algorithm"] == 'curve_fit':
         if 'maxfev' not in kwargs:
             kwargs['maxfev'] = 1e5
         if 'ftol' not in kwargs:
@@ -149,8 +284,8 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
             abs_Z = np.abs(Z)
             kwargs['sigma'] = np.hstack([abs_Z, abs_Z])
 
-        popt, pcov = curve_fit(wrapCircuit(circuit, constants), f,
-                               np.hstack([Z.real, Z.imag]),
+        popt, pcov = curve_fit(wrapedCircuit, f,
+                               target_Z,
                                p0=initial_guess, bounds=bounds, **kwargs)
 
         # Calculate one standard deviation error estimates for fit parameters,
@@ -158,7 +293,7 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
         # https://stackoverflow.com/a/52275674/5144795
         perror = np.sqrt(np.diag(pcov))
 
-    else:
+    elif opt["algorithm"] == 'basinhopping':
         if 'seed' not in kwargs:
             kwargs['seed'] = 0
 
@@ -176,7 +311,7 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
             function
                 Returns a function (RMSE as a function of parameters).
             """
-            return rmse(wrapCircuit(circuit, constants)(f, *x),
+            return rmse(wrapedCircuit(f, *x),
                         np.hstack([Z.real, Z.imag]))
 
         class BasinhoppingBounds(object):
@@ -213,11 +348,205 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
             warnings.warn('Failed to compute perror')
             perror = None
 
-    return popt, perror
+    elif opt["algorithm"] == 'scipy_minimize':
+        method = opt.pop('method', 'L-BFGS-B')
+        print(f"Running {opt['algorithm']} with {method}...")
 
+        from scipy.optimize import minimize
+        user_callback = kwargs.pop('callback', None)
+        def combined_callback(xk, *args, **kwds):
+            if pbar is not None:
+                pbar.update(1)
+            if user_callback is not None:
+                user_callback(xk, *args, **kwds)
+
+        min_bounds_scaled = list(zip(scaled_low, scaled_high))
+        res = minimize(obj_fn, initial_guess, bounds=min_bounds_scaled, callback=combined_callback, **kwargs)
+        if pbar is not None:
+            pbar.close()
+        popt = res.x * scale
+        if hasattr(res, 'hess_inv'):
+            pcov = res.hess_inv
+            if hasattr(pcov, "todense"): pcov = pcov.todense()
+            pcov = pcov * np.outer(scale, scale)
+        else:
+            pcov = np.zeros((len(popt), len(popt)))
+        perror = np.sqrt(np.diag(pcov))
+
+    elif opt["algorithm"] == 'pygad':
+        print(f"Running {opt['algorithm']}...")
+        import pygad
+
+        def fitness_func(ga_instance, solution, solution_idx):
+            return 1./obj_fn(solution)
+
+        gene_space = opt.pop('gene_space', None)
+        if gene_space is None and scaled_low is not None:
+            gene_space = [{'low': low, 'high': high} for low, high in zip(scaled_low, scaled_high)]
+
+        num_generations = opt.pop('num_generations', 1000)
+        num_parents_mating = opt.pop('num_parents_mating', 4)
+        sol_per_pop = opt.pop('sol_per_pop', 20)
+        num_genes=len(initial_guess)
+        
+        initial_population = opt.pop('initial_population', None)
+        if initial_population is None:
+            if scaled_low is None:
+                raise ValueError("Bounds must be provided for PyGAD optimization to generate the initial population.")
+            
+            if np.any(np.isinf(scaled_low)) or np.any(np.isinf(scaled_high)):
+                raise ValueError("Bounds must be finite for PyGAD optimization to generate the initial population.")
+                
+            initial_population = np.empty((sol_per_pop, num_genes))
+            initial_population[0] = np.array(initial_guess) / scale
+            
+            for i in range(1, sol_per_pop):
+                initial_population[i] = np.random.uniform(scaled_low, scaled_high)
+                
+            initial_population = np.clip(initial_population, scaled_low, scaled_high)
+        else:
+            initial_population = np.array(initial_population) / scale
+
+        plot_pygad = opt.pop('plot', False)
+        user_on_generation = opt.pop('on_generation', None)
+            
+        def on_generation(ga_instance):
+            if pbar is not None:
+                pbar.update(1)
+            if user_on_generation:
+                user_on_generation(ga_instance)
+
+        ga_instance = pygad.GA(num_generations=num_generations,
+                                num_parents_mating=num_parents_mating,
+                                fitness_func=fitness_func,
+                                initial_population=initial_population,
+                                sol_per_pop=sol_per_pop,
+                                num_genes=num_genes,
+                                gene_space=gene_space,
+                                on_generation=on_generation,
+                                parent_selection_type=opt.pop('parent_selection_type', 'sss'), #'tournament'
+                                keep_elitism=opt.pop('keep_elitism', 1),
+                                **kwargs)
+        ga_instance.run()
+        if pbar is not None:
+            pbar.close()
+            
+        if plot_pygad:
+            ga_instance.plot_fitness()
+
+        solution, solution_fitness, solution_idx = ga_instance.best_solution()
+        popt = solution * scale
+        pcov = np.zeros((len(popt), len(popt)))        
+        perror = np.sqrt(np.diag(pcov))
+
+    elif opt["algorithm"] == 'pyswarms':
+        print(f"Running {opt['algorithm']}...")
+        import pyswarms as ps
+
+        def fitness_func(x):
+            n_particles = x.shape[0]
+            j = [obj_fn(x[i]) for i in range(n_particles)]
+            if pbar is not None:
+                pbar.update(1)
+            return np.array(j)
+
+        if scaled_low is None:
+            raise ValueError("Bounds must be provided for pyswarms optimization.")
+            
+        if np.any(np.isinf(scaled_low)) or np.any(np.isinf(scaled_high)):
+            raise ValueError("Bounds must be finite for pyswarms optimization.")
+
+        bounds_ps = (np.array(scaled_low), np.array(scaled_high))
+        
+        options = opt.pop('options', {'c1': 0.5, 'c2': 0.3, 'w': 0.9})
+        n_particles = opt.pop('n_particles', 20)
+        iters = opt.pop('iters', 1000)
+        num_dimensions = len(initial_guess)
+        
+        initial_population = opt.pop('initial_population', None)
+        if initial_population is None:
+            initial_population = np.empty((n_particles, num_dimensions))
+            initial_population[0] = np.array(initial_guess) / scale
+            
+            for i in range(1, n_particles):
+                initial_population[i] = np.random.uniform(scaled_low, scaled_high)
+                
+            initial_population = np.clip(initial_population, scaled_low, scaled_high)
+        else:
+            initial_population = np.array(initial_population) / scale
+
+        optimizer = ps.single.GlobalBestPSO(n_particles=n_particles,
+                                            dimensions=num_dimensions,
+                                            options=options,
+                                            bounds=bounds_ps,
+                                            init_pos=initial_population)
+
+        verbose = opt.pop('verbose', pbar is None)
+        cost, pos = optimizer.optimize(fitness_func, iters=iters, verbose=verbose)
+        
+        if pbar is not None:
+            pbar.close()
+            
+        plot_pyswarms = opt.pop('plot', False)
+        if plot_pyswarms:
+            from pyswarms.utils.plotters import plot_cost_history
+            import matplotlib.pyplot as plt
+            plot_cost_history(cost_history=optimizer.cost_history)
+            plt.show()
+
+        popt = pos * scale
+        pcov = np.zeros((len(popt), len(popt)))        
+        perror = np.sqrt(np.diag(pcov))
+
+    elif callable(opt["algorithm"]):
+        algo=opt.pop('algorithm')
+        sig = inspect.signature(algo)
+        valid_params = sig.parameters
+        
+        call_kwargs = {}
+        # Map parameters dynamically based on the callable's signature
+        if 'initial_guess' in valid_params:
+            call_kwargs['initial_guess'] = initial_guess
+        elif 'x0' in valid_params: # Standard scipy optimize param
+            call_kwargs['x0'] = initial_guess
+        else:
+            warn('Initial guess was ignored')
+        if 'bounds' in valid_params:
+            call_kwargs['bounds'] = bounds
+        else:
+            warn('bounds was ignored')
+        if 'scale' in valid_params:
+            call_kwargs['scale'] = scale
+        elif not is_scalarval(scale,1): #scale != 1 : 
+            warn('scale was ignored')
+        if 'fun' in valid_params:
+            call_kwargs['fun'] = obj_fn
+        else:
+            warn('objective function was ignored (as callable does not accept "fun" parameter)')
+            
+        accepts_kwargs = any(p.kind == inspect.Parameter.VAR_KEYWORD for p in valid_params.values())
+        for k, v in opt.items():
+            if k in valid_params or accepts_kwargs:
+                call_kwargs[k] = v
+                
+        res = algo(**call_kwargs)
+        popt = res.x if hasattr(res, 'x') else res
+        pcov = np.zeros((len(popt), len(popt)))        
+        perror = np.sqrt(np.diag(pcov))
+    else:
+        raise ValueError(f"Unknown optimization algorithm: {opt['algorithm']}")
+    if len(optimizations) > 0:
+        return circuit_fit(frequencies, impedances, circuit, initial_guess=popt, constants=constants,
+                bounds=bounds, weight_by_modulus=weight_by_modulus, global_opt=False, optimizations=optimizations, scale=scale, **kwargs_org)
+    else:
+        return popt, perror
 
 def wrapCircuit(circuit, constants):
     """ wraps function so we can pass the circuit string """
+    buildCircuit_text=buildCircuit(circuit, constants=constants, 
+                        eval_string='', index=0)[0]
+    builtCircuit = eval('lambda frequencies,parameters : ' +  buildCircuit_text, circuit_elements)
+
     def wrappedCircuit(frequencies, *parameters):
         """ returns a stacked array of real and imaginary impedance
         components
@@ -235,19 +564,14 @@ def wrapCircuit(circuit, constants):
 
         """
 
-        x = eval(buildCircuit(circuit, frequencies, *parameters,
-                              constants=constants, eval_string='',
-                              index=0)[0],
-                 circuit_elements)
+        x = builtCircuit(frequencies,parameters)
         y_real = np.real(x)
         y_imag = np.imag(x)
 
         return np.hstack([y_real, y_imag])
     return wrappedCircuit
 
-
-def buildCircuit(circuit, frequencies, *parameters,
-                 constants=None, eval_string='', index=0):
+def buildCircuit(circuit, constants=None, eval_string='', index=0):
     """ recursive function that transforms a circuit, parameters, and
     frequencies into a string that can be evaluated
 
@@ -262,12 +586,15 @@ def buildCircuit(circuit, frequencies, *parameters,
     -------
     eval_string: str
         Python expression for calculating the resulting fit
+        This would a string that can be used to construct a lamda function. 
+        For example if circuit=R1,CPE1 with CPE1_1 = const1, eval_string = 
+        "p(R(frequencies,[parameters[0]), CPE(frequencies,[p[1],const1]))"; 
+        We can then construct lambda frequencies,parameters : <eval_string>
+
     index: int
         Tracks parameter index through recursive calling of the function
     """
 
-    parameters = np.array(parameters).tolist()
-    frequencies = np.array(frequencies).tolist()
     circuit = circuit.replace(' ', '')
 
     def parse_circuit(circuit, parallel=False, series=False):
@@ -327,12 +654,11 @@ def buildCircuit(circuit, frequencies, *parameters,
 
     for i, elem in enumerate(split):
         if ',' in elem or '-' in elem:
-            eval_string, index = buildCircuit(elem, frequencies,
-                                              *parameters,
-                                              constants=constants,
+            eval_string, index = buildCircuit(elem, constants=constants,
                                               eval_string=eval_string,
                                               index=index)
         else:
+            #Return a string that can be used to construct a lamda function lambda f,p : R(f,[p[0],const1,p[1]...])
             param_string = ""
             raw_elem = get_element_from_name(elem)
             elem_number = check_and_eval(raw_elem).num_params
@@ -344,13 +670,13 @@ def buildCircuit(circuit, frequencies, *parameters,
                     current_elem = elem
 
                 if current_elem in constants.keys():
-                    param_list.append(constants[current_elem])
+                    param_list.append(str(constants[current_elem]))
                 else:
-                    param_list.append(parameters[index])
+                    param_list.append(f'parameters[{index}]')
                     index += 1
 
-            param_string += str(param_list)
-            new = raw_elem + '(' + param_string + ',' + str(frequencies) + ')'
+            param_string = "[" + ','.join(param_list) + "]"
+            new = raw_elem + '(' + param_string + ', frequencies)'
             eval_string += new
 
         if i == len(split) - 1:
