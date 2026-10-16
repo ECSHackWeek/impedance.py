@@ -153,10 +153,10 @@ def test_buildCircuit():
 
     assert buildCircuit(circuit, frequencies, *params,
                         constants={})[0].replace(' ', '') == \
-        's([R([0.1],[1000.0,5.0,0.01]),' + \
-        'p([s([R([0.01],[1000.0,5.0,0.01]),' + \
-        'Wo([1.0,1000.0],[1000.0,5.0,0.01])]),' + \
-        'CPE([15.0,0.9],[1000.0,5.0,0.01])])])'
+        's([R([0.1],frequencies),' + \
+        'p([s([R([0.01],frequencies),' + \
+        'Wo([1.0,1000.0],frequencies)]),' + \
+        'CPE([15.0,0.9],frequencies)])])'
 
     # Test multiple parallel elements
     circuit = 'R0-p(C1,R1,R2)'
@@ -165,10 +165,10 @@ def test_buildCircuit():
 
     assert buildCircuit(circuit, frequencies, *params,
                         constants={})[0].replace(' ', '') == \
-        's([R([0.1],[1000.0,5.0,0.01]),' + \
-        'p([C([0.01],[1000.0,5.0,0.01]),' + \
-        'R([0.2],[1000.0,5.0,0.01]),' + \
-        'R([0.3],[1000.0,5.0,0.01])])])'
+        's([R([0.1],frequencies),' + \
+        'p([C([0.01],frequencies),' + \
+        'R([0.2],frequencies),' + \
+        'R([0.3],frequencies)])])'
 
     # Test nested parallel groups
     circuit = 'R0-p(p(R1, C1)-R2, C2)'
@@ -177,11 +177,11 @@ def test_buildCircuit():
 
     assert buildCircuit(circuit, frequencies, *params,
                         constants={})[0].replace(' ', '') == \
-        's([R([1],[1000.0,5.0,0.01]),' + \
-        'p([s([p([R([2],[1000.0,5.0,0.01]),' + \
-        'C([3],[1000.0,5.0,0.01])]),' + \
-        'R([4],[1000.0,5.0,0.01])]),' + \
-        'C([5],[1000.0,5.0,0.01])])])'
+        's([R([1],frequencies),' + \
+        'p([s([p([R([2],frequencies),' + \
+        'C([3],frequencies)]),' + \
+        'R([4],frequencies)]),' + \
+        'C([5],frequencies)])])'
 
     # Test parallel elements at beginning and end
     circuit = 'p(C1,R1)-p(C2,R2)'
@@ -190,10 +190,10 @@ def test_buildCircuit():
 
     assert buildCircuit(circuit, frequencies, *params,
                         constants={})[0].replace(' ', '') == \
-        's([p([C([0.1],[1000.0,5.0,0.01]),' + \
-        'R([0.01],[1000.0,5.0,0.01])]),' + \
-        'p([C([0.2],[1000.0,5.0,0.01]),' + \
-        'R([0.3],[1000.0,5.0,0.01])])])'
+        's([p([C([0.1],frequencies),' + \
+        'R([0.01],frequencies)]),' + \
+        'p([C([0.2],frequencies),' + \
+        'R([0.3],frequencies)])])'
 
     # Test single element circuit
     circuit = 'R1'
@@ -202,7 +202,7 @@ def test_buildCircuit():
 
     assert buildCircuit(circuit, frequencies, *params,
                         constants={})[0].replace(' ', '') == \
-        'R([100],[1000.0,5.0,0.01])'
+        'R([100],frequencies)'
 
 
 def test_RMSE():

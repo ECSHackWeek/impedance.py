@@ -149,7 +149,8 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
             abs_Z = np.abs(Z)
             kwargs['sigma'] = np.hstack([abs_Z, abs_Z])
 
-        popt, pcov = curve_fit(wrapCircuit(circuit, constants), f,
+        circuit_func = wrapCircuit(circuit, f, constants, initial_guess)
+        popt, pcov = curve_fit(circuit_func, f,
                                np.hstack([Z.real, Z.imag]),
                                p0=initial_guess, bounds=bounds, **kwargs)
 
@@ -176,8 +177,8 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
             function
                 Returns a function (RMSE as a function of parameters).
             """
-            return rmse(wrapCircuit(circuit, constants)(f, *x),
-                        np.hstack([Z.real, Z.imag]))
+            circuit_func = wrapCircuit(circuit, f, constants, x)
+            return rmse(circuit_func, np.hstack([Z.real, Z.imag]))
 
         class BasinhoppingBounds(object):
             """ Adapted from the basinhopping documetation
@@ -216,8 +217,12 @@ def circuit_fit(frequencies, impedances, circuit, initial_guess, constants={},
     return popt, perror
 
 
-def wrapCircuit(circuit, constants):
+def wrapCircuit(circuit, frequencies, constants, parameters):
     """ wraps function so we can pass the circuit string """
+    eval_str, _ = buildCircuit(circuit, frequencies, *parameters,
+                               constants=constants, eval_string='',
+                               index=0)
+    # maybe frequencies don't need to be passed as argument to buildCircuit
     def wrappedCircuit(frequencies, *parameters):
         """ returns a stacked array of real and imaginary impedance
         components
@@ -235,10 +240,13 @@ def wrapCircuit(circuit, constants):
 
         """
 
-        x = eval(buildCircuit(circuit, frequencies, *parameters,
-                              constants=constants, eval_string='',
-                              index=0)[0],
-                 circuit_elements)
+        arg_dict = {
+            **circuit_elements,
+            "frequencies": frequencies,
+            "parameters": parameters,
+            "constants": constants
+        }
+        x = eval(eval_str, arg_dict)
         y_real = np.real(x)
         y_imag = np.imag(x)
 
@@ -344,13 +352,14 @@ def buildCircuit(circuit, frequencies, *parameters,
                     current_elem = elem
 
                 if current_elem in constants.keys():
-                    param_list.append(constants[current_elem])
+                    param_list.append(f"constants['{current_elem}']")
                 else:
-                    param_list.append(parameters[index])
+                    param_list.append(f'parameters[{index}]')
                     index += 1
 
-            param_string += str(param_list)
-            new = raw_elem + '(' + param_string + ',' + str(frequencies) + ')'
+            # param_string += str(param_list)
+            param_string = '[' + ','.join(param_list) + ']'
+            new = raw_elem + '(' + param_string + ',frequencies)'
             eval_string += new
 
         if i == len(split) - 1:
@@ -442,4 +451,6 @@ def check_and_eval(element):
         raise ValueError(f'{element} not in ' +
                          f'allowed elements ({allowed_elements})')
     else:
-        return eval(element, circuit_elements)
+        dummy_frequency_array = np.array([1.])
+        arg_dict = {**circuit_elements, "frequencies": dummy_frequency_array}
+        return eval(element, arg_dict)
